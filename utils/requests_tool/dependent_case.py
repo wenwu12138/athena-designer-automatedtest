@@ -244,6 +244,11 @@ class DependentCase:
         :return:
         """
         _dependent_data = DependentCase(self.__yaml_case).is_dependent()
+        """
+        变量未替换
+        _dependent_data 是 最后替换的数据老远目前为空  是运行is_dependent()的返回值
+        
+        """
         _new_data = None
         # 判断有依赖
         if _dependent_data is not None and _dependent_data is not False:

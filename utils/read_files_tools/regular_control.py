@@ -10,6 +10,7 @@ from datetime import date, timedelta, datetime
 from jsonpath import jsonpath
 from faker import Faker
 from utils.logging_tool.log_control import ERROR
+from utils.cache_process.cache_control import CacheHandler
 
 
 class Context:
@@ -107,6 +108,18 @@ class Context:
         return config.athena_designer_host
 
     @classmethod
+    def iam_host(cls) -> str:
+        from utils import config
+        """ 获取设计器接口域名 """
+        return config.iam_host
+
+    @classmethod
+    def athena_deployer_host(cls) -> str:
+        from utils import config
+        """ 获取设计器接口域名 """
+        return config.athena_deployer_host
+
+    @classmethod
     def app_host(cls) -> str:
         from utils import config
         """获取app的host"""
@@ -131,13 +144,13 @@ def sql_regular(value, res=None):
     sql_json_list = re.findall(r"\$json\((.*?)\)\$", value)
 
     for i in sql_json_list:
-        pattern = re.compile(r'\$json\(' + i.replace('$', "\$").replace('[', '\[') + r'\)\$')
+        pattern = re.compile(r'\$json\(' + i.replace('$', r"\$").replace('[', r'\[') + r'\)\$')
         key = str(sql_json(i, res))
         value = re.sub(pattern, key, value, count=1)
 
     return value
 
-
+# 动态的缓存数据 每次发起缓存数据更新  CacheHandler.update_cache 存入缓存  $cache{} 占位   不用加配置
 def cache_regular(value):
     from utils.cache_process.cache_control import CacheHandler
 
@@ -160,7 +173,7 @@ def cache_regular(value):
             pattern = re.compile(r'\'\$cache\{' + value_types.split(":")[0] + ":" + regular_data + r'\}\'')
         else:
             pattern = re.compile(
-                r'\$cache\{' + regular_data.replace('$', "\$").replace('[', '\[') + r'\}'
+                r'\$cache\{' + regular_data.replace('$', r"\$").replace('[', r'\[') + r'\}'
             )
         try:
             # cache_data = Cache(regular_data).get_cache()
@@ -171,12 +184,13 @@ def cache_regular(value):
             pass
     return value
 
-
+# 静态的配置数据 放在配置文件中  在配置文件写入缓存数据后 {{}}占位  Context 类中加入方法 Config模型中配置参数
 def regular(target):
     """
     新版本
     使用正则替换请求数据
     :return:
+    为什么Context正则替换的双{{}}的格式  缓存替换的{}的形式
     """
     try:
         regular_pattern = r'\${{(.*?)}}'
@@ -194,7 +208,7 @@ def regular(target):
                 target = re.sub(regular_int_pattern, str(value_data), target, 1)
             else:
                 func_name = key.split("(")[0]
-                value_name = key.split("(")[1][:-1]
+                value_name = key.split("(")[1][:-1]#${{athena_designer_host()}}
                 if value_name == "":
                     value_data = getattr(Context(), func_name)()
                 else:
@@ -211,6 +225,7 @@ def regular(target):
 
 
 if __name__ == '__main__':
-    a = "${{host()}} aaa"
-    b = regular(a)
+    CacheHandler.update_cache(cache_name="test",value="闻武12313213312")
+
+    print(cache_regular("weweweweew:$cache{test}"))
 

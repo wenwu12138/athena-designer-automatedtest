@@ -1,0 +1,478 @@
+# 公共参数
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 基础功能验证
+  allureStory: 基于已有数据验证基础功能z
+
+
+#2.0应用，根据开发分支创建备份分支
+basis_AddBranch_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/multiBranch/createNewBranch
+  method: POST
+  detail: 2.0应用基础功能验证_新增分支接口
+  headers:
+    digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
+  requestType: json
+  is_run: true
+  data:
+    targetBranch: bak
+    sourceBranch: develop
+    lang:
+      title:
+        zh_CN: c001
+        zh_TW: c001
+        en_US: c001
+      description:
+        zh_CN: "2025728"
+        zh_TW: "2025728"
+        en_US: "2025728"
+    application: Aca83c666eAT
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: False
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 2.0应用根据备份分支编译
+basis_Compile_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/compile
+  method: POST
+  detail: 2.0应用基础功能验证_编译备份分支
+  headers:
+    digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
+  requestType: json
+  is_run: true
+  data:
+    application: Ae3affbb64AT
+    description: 20250801171145-備份分支(20250626)編譯
+    branch: bak
+    versionNum:
+      - "1"
+      - "0"
+      - "0"
+      - "2508011711"
+    versionLetter: alpha
+    version: 1.0.0.2508011711_alpha
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: False
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+#2.0应用发版测试区
+basis_PublishTest_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/addDeployPlan
+  method: POST
+  detail: 2.0应用基础功能验证_发版测试区
+  headers:
+    digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
+  requestType: json
+  is_run: true
+  data:
+    applicationDataList:
+      - application: Ae3affbb64AT
+        compileDataCode: $cache{compileDataCode}
+        applicationInfoDto:
+          createBy: wenwu@digiwin.com
+          editBy: wujiang@digiwin.com
+          editDate: '2025-01-14 10:16:56'
+          lang:
+            name:
+              zh_CN: 饮食管家
+              zh_TW: 飲食管家
+              en_US: 饮食管家
+            description:
+              zh_CN: wenwu（基础功能验证）
+              zh_TW: wenwu（基础功能验证）
+              en_US: wenwu（基础功能验证）
+          objectId: 65eecf9973bbc03b088ea5b1
+          code: Ae3affbb64AT
+          name: 饮食管家
+          description: wenwu（基础功能验证）
+          tenantId: lcdp
+          appToken: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkEyMDI0MDMxMTE3MzE1Ny1sY2RwIiwic2lkIjowfQ.H2xvViwpYE0ZDE-1stvZXJlCq_c2-zzwaWHt-uHDXeE
+          appType: 1
+          iconName: 1.png
+          iconBgcolor: '#0189FF'
+          commonApp: false
+          latestCompileVersion: 1.0.0.2507231812_alpha
+          latestCompileDescription: 20250723181251-開發分支編譯
+          deleteOrder: 0
+          appTypes:
+            - 1
+          gitProjectId: ''
+          gitUrl: ''
+          abandon: 0
+          appStatus: success
+          useTenantInfos: [ ]
+          assetInitFlag: { }
+    tenantUsers:
+      - option: 1
+        tenantId: lcdp
+        tenantSid: 501035035546176
+        tenantName: 鼎捷开发平台测试租户
+        testTenant: false
+    syncEsp: false
+    envServiceId: HuaweiTest
+    env: HuaweiTest-TEST
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: False
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+#1.0切板测试区
+basis_SwitchPlanTest_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/addSwitchPlan
+  method: POST
+  detail: 2.0应用基础功能验证_切板测试区
+  headers:
+    digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
+  requestType: json
+  is_run: true
+  data:
+    applicationDataList:
+      - application: Ae3affbb64AT
+        applicationInfoDto:
+          createBy: wenwu@digiwin.com
+          editBy: wujiang@digiwin.com
+          editDate: '2025-01-14 10:16:56'
+          lang:
+            name:
+              zh_CN: 饮食管家
+              zh_TW: 飲食管家
+              en_US: 饮食管家
+            description:
+              zh_CN: wenwu（基础功能验证）
+              zh_TW: wenwu（基础功能验证）
+              en_US: wenwu（基础功能验证）
+          objectId: 65eecf9973bbc03b088ea5b1
+          code: Ae3affbb64AT
+          name: 饮食管家
+          description: wenwu（基础功能验证）
+          tenantId: lcdp
+          appToken: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkEyMDI0MDMxMTE3MzE1Ny1sY2RwIiwic2lkIjowfQ.H2xvViwpYE0ZDE-1stvZXJlCq_c2-zzwaWHt-uHDXeE
+          appType: 1
+          iconName: 1.png
+          iconBgcolor: "#0189FF"
+          commonApp: false
+          latestCompileVersion: 1.0.0.2508151557_alpha
+          latestCompileDescription: 20250815155726-開發分支編譯
+          deleteOrder: 0
+          appTypes:
+            - 1
+          gitProjectId: ""
+          gitUrl: ""
+          abandon: 0
+          appStatus: success
+          useTenantInfos: [ ]
+          assetInitFlag: { }
+    tenantUsers:
+      - tenantId: lcdp
+        tenantName: 鼎捷开发平台测试租户
+        testTenant: false
+    switchEspAction: false
+    envServiceId: HuaweiTest
+    env: HuaweiTest-PROD
+
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: False
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+#1.0发版华为正式
+basis_PublishHuaweiProd_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/addDeployPlan
+  method: POST
+  detail: 2.0应用基础功能验证_发版测试区
+  headers:
+    digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
+  requestType: json
+  is_run: true
+  data:
+    applicationDataList:
+      - application: Ae3affbb64AT
+        compileDataCode: $cache{compileDataCode}
+        applicationInfoDto:
+          createBy: wenwu@digiwin.com
+          editBy: wujiang@digiwin.com
+          editDate: '2025-01-14 10:16:56'
+          lang:
+            name:
+              zh_CN: 饮食管家
+              zh_TW: 飲食管家
+              en_US: 饮食管家
+            description:
+              zh_CN: wenwu（基础功能验证）
+              zh_TW: wenwu（基础功能验证）
+              en_US: wenwu（基础功能验证）
+          objectId: 65eecf9973bbc03b088ea5b1
+          code: Ae3affbb64AT
+          name: 饮食管家
+          description: wenwu（基础功能验证）
+          tenantId: lcdp
+          appToken: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkEyMDI0MDMxMTE3MzE1Ny1sY2RwIiwic2lkIjowfQ.H2xvViwpYE0ZDE-1stvZXJlCq_c2-zzwaWHt-uHDXeE
+          appType: 1
+          iconName: 1.png
+          iconBgcolor: '#0189FF'
+          commonApp: false
+          latestCompileVersion: 1.0.0.2507231812_alpha
+          latestCompileDescription: 20250723181251-開發分支編譯
+          deleteOrder: 0
+          appTypes:
+            - 1
+          gitProjectId: ''
+          gitUrl: ''
+          abandon: 0
+          appStatus: success
+          useTenantInfos: [ ]
+          assetInitFlag: { }
+    tenantUsers:
+      - option: 1
+        tenantId: lcdp
+        tenantSid: 501035035546176
+        tenantName: 鼎捷开发平台测试租户
+        testTenant: false
+    syncEsp: false
+    envServiceId: HuaweiProd-TEST
+    env: HuaweiProd
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: False
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+#1.0切板华为正式
+basis_SwitchPlanHuaweiProd_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/addSwitchPlan
+  method: POST
+  detail: 2.0应用基础功能验证_切板测试区
+  headers:
+    digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
+  requestType: json
+  is_run: true
+  data:
+    applicationDataList:
+      - application: Ae3affbb64AT
+        applicationInfoDto:
+          createBy: wenwu@digiwin.com
+          editBy: wujiang@digiwin.com
+          editDate: '2025-01-14 10:16:56'
+          lang:
+            name:
+              zh_CN: 饮食管家
+              zh_TW: 飲食管家
+              en_US: 饮食管家
+            description:
+              zh_CN: wenwu（基础功能验证）
+              zh_TW: wenwu（基础功能验证）
+              en_US: wenwu（基础功能验证）
+          objectId: 65eecf9973bbc03b088ea5b1
+          code: Ae3affbb64AT
+          name: 饮食管家
+          description: wenwu（基础功能验证）
+          tenantId: lcdp
+          appToken: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkEyMDI0MDMxMTE3MzE1Ny1sY2RwIiwic2lkIjowfQ.H2xvViwpYE0ZDE-1stvZXJlCq_c2-zzwaWHt-uHDXeE
+          appType: 1
+          iconName: 1.png
+          iconBgcolor: "#0189FF"
+          commonApp: false
+          latestCompileVersion: 1.0.0.2508151557_alpha
+          latestCompileDescription: 20250815155726-開發分支編譯
+          deleteOrder: 0
+          appTypes:
+            - 1
+          gitProjectId: ""
+          gitUrl: ""
+          abandon: 0
+          appStatus: success
+          useTenantInfos: [ ]
+          assetInitFlag: { }
+    tenantUsers:
+      - tenantId: lcdp
+        tenantName: 鼎捷开发平台测试租户
+        testTenant: false
+    switchEspAction: false
+    envServiceId: HuaweiProd
+    env: HuaweiProd-PROD
+
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: False
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+#1.0发版微软正式
+basis_PublishAzureProd_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/addDeployPlan
+  method: POST
+  detail: 2.0应用基础功能验证_发版测试区
+  headers:
+    digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
+  requestType: json
+  is_run: true
+  data:
+    applicationDataList:
+      - application: Ae3affbb64AT
+        compileDataCode: $cache{compileDataCode}
+        applicationInfoDto:
+          createBy: wenwu@digiwin.com
+          editBy: wujiang@digiwin.com
+          editDate: '2025-01-14 10:16:56'
+          lang:
+            name:
+              zh_CN: 饮食管家
+              zh_TW: 飲食管家
+              en_US: 饮食管家
+            description:
+              zh_CN: wenwu（基础功能验证）
+              zh_TW: wenwu（基础功能验证）
+              en_US: wenwu（基础功能验证）
+          objectId: 65eecf9973bbc03b088ea5b1
+          code: Ae3affbb64AT
+          name: 饮食管家
+          description: wenwu（基础功能验证）
+          tenantId: lcdp
+          appToken: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkEyMDI0MDMxMTE3MzE1Ny1sY2RwIiwic2lkIjowfQ.H2xvViwpYE0ZDE-1stvZXJlCq_c2-zzwaWHt-uHDXeE
+          appType: 1
+          iconName: 1.png
+          iconBgcolor: '#0189FF'
+          commonApp: false
+          latestCompileVersion: 1.0.0.2507231812_alpha
+          latestCompileDescription: 20250723181251-開發分支編譯
+          deleteOrder: 0
+          appTypes:
+            - 1
+          gitProjectId: ''
+          gitUrl: ''
+          abandon: 0
+          appStatus: success
+          useTenantInfos: [ ]
+          assetInitFlag: { }
+    tenantUsers:
+      - option: 1
+        tenantId: lcdp
+        tenantSid: 501035035546176
+        tenantName: 鼎捷开发平台测试租户
+        testTenant: false
+    syncEsp: false
+    envServiceId: AzureProd-TEST
+    env: AzureProd
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: False
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+#1.0切板华为正式
+basis_SwitchPlanAzureProd_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/addSwitchPlan
+  method: POST
+  detail: 2.0应用基础功能验证_切板测试区
+  headers:
+    digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
+  requestType: json
+  is_run: true
+  data:
+    applicationDataList:
+      - application: Ae3affbb64AT
+        applicationInfoDto:
+          createBy: wenwu@digiwin.com
+          editBy: wujiang@digiwin.com
+          editDate: '2025-01-14 10:16:56'
+          lang:
+            name:
+              zh_CN: 饮食管家
+              zh_TW: 飲食管家
+              en_US: 饮食管家
+            description:
+              zh_CN: wenwu（基础功能验证）
+              zh_TW: wenwu（基础功能验证）
+              en_US: wenwu（基础功能验证）
+          objectId: 65eecf9973bbc03b088ea5b1
+          code: Ae3affbb64AT
+          name: 饮食管家
+          description: wenwu（基础功能验证）
+          tenantId: lcdp
+          appToken: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkEyMDI0MDMxMTE3MzE1Ny1sY2RwIiwic2lkIjowfQ.H2xvViwpYE0ZDE-1stvZXJlCq_c2-zzwaWHt-uHDXeE
+          appType: 1
+          iconName: 1.png
+          iconBgcolor: "#0189FF"
+          commonApp: false
+          latestCompileVersion: 1.0.0.2508151557_alpha
+          latestCompileDescription: 20250815155726-開發分支編譯
+          deleteOrder: 0
+          appTypes:
+            - 1
+          gitProjectId: ""
+          gitUrl: ""
+          abandon: 0
+          appStatus: success
+          useTenantInfos: [ ]
+          assetInitFlag: { }
+    tenantUsers:
+      - tenantId: lcdp
+        tenantName: 鼎捷开发平台测试租户
+        testTenant: false
+    switchEspAction: false
+    envServiceId: AzureProd
+    env: AzureProd-PROD
+
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: False
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:

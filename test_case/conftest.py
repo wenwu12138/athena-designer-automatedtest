@@ -15,6 +15,8 @@ from utils.read_files_tools.clean_files import del_file
 from utils.other_tools.allure_data.allure_tools import allure_step, allure_step_no
 from utils.cache_process.cache_control import CacheHandler
 from datetime import datetime
+import json
+from utils.read_files_tools.regular_control import regular
 
 
 @pytest.fixture(scope="session", autouse=False)
@@ -48,7 +50,31 @@ def work_login_init():
         cookies += _cookie
         # 将登录接口中的cookie写入缓存中，其中login_cookie是缓存名称
     CacheHandler.update_cache(cache_name='login_cookie', value=cookies)
-    CacheHandler.update_cache(cache_name='token', value='e3478ac5-e4e2-4403-8cd8-143d7a9a780e')
+
+@pytest.fixture(scope="session", autouse=True)
+def get_iam_token():
+    """"
+    调用iam接口获取token
+    """
+    url = "${{iam_host()}}/api/iam/v2/identity/login"
+    data = {
+            "userId": "wenwu@digiwin.com",
+            "passwordHash": "z3EPUcHGTXohKcbLF6Z/OA==",
+            "clientEncryptPublicKey": "l6Qr+B4I4NUwdcjT+IHp240w2p7RD2UfGpkwHYsqv2OCKbPYPZzGHvUljNDakN8iPDoCH2W2DqlVu/gqonfqb35Xm+rSBbjrp6iBZbdNturLEHSnXGsAaz4r2vsV98C++MFE4a3dYN5du7nTlB/5DhSSKrjFJw+S/FWLd1pVz7jeOonGNqHmAXOyKwZZ43wYIPTVnlZOG+FRbmIpO2EUutneHEj9yX/TyVp9meGwbWkXnT6wFtKifIPAvYho1JUTa2LoxeKtUPrx20eLW9+RQgL8TaX+yIMifWpzTxHBG6c2vTUiU0VyOM0FQIWD3zFIEYsHNbpZu5KDN+c+b56EHg==",
+            "excludeNonVisible": True,
+            "tenantId":"lcdp"
+        }
+    headers = {
+        "Content-Type": "application/json",
+        "Host":"iam.digiwincloud.com.cn",
+        "digi-middleware-auth-app":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1MzczMjY2ODk0NjEsInNpZCI6NDA3MTI4ODI1NTM0NDY0MSwiaWQiOiJEaWdpd2luQ2xvdWQifQ.XGPl3brNeNTCivWN_bIYj8TfcxqlkQ0sFV2woPOr0TY"
+
+    }
+    url = regular(str(url))
+    res = requests.post(url=url, json=data, headers=headers)
+    response_data = res.json()
+    token = response_data["token"]
+    CacheHandler.update_cache(cache_name='token', value=token)
 
 
 

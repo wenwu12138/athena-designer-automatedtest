@@ -439,4 +439,5 @@ class RequestControl:
             ).set_caches_main()
 
             return _res_data
+        return None
 

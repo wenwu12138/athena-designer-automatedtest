@@ -51,6 +51,10 @@ from utils.assertion.assert_control import Assert
 from utils.requests_tool.request_control import RequestControl
 from utils.read_files_tools.regular_control import regular
 from utils.requests_tool.teardown_control import TearDownHandler
+from utils.assertion.asynchronous_assert import AsynchronousAssert
+from utils.cache_process.cache_control import CacheHandler
+import datetime
+import json
 
 
 case_id = {case_ids}
@@ -70,6 +74,15 @@ class Test{class_title}:
         :return:
         """
         res = RequestControl(in_data).http_request()
+        """
+                        处理异步接口断言
+                        判断用例是否为发版切板用例
+                        如果是的话循环调用查询接口，设定超时次数为100次 100次以内没满足条件抛异常
+        """
+        AsynchronousAssert(in_data=in_data, in_data_res=res).deployer_assert()
+        # 如果是编译接口那么就存储存储编译包信息给后面用
+        if "compile" in in_data["url"]:
+            CacheHandler.update_cache(cache_name='compileDataCode', value=json.loads(res.response_data)["data"])
         TearDownHandler(res).teardown_handle()
         Assert(assert_data=in_data['assert_data'],
                sql_data=res.sql_data,

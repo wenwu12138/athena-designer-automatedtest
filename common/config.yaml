@@ -2,15 +2,28 @@ project_name: xxx项目名称
 
 env: 测试环境
 # 测试人员名称，作用于自动生成代码的作者，以及发送企业微信、钉钉通知的测试负责人
-tester_name: 七月
+tester_name: 闻武
 
 # 域名1
 host: https://www.wanandroid.com
 # 域名2，支持多个域名配置
 app_host:
 
-#paas-设计器域名
-athena_designer_host: https://adp-paas.apps.digiwincloud.com.cn
+#华为正式
+#设计器域名
+athena_designer_host: https://adp.apps.digiwincloud.com.cn
+athena_deployer_host: https://aadc.apps.digiwincloud.com.cn
+#iam域名
+iam_host: https://iam.digiwincloud.com.cn
+
+
+##华为测试-设计器域名
+#athena_designer_host: https://adp-test.apps.digiwincloud.com.cn
+#athena_deployer_host: https://aadc-test.apps.digiwincloud.com.cn
+#
+##阿里paas-设计器域名
+#athena_designer_host: https://adp-paas.apps.digiwincloud.com.cn
+#athena_deployer_host: https://aadc-paas.apps.digiwincloud.com.cn
 
 # 实时更新用例内容，False时，已生成的代码不会在做变更
 # 设置为True的时候，修改yaml文件的用例，代码中的内容会实时更新
@@ -64,6 +77,7 @@ email:
 # 飞书通知
 lark:
   webhook:
+
 
 
 

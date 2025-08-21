@@ -215,7 +215,9 @@ class Config(BaseModel):
     real_time_update_test_cases: bool = False
     host: Text
     athena_designer_host: Text
+    iam_host: Text
     app_host: Union[Text, None]
+    athena_deployer_host: Text
 
 
 @unique
