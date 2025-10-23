@@ -1,4 +1,6 @@
 """重写正则替换方法"""
+from symtable import Class
+
 from faker import Faker
 import random
 import re
@@ -105,9 +107,32 @@ def regular(target):
 
 
 
+# 静态方法以及属性装饰器
+
+class MathTils:
+    def __init__(self,a, b):
+        self.a = a
+        self.b = b
+
+    #普通方法
+    def add(self, a, b):
+        return  a + b
+
+    @property
+    def sub(self):
+        return self.a - self.b
+
+    @staticmethod
+    def multiply(d, c):
+        return d * c
 
 
 
+
+proton = MathTils(a=1, b=3)
+print(proton.sub)
+
+print(MathTils.multiply(100,3))
 
 
 

@@ -28,7 +28,7 @@ class GetYamlData:
             data = open(self.file_dir, 'r', encoding='utf-8')
             res = yaml.load(data, Loader=yaml.FullLoader)
         else:
-            raise FileNotFoundError("文件路径不存在")
+            raise FileNotFoundError(f"文件路径不存在{self.file_dir}")
         return res
 
     def write_yaml_data(self, key: str, value) -> int:

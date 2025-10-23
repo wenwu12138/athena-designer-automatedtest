@@ -58,15 +58,14 @@ def get_iam_token():
     """
     url = "${{iam_host()}}/api/iam/v2/identity/login"
     data = {
-            "userId": "wenwu@digiwin.com",
-            "passwordHash": "z3EPUcHGTXohKcbLF6Z/OA==",
-            "clientEncryptPublicKey": "l6Qr+B4I4NUwdcjT+IHp240w2p7RD2UfGpkwHYsqv2OCKbPYPZzGHvUljNDakN8iPDoCH2W2DqlVu/gqonfqb35Xm+rSBbjrp6iBZbdNturLEHSnXGsAaz4r2vsV98C++MFE4a3dYN5du7nTlB/5DhSSKrjFJw+S/FWLd1pVz7jeOonGNqHmAXOyKwZZ43wYIPTVnlZOG+FRbmIpO2EUutneHEj9yX/TyVp9meGwbWkXnT6wFtKifIPAvYho1JUTa2LoxeKtUPrx20eLW9+RQgL8TaX+yIMifWpzTxHBG6c2vTUiU0VyOM0FQIWD3zFIEYsHNbpZu5KDN+c+b56EHg==",
-            "excludeNonVisible": True,
-            "tenantId":"lcdp"
-        }
+    "userId": "wenwu@digiwin.com",
+    "passwordHash": "lOqy40uSwNkSrh2WxxkQdQ==",
+    "clientEncryptPublicKey": "eKUub4lLDSwDkyc5kyLzkTyqtWEtOYTDLW4pd95sbMkO94OJIE9ClHzKgKw0HxeCnJuG1KdbMKaR6I58bESQWNbifxMsO1zcroBffXU6ZUewq1kKfz2S8O83384BS7Aw+UPawwUQlKzZwUGUPqreZU5LSD4+1iir/NIdp2658CcY0oFZdXdXiCLc+dDNng8hC2t13u8q//bgIhTNwKF2W/z3JCeziZzL42jx1/hsrrNlhnXeN/4w+Kfbklr7XSvJSLz6zgu4YqYcu4DWUfxdRWn+Khj6NYNr2RrouZQlGjUDZjqgAn+TxGu4j4RF6Mf14xVeaB+6toENoq7gQqL7yw==",
+    "excludeNonVisible": True,
+    "tenantId":"athenadeveloperTest"
+}
     headers = {
         "Content-Type": "application/json",
-        "Host":"iam.digiwincloud.com.cn",
         "digi-middleware-auth-app":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1MzczMjY2ODk0NjEsInNpZCI6NDA3MTI4ODI1NTM0NDY0MSwiaWQiOiJEaWdpd2luQ2xvdWQifQ.XGPl3brNeNTCivWN_bIYj8TfcxqlkQ0sFV2woPOr0TY"
 
     }
@@ -119,6 +118,9 @@ def pytest_configure(config):
 def case_skip(in_data):
     """处理跳过用例"""
     in_data = TestCase(**in_data)
+    if isinstance(in_data.is_run, str):
+        in_data.is_run = eval(in_data.is_run)
+    #目前is_run有两种形式,如果是string 就当表达式执行一下
     if ast.literal_eval(cache_regular(str(in_data.is_run))) is False:
         allure.dynamic.title(in_data.detail)
         allure_step_no(f"请求URL: {in_data.is_run}")

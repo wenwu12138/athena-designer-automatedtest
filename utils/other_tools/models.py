@@ -218,6 +218,12 @@ class Config(BaseModel):
     iam_host: Text
     app_host: Union[Text, None]
     athena_deployer_host: Text
+    app1_code: Text
+    app1_Token: Text
+    app2_code: Text
+    app2_Token:Text
+    env: Text
+
 
 
 @unique

@@ -162,7 +162,7 @@ class AssertUtil:
 
 
 class Assert(AssertUtil):
-
+    # 首先会对assert数据进行一个处理，如果最外层是status_code（他是一个key包裹形式）直接断言，否则讲多个放入数组进行下一步判断
     def assert_data_list(self):
         assert_list = []
         for k, v in self.assert_data.items():
@@ -173,6 +173,7 @@ class Assert(AssertUtil):
         return assert_list
 
     def assert_type_handle(self):
+        # 兼容多个断言条件 遍历执行
         for i in self.assert_data_list():
             self.assert_data = i
             super().assert_type_handle()

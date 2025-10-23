@@ -3,18 +3,20 @@
 # @Time   : 2022/3/28 10:56
 # @Author : 余少琪
 """
-日志封装，可设置不同等级的日志颜色
+日志封装，可设置不同等级的日志颜色，适配PyInstaller打包环境
 """
 import logging
 from logging import handlers
 from typing import Text
 import colorlog
 import time
+import os
+import sys
 from common.setting import ensure_path_sep
 
 
 class LogHandler:
-    """ 日志打印封装"""
+    """ 日志打印封装，支持PyInstaller打包环境 """
     # 日志级别关系映射
     level_relations = {
         'debug': logging.DEBUG,
@@ -31,7 +33,18 @@ class LogHandler:
             when: Text = "D",
             fmt: Text = "%(levelname)-8s%(asctime)s%(name)s:%(filename)s:%(lineno)d %(message)s"
     ):
+        # 确定日志文件的基础目录（适配PyInstaller打包）
+        self.base_dir = self._get_base_dir()
+        # 确保日志目录存在
+        self._ensure_log_dir()
+
+        # 修正文件名路径，使用基础目录
+        filename = os.path.join(self.base_dir, filename)
         self.logger = logging.getLogger(filename)
+
+        # 防止日志重复输出
+        if self.logger.hasHandlers():
+            self.logger.handlers.clear()
 
         formatter = self.log_color()
 
@@ -55,7 +68,26 @@ class LogHandler:
         # 把对象加到logger里
         self.logger.addHandler(screen_output)
         self.logger.addHandler(time_rotating)
-        self.log_path = ensure_path_sep('\\logs\\log.log')
+        self.log_path = ensure_path_sep(os.path.join(self.base_dir, 'logs\\log.log'))
+
+    @classmethod
+    def _get_base_dir(cls) -> Text:
+        """获取基础目录，适配PyInstaller打包环境"""
+        if getattr(sys, 'frozen', False):
+            # 打包后的临时目录
+            return sys._MEIPASS
+        else:
+            # 开发环境下的项目根目录（根据实际项目结构调整）
+            return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    def _ensure_log_dir(self) -> None:
+        """确保日志目录存在"""
+        log_dir = os.path.join(self.base_dir, 'logs')
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+            # 可选项：在开发环境下打印日志目录信息
+            if not getattr(sys, 'frozen', False):
+                print(f"日志目录已创建: {log_dir}")
 
     @classmethod
     def log_color(cls):
@@ -75,10 +107,14 @@ class LogHandler:
         return formatter
 
 
+# 生成日志文件名时使用相对路径，避免硬编码斜杠
 now_time_day = time.strftime("%Y-%m-%d", time.localtime())
-INFO = LogHandler(ensure_path_sep(f"\\logs\\info-{now_time_day}.log"), level='info')
-ERROR = LogHandler(ensure_path_sep(f"\\logs\\error-{now_time_day}.log"), level='error')
-WARNING = LogHandler(ensure_path_sep(f'\\logs\\warning-{now_time_day}.log'))
+# 使用os.path.join处理路径，增强跨平台兼容性
+INFO = LogHandler(os.path.join('logs', f"info-{now_time_day}.log"), level='info')
+ERROR = LogHandler(os.path.join('logs', f"error-{now_time_day}.log"), level='error')
+WARNING = LogHandler(os.path.join('logs', f'warning-{now_time_day}.log'))
 
 if __name__ == '__main__':
-    ERROR.logger.error("测试")
+    ERROR.logger.error("测试错误日志")
+    INFO.logger.info("测试信息日志")
+    WARNING.logger.warning("测试警告日志")

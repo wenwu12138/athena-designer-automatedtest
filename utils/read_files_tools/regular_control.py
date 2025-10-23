@@ -120,10 +120,48 @@ class Context:
         return config.athena_deployer_host
 
     @classmethod
+    def appconfig(cls) -> str:
+        from utils import config
+        """ 获取设计器接口域名 """
+        return config.appconfig
+
+    @classmethod
     def app_host(cls) -> str:
         from utils import config
         """获取app的host"""
         return config.app_host
+
+    @classmethod
+    def app1_code(cls) -> str:
+        from utils import config
+        """获取app的host"""
+        return config.app1_code
+
+    @classmethod
+    def app1_Token(cls) -> str:
+        from utils import config
+        """获取app的host"""
+        return config.app1_Token
+
+    @classmethod
+    def app2_code(cls) -> str:
+        from utils import config
+        """获取app的host"""
+        return config.app2_code
+
+    @classmethod
+    def app2_Token(cls) -> str:
+        from utils import config
+        """获取app的host"""
+        return config.app2_Token
+
+    @classmethod
+    def env(cls) -> str:
+        from utils import config
+        """获取app的host"""
+        return config.env
+
+
 
 
 def sql_json(js_path, res):

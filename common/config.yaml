@@ -1,6 +1,5 @@
-project_name: xxx项目名称
+project_name: Athena开发平台
 
-env: 测试环境
 # 测试人员名称，作用于自动生成代码的作者，以及发送企业微信、钉钉通知的测试负责人
 tester_name: 闻武
 
@@ -11,19 +10,40 @@ app_host:
 
 #华为正式
 #设计器域名
-athena_designer_host: https://adp.apps.digiwincloud.com.cn
-athena_deployer_host: https://aadc.apps.digiwincloud.com.cn
-#iam域名
-iam_host: https://iam.digiwincloud.com.cn
+#env: "华为正式区"
+#athena_designer_host: https://adp.apps.digiwincloud.com.cn
+#athena_deployer_host: https://aadc.apps.digiwincloud.com.cn
+##iam域名
+#iam_host: https://iam.digiwincloud.com.cn
+## 用例配置
+#app1_code: A20240311173157-lcdp
+#app1_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkEyMDI0MDMxMTE3MzE1Ny1sY2RwIiwic2lkIjowfQ.H2xvViwpYE0ZDE-1stvZXJlCq_c2-zzwaWHt-uHDXeE
+#
+#app2_code: Ae3affbb64AT
+#app2_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFlM2FmZmJiNjRBVCIsInNpZCI6MH0.Y6TOeZ1he6Qgi3F2Xuqx2b6gbWUWH3YCF5bvZ_7q7zU
+
+
 
 
 ##华为测试-设计器域名
-#athena_designer_host: https://adp-test.apps.digiwincloud.com.cn
-#athena_deployer_host: https://aadc-test.apps.digiwincloud.com.cn
-#
+env: "华为测试区"
+athena_designer_host: https://adp-test.apps.digiwincloud.com.cn
+athena_deployer_host: https://aadc-test.apps.digiwincloud.com.cn
+#iam域名
+iam_host: https://iam-test.digiwincloud.com.cn
+#用例配置
+app1_code: Aautotest1AT
+app1_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFhdXRvdGVzdDFBVCIsInNpZCI6MH0.x51q6SkRChvBOr1ca-iqzHU6SS_Mu2DqnrrJfFKO-7o
+app2_code: AautotestZAT
+app2_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFhdXRvdGVzdFpBVCIsInNpZCI6MH0.byJUAVBMyW_sa5ajAGqmUP97kkqqb1L-yM1ya64S8Z8
+
+
 ##阿里paas-设计器域名
+#env: "阿里Paas区"
 #athena_designer_host: https://adp-paas.apps.digiwincloud.com.cn
 #athena_deployer_host: https://aadc-paas.apps.digiwincloud.com.cn
+##iam域名
+#iam_host: https://iam-test.digiwincloud.com.cn
 
 # 实时更新用例内容，False时，已生成的代码不会在做变更
 # 设置为True的时候，修改yaml文件的用例，代码中的内容会实时更新
@@ -31,7 +51,7 @@ real_time_update_test_cases: False
 
 # 报告通知类型：0: 不发送通知 1：钉钉 2：企业微信通知 3、邮箱通知 4、飞书通知
 # 支持同时发送多个通知，如多个，则用逗号分割， 如 1, 2
-notification_type: "0"
+notification_type: "2"
 # 收集失败的用例开关，整理成excel报告的形式，自动发送，目前只支持返送企业微信通知
 excel_report: False
 
@@ -59,7 +79,7 @@ mirror_source: http://mirrors.aliyun.com/pypi/simple/
 
 # 企业通知的相关配置
 wechat:
-  webhook: https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=22748687-fa3b-4e48-a5d7-0502cef422b4
+  webhook: https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=ac8df254-db33-48af-854a-dc300ce17caa
 
 
 ### 邮箱必填，需要全部都配置好，程序运行失败时，会发送邮件通知!!!!
@@ -72,7 +92,7 @@ email:
   # 自己到QQ邮箱中配置stamp_key
   stamp_key:
   # 收件人改成自己的邮箱
-  send_list:
+  send_list: 742611390@qq.com
 
 # 飞书通知
 lark:

@@ -79,7 +79,6 @@ class Test{class_title}:
                         判断用例是否为发版切板用例
                         如果是的话循环调用查询接口，设定超时次数为100次 100次以内没满足条件抛异常
         """
-        AsynchronousAssert(in_data=in_data, in_data_res=res).deployer_assert()
         # 如果是编译接口那么就存储存储编译包信息给后面用
         if "compile" in in_data["url"]:
             CacheHandler.update_cache(cache_name='compileDataCode', value=json.loads(res.response_data)["data"])
@@ -89,6 +88,7 @@ class Test{class_title}:
                request_data=res.body,
                response_data=res.response_data,
                status_code=res.status_code).assert_type_handle()
+        AsynchronousAssert(in_data=in_data, in_data_res=res).deployer_assert()
 
 
 if __name__ == '__main__':

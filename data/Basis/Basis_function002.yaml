@@ -27,7 +27,7 @@ basis_AddBranch_002:
         en_US: ""
         zh_CN: ""
         zh_TW: ""
-    application: Ae3affbb64AT
+    application: ${{app2_code()}}
   # 是否有依赖业务，为空或者false则表示没有
   dependence_case: False
   # 依赖的数据
@@ -51,7 +51,7 @@ basis_Compile_002:
   requestType: json
   is_run: true
   data:
-    application: Ae3affbb64AT
+    application: ${{app2_code()}}
     description: 20250821162729-備份分支(備份分支2)編譯
     branch: bak
     versionNum:
@@ -71,6 +71,12 @@ basis_Compile_002:
       type: ==
       value: 0
       AssertType:
+  current_request_set_cache:
+    # type 指定获取缓存路径及方式
+    - type: response
+      jsonpath: $.data
+      # 自定义缓存名称
+      name: compileDataCode
 
 #2.0应用发版测试区
 basis_PublishTest_002:
@@ -84,7 +90,7 @@ basis_PublishTest_002:
   is_run: true
   data:
     applicationDataList:
-      - application: Ae3affbb64AT
+      - application: ${{app2_code()}}
         compileDataCode: $cache{compileDataCode}
         applicationInfoDto:
           createBy: wenwu@digiwin.com
@@ -101,11 +107,11 @@ basis_PublishTest_002:
               zh_TW: 通用驗證Z
               en_US: 通用驗證Z
           objectId: 68261b5d42bd111dc73b7976
-          code: Ae3affbb64AT
+          code: ${{app2_code()}}
           name: 通用驗證Z
           description: 通用驗證Z
           tenantId: lcdp
-          appToken: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFlM2FmZmJiNjRBVCIsInNpZCI6MH0.Y6TOeZ1he6Qgi3F2Xuqx2b6gbWUWH3YCF5bvZ_7q7zU
+          appToken: ${{app2_Token()}}
           appType: 5
           iconName: 1.png
           iconBgcolor: '#0189FF'
@@ -152,7 +158,7 @@ basis_SwitchPlanTest_002:
   is_run: true
   data:
     applicationDataList:
-      - application: Ae3affbb64AT
+      - application: ${{app2_code()}}
         applicationInfoDto:
           createBy: wenwu@digiwin.com
           createDate: '2025-05-16 00:50:37'
@@ -168,11 +174,11 @@ basis_SwitchPlanTest_002:
               zh_TW: 通用驗證Z
               en_US: 通用驗證Z
           objectId: 68261b5d42bd111dc73b7976
-          code: Ae3affbb64AT
+          code: ${{app2_code()}}
           name: 通用驗證Z
           description: 通用驗證Z
           tenantId: lcdp
-          appToken: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFlM2FmZmJiNjRBVCIsInNpZCI6MH0.Y6TOeZ1he6Qgi3F2Xuqx2b6gbWUWH3YCF5bvZ_7q7zU
+          appToken: ${{app2_Token()}}
           appType: 5
           iconName: 1.png
           iconBgcolor: '#0189FF'
@@ -214,10 +220,10 @@ basis_PublishHuaweiProd_002:
   headers:
     digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
   requestType: json
-  is_run: true
+  is_run: "'正式' in '${{env()}}'"
   data:
     applicationDataList:
-      - application: Ae3affbb64AT
+      - application: ${{app2_code()}}
         compileDataCode: $cache{compileDataCode}
         applicationInfoDto:
           createBy: wenwu@digiwin.com
@@ -234,11 +240,11 @@ basis_PublishHuaweiProd_002:
               zh_TW: 通用驗證Z
               en_US: 通用驗證Z
           objectId: 68261b5d42bd111dc73b7976
-          code: Ae3affbb64AT
+          code: ${{app2_code()}}
           name: 通用驗證Z
           description: 通用驗證Z
           tenantId: lcdp
-          appToken: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFlM2FmZmJiNjRBVCIsInNpZCI6MH0.Y6TOeZ1he6Qgi3F2Xuqx2b6gbWUWH3YCF5bvZ_7q7zU
+          appToken: ${{app2_Token()}}
           appType: 5
           iconName: 1.png
           iconBgcolor: '#0189FF'
@@ -282,10 +288,10 @@ basis_SwitchPlanHuaweiProd_002:
   headers:
     digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
   requestType: json
-  is_run: true
+  is_run: "'正式' in '${{env()}}'"
   data:
     applicationDataList:
-      - application: Ae3affbb64AT
+      - application: ${{app2_code()}}
         applicationInfoDto:
           createBy: wenwu@digiwin.com
           createDate: '2025-05-16 00:50:37'
@@ -301,11 +307,11 @@ basis_SwitchPlanHuaweiProd_002:
               zh_TW: 通用驗證Z
               en_US: 通用驗證Z
           objectId: 68261b5d42bd111dc73b7976
-          code: Ae3affbb64AT
+          code: ${{app2_code()}}
           name: 通用驗證Z
           description: 通用驗證Z
           tenantId: lcdp
-          appToken: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFlM2FmZmJiNjRBVCIsInNpZCI6MH0.Y6TOeZ1he6Qgi3F2Xuqx2b6gbWUWH3YCF5bvZ_7q7zU
+          appToken: ${{app2_Token()}}
           appType: 5
           iconName: 1.png
           iconBgcolor: '#0189FF'
@@ -347,10 +353,10 @@ basis_PublishAzureProd_002:
   headers:
     digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
   requestType: json
-  is_run: true
+  is_run: "'正式' in '${{env()}}'"
   data:
     applicationDataList:
-      - application: Ae3affbb64AT
+      - application: ${{app2_code()}}
         compileDataCode: $cache{compileDataCode}
         applicationInfoDto:
           createBy: wenwu@digiwin.com
@@ -367,11 +373,11 @@ basis_PublishAzureProd_002:
               zh_TW: 通用驗證Z
               en_US: 通用驗證Z
           objectId: 68261b5d42bd111dc73b7976
-          code: Ae3affbb64AT
+          code: ${{app2_code()}}
           name: 通用驗證Z
           description: 通用驗證Z
           tenantId: lcdp
-          appToken: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFlM2FmZmJiNjRBVCIsInNpZCI6MH0.Y6TOeZ1he6Qgi3F2Xuqx2b6gbWUWH3YCF5bvZ_7q7zU
+          appToken: ${{app2_Token()}}
           appType: 5
           iconName: 1.png
           iconBgcolor: '#0189FF'
@@ -415,10 +421,10 @@ basis_SwitchPlanAzureProd_002:
   headers:
     digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
   requestType: json
-  is_run: true
+  is_run: "'正式' in '${{env()}}'"
   data:
     applicationDataList:
-      - application: Ae3affbb64AT
+      - application: ${{app2_code()}}
         applicationInfoDto:
           createBy: wenwu@digiwin.com
           createDate: '2025-05-16 00:50:37'
@@ -434,11 +440,11 @@ basis_SwitchPlanAzureProd_002:
               zh_TW: 通用驗證Z
               en_US: 通用驗證Z
           objectId: 68261b5d42bd111dc73b7976
-          code: Ae3affbb64AT
+          code: ${{app2_code()}}
           name: 通用驗證Z
           description: 通用驗證Z
           tenantId: lcdp
-          appToken: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFlM2FmZmJiNjRBVCIsInNpZCI6MH0.Y6TOeZ1he6Qgi3F2Xuqx2b6gbWUWH3YCF5bvZ_7q7zU
+          appToken: ${{app2_Token()}}
           appType: 5
           iconName: 1.png
           iconBgcolor: '#0189FF'

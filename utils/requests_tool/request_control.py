@@ -402,6 +402,9 @@ class RequestControl:
             RequestType.EXPORT.value: self.request_type_for_export
         }
 
+        if isinstance(self.__yaml_case.is_run, str):
+            self.__yaml_case.is_run = eval(self.__yaml_case.is_run)
+        # 目前is_run有两种形式,如果是string 就当表达式执行一下
         is_run = ast.literal_eval(cache_regular(str(self.__yaml_case.is_run)))
         # 判断用例是否执行
         if is_run is True or is_run is None:

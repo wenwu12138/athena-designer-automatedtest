@@ -2,18 +2,45 @@
 
 # 按 Shift+F10 执行或将其替换为您的代码。
 # 按 双击 Shift 在所有地方搜索类、文件、工具窗口、操作和设置。
+import os
+import subprocess
 
 
-def print_hi(name):
-    # 在下面的代码行中使用断点来调试脚本。
-    print(f'Hi, {name}')  # 按 Ctrl+F8 切换断点。
+def package_python_app(script_path, output_dir="dist", onefile=True):
+    """
+    使用PyInstaller打包Python应用
+
+    :param script_path: Python主脚本路径
+    :param output_dir: 输出目录
+    :param onefile: 是否打包为单个文件
+    """
+    # 检查脚本文件是否存在
+    if not os.path.exists(script_path):
+        print(f"错误: 脚本文件 {script_path} 不存在")
+        return
+
+    # 构建PyInstaller命令
+    cmd = ["pyinstaller", "--distpath", output_dir]
+    if onefile:
+        cmd.append("--onefile")
+    cmd.append(script_path)
+
+    # 执行打包命令
+    try:
+        result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+        print("打包成功!")
+        print(f"可执行文件已生成在: {output_dir}")
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"打包失败: {e.stderr}")
+        return False
 
 
-# 按装订区域中的绿色按钮以运行脚本。
-if __name__ == '__main__':
-    print_hi('PyCharm')
+if __name__ == "__main__":
+    # 替换为你的主脚本路径
+    main_script = "run.py"
+    package_python_app(main_script)
 
-# 访问 https://www.jetbrains.com/help/pycharm/ 获取 PyCharm 帮助
 """
 对于缓存的使用有两种场景
 

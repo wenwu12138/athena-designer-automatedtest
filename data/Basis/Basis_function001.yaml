@@ -51,7 +51,7 @@ basis_Compile_001:
   requestType: json
   is_run: true
   data:
-    application: A20240311173157-lcdp
+    application: ${{app1_code()}}
     description: 20250801171145-備份分支(20250626)編譯
     branch: bak
     versionNum:
@@ -71,6 +71,14 @@ basis_Compile_001:
       type: ==
       value: 0
       AssertType:
+  current_request_set_cache:
+    # type 指定获取缓存路径及方式
+    - type: response
+      jsonpath: $.data
+      # 自定义缓存名称
+      name: compileDataCode
+
+
 
 #1.0应用发版测试区
 basis_PublishTest_001:
@@ -84,7 +92,7 @@ basis_PublishTest_001:
   is_run: true
   data:
     applicationDataList:
-      - application: A20240311173157-lcdp
+      - application: ${{app1_code()}}
         compileDataCode: $cache{compileDataCode}
         applicationInfoDto:
           createBy: wenwu@digiwin.com
@@ -100,11 +108,11 @@ basis_PublishTest_001:
               zh_TW: wenwu（基础功能验证）
               en_US: wenwu（基础功能验证）
           objectId: 65eecf9973bbc03b088ea5b1
-          code: A20240311173157-lcdp
+          code: ${{app1_code()}}
           name: 饮食管家
           description: wenwu（基础功能验证）
           tenantId: lcdp
-          appToken: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkEyMDI0MDMxMTE3MzE1Ny1sY2RwIiwic2lkIjowfQ.H2xvViwpYE0ZDE-1stvZXJlCq_c2-zzwaWHt-uHDXeE
+          appToken: ${{app1_Token()}}
           appType: 1
           iconName: 1.png
           iconBgcolor: '#0189FF'
@@ -153,7 +161,7 @@ basis_SwitchPlanTest_001:
   is_run: true
   data:
     applicationDataList:
-      - application: A20240311173157-lcdp
+      - application: ${{app1_code()}}
         applicationInfoDto:
           createBy: wenwu@digiwin.com
           editBy: wujiang@digiwin.com
@@ -168,11 +176,11 @@ basis_SwitchPlanTest_001:
               zh_TW: wenwu（基础功能验证）
               en_US: wenwu（基础功能验证）
           objectId: 65eecf9973bbc03b088ea5b1
-          code: A20240311173157-lcdp
+          code: ${{app1_code()}}
           name: 饮食管家
           description: wenwu（基础功能验证）
           tenantId: lcdp
-          appToken: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkEyMDI0MDMxMTE3MzE1Ny1sY2RwIiwic2lkIjowfQ.H2xvViwpYE0ZDE-1stvZXJlCq_c2-zzwaWHt-uHDXeE
+          appToken: ${{app1_Token()}}
           appType: 1
           iconName: 1.png
           iconBgcolor: "#0189FF"
@@ -216,10 +224,10 @@ basis_PublishHuaweiProd_001:
   headers:
     digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
   requestType: json
-  is_run: true
+  is_run: "'正式' in '${{env()}}'"
   data:
     applicationDataList:
-      - application: A20240311173157-lcdp
+      - application: ${{app1_code()}}
         compileDataCode: $cache{compileDataCode}
         applicationInfoDto:
           createBy: wenwu@digiwin.com
@@ -235,11 +243,11 @@ basis_PublishHuaweiProd_001:
               zh_TW: wenwu（基础功能验证）
               en_US: wenwu（基础功能验证）
           objectId: 65eecf9973bbc03b088ea5b1
-          code: A20240311173157-lcdp
+          code: ${{app1_code()}}
           name: 饮食管家
           description: wenwu（基础功能验证）
           tenantId: lcdp
-          appToken: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkEyMDI0MDMxMTE3MzE1Ny1sY2RwIiwic2lkIjowfQ.H2xvViwpYE0ZDE-1stvZXJlCq_c2-zzwaWHt-uHDXeE
+          appToken: ${{app1_Token()}}
           appType: 1
           iconName: 1.png
           iconBgcolor: '#0189FF'
@@ -263,7 +271,7 @@ basis_PublishHuaweiProd_001:
         testTenant: false
     syncEsp: false
     envServiceId: HuaweiProd
-    env: HuaweiTest-TEST
+    env: HuaweiProd-TEST
   # 是否有依赖业务，为空或者false则表示没有
   dependence_case: False
   # 依赖的数据
@@ -285,10 +293,10 @@ basis_SwitchPlanHuaweiProd_001:
   headers:
     digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
   requestType: json
-  is_run: true
+  is_run: "'正式' in '${{env()}}'"
   data:
     applicationDataList:
-      - application: A20240311173157-lcdp
+      - application: ${{app1_code()}}
         applicationInfoDto:
           createBy: wenwu@digiwin.com
           editBy: wujiang@digiwin.com
@@ -303,11 +311,11 @@ basis_SwitchPlanHuaweiProd_001:
               zh_TW: wenwu（基础功能验证）
               en_US: wenwu（基础功能验证）
           objectId: 65eecf9973bbc03b088ea5b1
-          code: A20240311173157-lcdp
+          code: ${{app1_code()}}
           name: 饮食管家
           description: wenwu（基础功能验证）
           tenantId: lcdp
-          appToken: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkEyMDI0MDMxMTE3MzE1Ny1sY2RwIiwic2lkIjowfQ.H2xvViwpYE0ZDE-1stvZXJlCq_c2-zzwaWHt-uHDXeE
+          appToken: ${{app1_Token()}}
           appType: 1
           iconName: 1.png
           iconBgcolor: "#0189FF"
@@ -351,10 +359,10 @@ basis_PublishAzureProd_001:
   headers:
     digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
   requestType: json
-  is_run: true
+  is_run: "'正式' in '${{env()}}'"
   data:
     applicationDataList:
-      - application: A20240311173157-lcdp
+      - application: ${{app1_code()}}
         compileDataCode: $cache{compileDataCode}
         applicationInfoDto:
           createBy: wenwu@digiwin.com
@@ -370,11 +378,11 @@ basis_PublishAzureProd_001:
               zh_TW: wenwu（基础功能验证）
               en_US: wenwu（基础功能验证）
           objectId: 65eecf9973bbc03b088ea5b1
-          code: A20240311173157-lcdp
+          code: ${{app1_code()}}
           name: 饮食管家
           description: wenwu（基础功能验证）
           tenantId: lcdp
-          appToken: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkEyMDI0MDMxMTE3MzE1Ny1sY2RwIiwic2lkIjowfQ.H2xvViwpYE0ZDE-1stvZXJlCq_c2-zzwaWHt-uHDXeE
+          appToken: ${{app1_Token()}}
           appType: 1
           iconName: 1.png
           iconBgcolor: '#0189FF'
@@ -420,10 +428,10 @@ basis_SwitchPlanAzureProd_001:
   headers:
     digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
   requestType: json
-  is_run: true
+  is_run: "'正式' in '${{env()}}'"
   data:
     applicationDataList:
-      - application: A20240311173157-lcdp
+      - application: ${{app1_code()}}
         applicationInfoDto:
           createBy: wenwu@digiwin.com
           editBy: wujiang@digiwin.com
@@ -438,11 +446,11 @@ basis_SwitchPlanAzureProd_001:
               zh_TW: wenwu（基础功能验证）
               en_US: wenwu（基础功能验证）
           objectId: 65eecf9973bbc03b088ea5b1
-          code: A20240311173157-lcdp
+          code: ${{app1_code()}}
           name: 饮食管家
           description: wenwu（基础功能验证）
           tenantId: lcdp
-          appToken: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkEyMDI0MDMxMTE3MzE1Ny1sY2RwIiwic2lkIjowfQ.H2xvViwpYE0ZDE-1stvZXJlCq_c2-zzwaWHt-uHDXeE
+          appToken: ${{app1_Token()}}
           appType: 1
           iconName: 1.png
           iconBgcolor: "#0189FF"
