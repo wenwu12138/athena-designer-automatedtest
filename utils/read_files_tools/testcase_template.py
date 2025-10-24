@@ -80,7 +80,7 @@ class Test{class_title}:
                         如果是的话循环调用查询接口，设定超时次数为100次 100次以内没满足条件抛异常
         """
         # 如果是编译接口那么就存储存储编译包信息给后面用
-        if "compile" in in_data["url"]:
+        if any(i in in_data for i in ["compile"] ):
             CacheHandler.update_cache(cache_name='compileDataCode', value=json.loads(res.response_data)["data"])
         TearDownHandler(res).teardown_handle()
         Assert(assert_data=in_data['assert_data'],

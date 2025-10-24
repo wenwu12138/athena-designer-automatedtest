@@ -27,7 +27,7 @@ basis_AddBranch_001:
         zh_CN: "2025728"
         zh_TW: "2025728"
         en_US: "2025728"
-    application: Aca83c666eAT
+    application: ${{app1_code()}}
   # 是否有依赖业务，为空或者false则表示没有
   dependence_case: False
   # 依赖的数据

@@ -1,0 +1,255 @@
+# 公共参数
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 应用总览
+  allureStory: 应用总览
+
+# 查询应用范式信息
+basis_QueryParadigm_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/paradigm/atuoAddParadigm
+  method: GET
+  detail: 查询应用范式信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 记录应用访问记录
+basis_AccessRecord_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/accessRecord
+  method: GET
+  detail: 记录应用访问记录
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询应用授权信息
+basis_AuthAppInfo_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/authAppInfo/${{app2_code()}}
+  method: GET
+  detail: 查询应用授权信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询用户权限策略
+basis_QueryAuthPolicy_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/auth/queryAuthPolicy
+  method: POST
+  detail: 查询用户权限策略
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    resourceType: tenant
+    userId: wenwu@digiwin.com
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询应用权限策略
+basis_QueryAppAuthPolicy_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/auth/queryAuthPolicy
+  method: POST
+  detail: 查询应用权限策略
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    resourceType: application
+    userId: wenwu@digiwin.com
+    resourceId: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询数据标准权限
+basis_QueryDataStandardAuth_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/dataStandard/auth/query
+  method: POST
+  detail: 查询数据标准权限
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: json
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询预设数据
+basis_GetPresetData_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/presetData/getPresetDataObject
+  method: GET
+  detail: 查询预设数据
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+    key: isPrivatization
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询应用详情
+basis_QueryApplicationDetail_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/queryApplicationDetail
+  method: GET
+  detail: 查询应用详情
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+    applicationCode: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询服务代码列表
+basis_QueryServiceCodeList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modelDriverTarget/servicecode/queryList
+  method: POST
+  detail: 查询服务代码列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 更新应用信息
+basis_UpdateApplicationV3_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/updateV3
+  method: POST
+  detail: 更新应用信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    application:
+      code: ${{app2_code()}}
+      name: 2.0全流程验证__自动化
+      description: 全流程验证全流程验证__自动化
+      iconName: 1.png
+      iconBgcolor: "#0189FF"
+      commonApp: false
+      createType: 1
+      serviceCode:
+        - DPBAS
+      appType: 5
+      lang:
+        name:
+          zh_CN: 2.0全流程验证__自动化
+          zh_TW: 2.0全流程驗證__自動化
+          en_US: 2.0全流程验证__自动化
+        description:
+          zh_CN: 全流程验证全流程验证__自动化
+          zh_TW: 全流程驗證全流程驗證__自動化
+          en_US: 全流程验证全流程验证__自动化
+    code: ${{app2_code()}}
+    name: 2.0全流程验证__自动化
+    description: 全流程验证全流程验证__自动化
+    iconName: 1.png
+    iconBgcolor: "#0189FF"
+    commonApp: false
+    createType: 1
+    serviceCode:
+      - DPBAS
+    serverResources: []
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:

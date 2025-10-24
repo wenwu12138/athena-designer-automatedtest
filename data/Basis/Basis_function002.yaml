@@ -20,9 +20,9 @@ basis_AddBranch_002:
     sourceBranch: develop
     lang:
       title:
-        zh_CN: 备份分支2
-        zh_TW: 備份分支2
-        en_US: 备份分支2
+        zh_CN: ${{get_time()}}
+        zh_TW: ${{get_time()}}
+        en_US: ${{get_time()}}
       description:
         en_US: ""
         zh_CN: ""

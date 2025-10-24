@@ -81,4 +81,3 @@ def run():
 
 if __name__ == '__main__':
     run()
-    input("输入任何内容后结束")

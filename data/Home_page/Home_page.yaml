@@ -1,0 +1,356 @@
+# 公共参数
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 首页
+  allureStory: 首页
+
+
+# 查询首页租户流水线信息
+basis_QueryTenantPipeline4IndexPage_001:
+  host: ${{athena_deployer_host()}}
+  url: /athenadeployer/releasePipeline/queryTenantPipeline4IndexPage
+  method: GET
+  detail: 查询首页租户流水线信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: false
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询解决方案卡片
+basis_QuerySolutionCards_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/querySolutionCards
+  method: GET
+  detail: 查询解决方案卡片
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+    popular: 0
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: false
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询所有消息通知
+basis_QueryAllMessageNotification_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/messageNotification/queryAll
+  method: GET
+  detail: 查询所有消息通知
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: false
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询最近访问应用
+basis_QueryRecentVisit_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/queryRecentVisit
+  method: GET
+  detail: 查询最近访问应用
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+    searchAppAuth: ""
+    appType: ""
+    condition: ""
+    num: 20
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: false
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询最近创建应用
+basis_QueryRecentCreate_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/queryRecentCreate
+  method: GET
+  detail: 查询最近创建应用
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+    searchAppAuth: ""
+    appType: ""
+    condition: ""
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: false
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 新建,删除应用
+# 应用基础功能验证模块
+# 验证解决方案权限接口
+basis_VerifyPermission_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/verifySolutionPermission?appType=5
+  method: GET
+  detail: 2.0应用基础功能验证_验证解决方案权限
+  headers:
+    authorization: $cache{token}
+    digi-middleware-auth-user: $cache{token}
+  requestType: json
+  is_run: true
+  data: {}
+  dependence_case: False
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 获取服务代码列表接口
+basis_GetServiceCode_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modelDriverTarget/serverSource/getServiceCodeList
+  method: GET
+  detail: 2.0应用基础功能验证_获取服务代码列表
+  headers:
+    authorization: $cache{token}
+    digi-middleware-auth-user: $cache{token}
+  requestType: json
+  is_run: true
+  data: {}
+  dependence_case: False
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 翻译服务接口
+basis_Translate_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/translate/translate
+  method: POST
+  detail: 应用基础功能验证_翻译服务
+  headers:
+    authorization: $cache{token}
+    digi-middleware-auth-user: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    content: "Test001"
+    convertTypes: ["zh2Hant", "zh2Hans"]
+  dependence_case: False
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 创建新应用接口
+basis_CreateApp_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/addV3
+  method: POST
+  detail: 2.0应用基础功能验证_创建新应用
+  headers:
+    authorization: $cache{token}
+    digi-middleware-auth-user: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    application:
+      code: "AAutoTestDelAT"
+      name: "自动化删除测试应用"
+      description: "自动化测试专用-用于删除流程验证"
+      iconName: "1.png"
+      iconBgcolor: "#0189FF"
+      commonApp: false
+      createType: 1
+      serviceCode: ["DPBAS"]
+      appType: 5
+      lang:
+        name:
+          zh_CN: "自动化删除测试应用"
+          zh_TW: "自動化刪除測試應用"
+          en_US: "Auto Test Delete App"
+        description:
+          zh_CN: "自动化测试专用-用于删除流程验证"
+          zh_TW: "自動化測試專用-用於刪除流程驗證"
+          en_US: "Auto test for delete flow verification"
+    code: "AAutoTestDelAT"
+    name: "自动化删除测试应用"
+    description: "自动化测试专用-用于删除流程验证"
+    iconName: "1.png"
+    iconBgcolor: "#0189FF"
+    commonApp: false
+    createType: 1
+    serviceCode: ["DPBAS"]
+    serverResources: []
+  dependence_case: False
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 应用授权用户接口
+basis_AppAuthUser_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/appAuthUser
+  method: POST
+  detail: 2.0应用基础功能验证_应用授权用户
+  headers:
+    authorization: $cache{token}
+    digi-middleware-auth-user: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    code: "AAutoTestDelAT"
+  dependence_case: False
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询最近访问记录接口
+basis_QueryRecentVisit_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/queryRecentVisit?searchAppAuth=&appType=&condition=&num=20
+  method: GET
+  detail: 2.0应用基础功能验证_查询最近访问
+  headers:
+    authorization: $cache{token}
+    digi-middleware-auth-user: $cache{token}
+  requestType: json
+  is_run: true
+  data: {}
+  dependence_case: False
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 删除应用接口
+basis_DeleteApp_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/delete/v2/AAutoTestDelAT
+  method: GET
+  detail: 1.0应用基础功能验证_删除应用
+  headers:
+    authorization: $cache{token}
+    digi-middleware-auth-user: $cache{token}
+  requestType: json
+  is_run: true
+  data: {}
+  dependence_case: False
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询删除日志详情接口
+basis_QueryDeleteLog_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/queryDeleteLogDetail
+  method: POST
+  detail: 2.0应用基础功能验证_查询删除日志详情
+  headers:
+    authorization: $cache{token}
+    digi-middleware-auth-user: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    applicationCode: "AAutoTestDelAT"
+    deleteNo: $cache{compileDataCode}
+  dependence_case: False
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询删除进度接口
+basis_QueryDeleteProgress_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/queryDeleteProgress
+  method: POST
+  detail: 2.0应用基础功能验证_查询删除进度
+  headers:
+    authorization: $cache{token}
+    digi-middleware-auth-user: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    applicationCode: "AAutoTestDelAT"
+    deleteNo: $cache{compileDataCode}
+  dependence_case: False
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:

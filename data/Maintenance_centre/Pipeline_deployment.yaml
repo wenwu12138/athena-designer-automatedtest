@@ -1,0 +1,225 @@
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 运维中心
+  allureStory: 流水线部署
+
+
+# 查询租户流水线信息
+# 查询租户流水线信息
+basis_QueryTenantPipeline_001:
+  host: ${{athena_deployer_host()}}
+  url: /athenadeployer/releasePipeline/queryTenantPipeline
+  method: GET
+  detail: 查询应用租户流水线信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: false
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询应用对应环境当前编译包
+basis_QueryDeployLogByEnv_001:
+  host: ${{athena_deployer_host()}}
+  url: /athenadeployer/releasePipeline/queryDeployLogByEnv
+  method: POST
+  detail: 查询应用对应环境当前编译包
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    envs:
+      - serviceId: HuaweiTest
+        env: HuaweiTest-TEST
+        operate: publish
+      - serviceId: HuaweiTest
+        env: HuaweiTest-PROD
+        operate: switch
+      - serviceId: AliTest
+        env: AliTest-TEST
+        operate: publish
+      - serviceId: AliTest
+        env: AliTest-PROD
+        operate: switch
+    result:
+      - success
+      - fail
+      - waiting
+      - executing
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: false
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 查询租户下所有应用
+basis_QueryAllAppInTenant_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/allAppInTenant
+  method: GET
+  detail: 查询租户下所有应用
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: false
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询应用最新编译信息
+basis_QueryApplicationLatestCompileInfo_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/queryApplicationLatestCompileInfo
+  method: GET
+  detail: 查询应用最新编译信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: false
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询应用分支信息
+basis_GetBranchInfo_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/multiBranch/${{app2_code()}}/getBranchInfo
+  method: GET
+  detail: 查询应用分支信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: false
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询应用编译记录
+basis_QueryCompileLog_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/compileLog
+  method: POST
+  detail: 查询应用编译记录
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    startTime: "2025-01-01 00:00:00"
+    endTime: "2026-01-01 00:00:00"
+    pageNum: 1
+    pageSize: 20
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: false
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询应用部署记录
+basis_QueryDeployLog_001:
+  host: ${{athena_deployer_host()}}
+  url: /athenadeployer/deploy/v3/queryDeployLog
+  method: POST
+  detail: 查询应用部署记录
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    pageNum: 1
+    pageSize: 20
+    operate: publish
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: false
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询租户华为测试区版本信息
+basis_QueryTenantVersion_001:
+  host: ${{athena_deployer_host()}}
+  url: /athenadeployer/tenant/tenantVersion
+  method: GET
+  detail: 查询租户版本信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+    tenantId: athenadeveloperTest
+    envServiceId: HuaweiTest
+    pageNum: 1
+    pageSize: 20
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: false
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:

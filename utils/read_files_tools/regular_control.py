@@ -19,6 +19,11 @@ class Context:
         self.faker = Faker(locale='zh_CN')
 
     @classmethod
+    def randon_id(self):
+        Id = Faker().pystr(min_chars=10, max_chars=20)
+        return Id
+
+    @classmethod
     def random_int(cls) -> int:
         """
         :return: 随机数
@@ -266,4 +271,6 @@ if __name__ == '__main__':
     CacheHandler.update_cache(cache_name="test",value="闻武12313213312")
 
     print(cache_regular("weweweweew:$cache{test}"))
+
+    print(Context().randon_id())
 
