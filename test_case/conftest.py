@@ -17,6 +17,7 @@ from utils.cache_process.cache_control import CacheHandler
 from datetime import datetime
 import json
 from utils.read_files_tools.regular_control import regular
+from utils import config
 
 
 @pytest.fixture(scope="session", autouse=False)
@@ -69,6 +70,9 @@ def get_iam_token():
         "digi-middleware-auth-app":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1MzczMjY2ODk0NjEsInNpZCI6NDA3MTI4ODI1NTM0NDY0MSwiaWQiOiJEaWdpd2luQ2xvdWQifQ.XGPl3brNeNTCivWN_bIYj8TfcxqlkQ0sFV2woPOr0TY"
 
     }
+    # 正式区就要用lcdp这个租户验证  只有这个租户能发微软正式
+    if '正式' in config.env:
+        data['tenantId'] = 'lcdp'
     url = regular(str(url))
     res = requests.post(url=url, json=data, headers=headers)
     response_data = res.json()

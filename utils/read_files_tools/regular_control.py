@@ -11,6 +11,7 @@ from jsonpath import jsonpath
 from faker import Faker
 from utils.logging_tool.log_control import ERROR
 from utils.cache_process.cache_control import CacheHandler
+import string
 
 
 class Context:
@@ -20,8 +21,11 @@ class Context:
 
     @classmethod
     def randon_id(self):
-        Id = Faker().pystr(min_chars=10, max_chars=20)
+        length = random.randint(5, 10)  #随机生成长度5~10
+        characters = string.ascii_lowercase + string.digits  # 创建一个字母和数字的小写字符集
+        Id = ''.join(random.choice(characters) for _ in range(length))
         return Id
+
 
     @classmethod
     def random_int(cls) -> int:
@@ -115,13 +119,13 @@ class Context:
     @classmethod
     def iam_host(cls) -> str:
         from utils import config
-        """ 获取设计器接口域名 """
+        """ 获取iam设计器接口域名 """
         return config.iam_host
 
     @classmethod
     def athena_deployer_host(cls) -> str:
         from utils import config
-        """ 获取设计器接口域名 """
+        """ 获取设计器发布服务接口域名 """
         return config.athena_deployer_host
 
     @classmethod
@@ -165,6 +169,12 @@ class Context:
         from utils import config
         """获取app的host"""
         return config.env
+
+    @classmethod
+    def TestApp_code(cls) -> str:
+        from utils import config
+        """获取app的host"""
+        return config.TestApp_code
 
 
 
@@ -272,5 +282,5 @@ if __name__ == '__main__':
 
     print(cache_regular("weweweweew:$cache{test}"))
 
-    print(Context().randon_id())
+    print("随机的id：",Context().randon_id())
 

@@ -223,6 +223,7 @@ class Config(BaseModel):
     app2_code: Text
     app2_Token:Text
     env: Text
+    TestApp_code: Text
 
 
 

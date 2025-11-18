@@ -87,3 +87,15 @@ class CacheHandler:
     @staticmethod
     def update_cache(*, cache_name, value):
         _cache_config[cache_name] = value
+        #  执行模型code缓存的情况下 顺便根据模型code生成一个api路径
+        #  这个地方将模型code和api路径的缓存变量key固定一下，模型code：business_model_code，api路径：business_Api
+        if cache_name == "business_model_code":
+            value = value.replace("_",".")
+            _cache_config["business_Api"]=value
+
+
+
+
+if __name__ == "__main__":
+    CacheHandler.update_cache(cache_name="business_model_code",value="automatedtesting_basis_udylq0")
+    print(CacheHandler.get_cache("business_model_code"), CacheHandler.get_cache("business_Api"))

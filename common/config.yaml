@@ -8,34 +8,34 @@ host: https://www.wanandroid.com
 # 域名2，支持多个域名配置
 app_host:
 
-#华为正式
+###华为正式
 #设计器域名
-#env: "华为正式区"
-#athena_designer_host: https://adp.apps.digiwincloud.com.cn
-#athena_deployer_host: https://aadc.apps.digiwincloud.com.cn
-##iam域名
-#iam_host: https://iam.digiwincloud.com.cn
-## 用例配置
-#app1_code: A20240311173157-lcdp
-#app1_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkEyMDI0MDMxMTE3MzE1Ny1sY2RwIiwic2lkIjowfQ.H2xvViwpYE0ZDE-1stvZXJlCq_c2-zzwaWHt-uHDXeE
-#
-#app2_code: Ae3affbb64AT
-#app2_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFlM2FmZmJiNjRBVCIsInNpZCI6MH0.Y6TOeZ1he6Qgi3F2Xuqx2b6gbWUWH3YCF5bvZ_7q7zU
-#
-#
-
-
-#华为测试-设计器域名
-env: "华为测试区"
-athena_designer_host: https://adp-test.apps.digiwincloud.com.cn
-athena_deployer_host: https://aadc-test.apps.digiwincloud.com.cn
+env: "华为正式区"
+athena_designer_host: https://adp.apps.digiwincloud.com.cn
+athena_deployer_host: https://aadc.apps.digiwincloud.com.cn
 #iam域名
-iam_host: https://iam-test.digiwincloud.com.cn
-#用例配置
-app1_code: Aautotest1AT
-app1_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFhdXRvdGVzdDFBVCIsInNpZCI6MH0.x51q6SkRChvBOr1ca-iqzHU6SS_Mu2DqnrrJfFKO-7o
-app2_code: AautotestZAT
-app2_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFhdXRvdGVzdFpBVCIsInNpZCI6MH0.byJUAVBMyW_sa5ajAGqmUP97kkqqb1L-yM1ya64S8Z8
+iam_host: https://iam.digiwincloud.com.cn
+# 用例配置
+app1_code: A20240311173157-lcdp
+app1_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkEyMDI0MDMxMTE3MzE1Ny1sY2RwIiwic2lkIjowfQ.H2xvViwpYE0ZDE-1stvZXJlCq_c2-zzwaWHt-uHDXeE
+app2_code: Ae3affbb64AT
+app2_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFlM2FmZmJiNjRBVCIsInNpZCI6MH0.Y6TOeZ1he6Qgi3F2Xuqx2b6gbWUWH3YCF5bvZ_7q7zU
+TestApp_code: "${{randon_id()}}AT"
+
+
+
+###华为测试-设计器域名
+#env: "华为测试区"
+#athena_designer_host: https://adp-test.apps.digiwincloud.com.cn
+#athena_deployer_host: https://aadc-test.apps.digiwincloud.com.cn
+##iam域名
+#iam_host: https://iam-test.digiwincloud.com.cn
+##用例配置
+#TestApp_code: "${{randon_id()}}AT"
+#app1_code: Aautotest1AT
+#app1_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFhdXRvdGVzdDFBVCIsInNpZCI6MH0.x51q6SkRChvBOr1ca-iqzHU6SS_Mu2DqnrrJfFKO-7o
+#app2_code: AautotestZAT
+#app2_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFhdXRvdGVzdFpBVCIsInNpZCI6MH0.byJUAVBMyW_sa5ajAGqmUP97kkqqb1L-yM1ya64S8Z8
 
 
 ##阿里paas-设计器域名

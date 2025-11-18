@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time   : 2025-10-23 19:03:02
+# @Time   : 2025-11-17 17:10:14
 
 
 import allure
@@ -16,18 +16,18 @@ import datetime
 import json
 
 
-case_id = ['basis_QueryParadigm_001', 'basis_AccessRecord_001', 'basis_AuthAppInfo_001', 'basis_QueryAuthPolicy_001', 'basis_QueryAppAuthPolicy_001', 'basis_QueryDataStandardAuth_001', 'basis_GetPresetData_001', 'basis_QueryApplicationDetail_001', 'basis_QueryServiceCodeList_001']
+case_id = ['auth_QueryNormalUsers_001', 'auth_BatchGrantAuth_001', 'basis_CreateAuthTestApp_001', 'auth_ApplyForAuth_001', 'auth_AuditAuth_001', 'basis_DeleteAuthTestApp_001']
 TestData = GetTestCase.case_data(case_id)
 re_data = regular(str(TestData))
 
 
 @allure.epic("开发平台接口")
-@allure.feature("应用总览")
-class TestApplicationOverview:
+@allure.feature("权限管理")
+class TestLimitAuthority:
 
-    @allure.story("应用总览")
+    @allure.story("查询普通用户")
     @pytest.mark.parametrize('in_data', eval(re_data), ids=[i['detail'] for i in TestData])
-    def test_Application_overview(self, in_data, case_skip):
+    def test_Limit_authority(self, in_data, case_skip):
         """
         :param :
         :return:
@@ -39,16 +39,15 @@ class TestApplicationOverview:
                         如果是的话循环调用查询接口，设定超时次数为100次 100次以内没满足条件抛异常
         """
         # 如果是编译接口那么就存储存储编译包信息给后面用
-        if "compile" in in_data["url"]:
-            CacheHandler.update_cache(cache_name='compileDataCode', value=json.loads(res.response_data)["data"])
         TearDownHandler(res).teardown_handle()
         Assert(assert_data=in_data['assert_data'],
                sql_data=res.sql_data,
                request_data=res.body,
                response_data=res.response_data,
                status_code=res.status_code).assert_type_handle()
-        AsynchronousAssert(in_data=in_data, in_data_res=res).deployer_assert()
+        # 异步断言
+        assert AsynchronousAssert(in_data=in_data, in_data_res=res).deployer_assert() == True
 
 
 if __name__ == '__main__':
-    pytest.main(['test_test_Application_overview.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])
+    pytest.main(['test_test_Limit_authority.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])

@@ -1,0 +1,193 @@
+# 公共参数
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 基础功能验证
+  allureStory: 权限相关
+
+
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 权限管理
+  allureStory: 查询普通用户
+
+
+# 查询应用普通用户权限列表
+auth_QueryNormalUsers_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/auth/queryNormalUsers
+  method: GET
+  detail: 查询应用普通用户权限
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+    resourceType: application
+    resourceId: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 批量授予用户应用权限
+auth_BatchGrantAuth_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/auth/batchGrantAuth
+  method: POST
+  detail: 批量授予用户应用权限
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    - userId: yaosla@digiwin.com
+      role: application:actor
+      application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 创建权限测试应用（权限管理功能前置数据准备）
+basis_CreateAuthTestApp_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/addV3
+  method: POST
+  detail: 创建权限测试应用（权限管理功能前置数据准备）
+  headers:
+    authorization: $cache{token}
+    digi-middleware-auth-user: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    application:
+      code: "${{TestApp_code()}}"
+      name: "权限授权测试应用"
+      description: "权限管理功能自动化测试专用应用"
+      iconName: "1.png"
+      iconBgcolor: "#0189FF"
+      commonApp: false
+      createType: 1
+      serviceCode: ["DPBAS"]
+      appType: 5
+      lang:
+        name:
+          zh_CN: "权限授权测试应用"
+          zh_TW: "權限授權測試應用"
+          en_US: "Auth Test Application"
+        description:
+          zh_CN: "权限管理功能自动化测试专用应用"
+          zh_TW: "權限管理功能自動化測試專用應用"
+          en_US: "Auto test application for auth management"
+    code: "${{TestApp_code()}}"
+    name: "权限授权测试应用"
+    description: "权限管理功能自动化测试专用应用"
+    iconName: "1.png"
+    iconBgcolor: "#0189FF"
+    commonApp: false
+    createType: 1
+    serviceCode: ["DPBAS"]
+    serverResources: []
+  dependence_case: False
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    # request是从请求中提取内容，  response是从详情中提取需求
+    - type: request
+      jsonpath: $.code
+      # 自定义缓存名称
+      name: TestApp_code
+
+
+# 用户申请应用权限
+auth_ApplyForAuth_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/auth/applyForAuth
+  method: POST
+  detail: 用户申请应用权限
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    userId: yaosla@digiwin.com
+    role: application:actor
+    description: 我申请权限我申请权限我申请权限我申请权限我申请权限我申请权限
+    application: $cache{TestApp_code}
+  dependence_case: False
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+
+
+# 审核用户权限申请
+auth_AuditAuth_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/auth/auditAuth
+  method: POST
+  detail: 审核用户权限申请
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    userId: yaosla@digiwin.com
+    role: application:actor
+    status: PASSED
+    application: $cache{TestApp_code}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 清理权限测试应用（权限管理功能后置数据清理）
+basis_DeleteAuthTestApp_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/delete/v2/$cache{TestApp_code}
+  method: GET
+  detail: 清理权限测试应用（权限管理功能后置数据清理）
+  headers:
+    authorization: $cache{token}
+    digi-middleware-auth-user: $cache{token}
+  requestType: json
+  is_run: true
+  data: {}
+  dependence_case: False
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:

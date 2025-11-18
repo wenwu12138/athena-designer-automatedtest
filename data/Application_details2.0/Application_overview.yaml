@@ -1,7 +1,7 @@
 # 公共参数
 case_common:
   allureEpic: 开发平台接口
-  allureFeature: 应用总览
+  allureFeature: 2.0应用详情
   allureStory: 应用总览
 
 # 查询应用范式信息
@@ -217,7 +217,7 @@ basis_UpdateApplicationV3_001:
   data:
     application:
       code: ${{app2_code()}}
-      name: 2.0全流程验证__自动化
+      name: 2.0全流程验证__自动化${{get_time()}}
       description: 全流程验证全流程验证__自动化
       iconName: 1.png
       iconBgcolor: "#0189FF"
@@ -228,15 +228,15 @@ basis_UpdateApplicationV3_001:
       appType: 5
       lang:
         name:
-          zh_CN: 2.0全流程验证__自动化
-          zh_TW: 2.0全流程驗證__自動化
-          en_US: 2.0全流程验证__自动化
+          zh_CN: 2.0全流程验证__自动化${{get_time()}}
+          zh_TW: 2.0全流程驗證__自動化${{get_time()}}
+          en_US: 2.0全流程验证__自动化${{get_time()}}
         description:
           zh_CN: 全流程验证全流程验证__自动化
           zh_TW: 全流程驗證全流程驗證__自動化
           en_US: 全流程验证全流程验证__自动化
     code: ${{app2_code()}}
-    name: 2.0全流程验证__自动化
+    name: 2.0全流程验证__自动化${{get_time()}}
     description: 全流程验证全流程验证__自动化
     iconName: 1.png
     iconBgcolor: "#0189FF"
@@ -245,6 +245,330 @@ basis_UpdateApplicationV3_001:
     serviceCode:
       - DPBAS
     serverResources: []
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询应用所有资产列表
+asset_QueryAllAssetList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/assetCenter/application/assetList/AautotestZAT/all
+  method: POST
+  detail: 查询应用所有资产列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    pageSize: 10
+    pageNum: 1
+    condition: ""
+    advancedQueryParams:
+      queryGroups: []
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询应用DTD类型资产列表
+asset_QueryDTDAssetList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/assetCenter/application/assetList/AautotestZAT/DTD
+  method: POST
+  detail: 查询应用DTD类型资产列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    pageSize: 10
+    pageNum: 1
+    condition: ""
+    advancedQueryParams:
+      queryGroups: []
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询应用所有外部依赖资产信息
+asset_QueryAllExternalDependentAssets_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/assetCenter/application/dependentAssetsInfo/AautotestZAT/all
+  method: POST
+  detail: 查询应用所有外部依赖资产信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    pageSize: 10
+    pageNum: 1
+    condition: ""
+    advancedQueryParams:
+      queryGroups: []
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询应用DTD外部依赖资产信息
+asset_QueryDTDExternalDependentAssets_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/assetCenter/application/dependentAssetsInfo/AautotestZAT/DTD
+  method: POST
+  detail: 查询应用DTD外部依赖资产信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    pageSize: 10
+    pageNum: 1
+    condition: ""
+    advancedQueryParams:
+      queryGroups: []
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 获取应用后端信息
+modelDriver_GetAppBackendInfo_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modelDriverTarget/serverSource/getSaveServiceLog
+  method: GET
+  detail: 获取应用后端信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 新增定制配置
+customConfig_AddCustomConfig_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/customConfig/add
+  method: POST
+  detail: 新增定制配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    name: 新增定制配置zZ${{get_time()}}
+    description: 定制弹窗组件
+    path: /page/data
+    chunkName: /data/customer
+    isMF: true
+    remoteName: abc
+    exposedModule: def
+    lang:
+      description:
+        zh_CN: 定制弹窗组件
+        zh_TW: 定製彈窗元件
+        en_US: 定制弹窗组件
+    application: ${{app2_code()}}
+    customControl:
+      - type: a
+        title: b
+        icon: iconwenbenkuang
+        lang:
+          title:
+            en_US: ""
+            zh_CN: b
+            zh_TW: ""
+        isPlaceholderActive: false
+        isHookActive: true
+        isRuleActive: true
+        references: []
+        properties: []
+        hooks: []
+        extendInfo: {}
+    shareTenantIdList: []
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    # request是从请求中提取内容，  response是从详情中提取需求
+    - type: response
+      jsonpath: $.data.adpCode
+      # 自定义缓存名称
+      name: adpCode
+# 查询应用定制配置
+customConfig_QueryCustomConfig_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/customConfig/queryCustomConfig/${{app2_code()}}
+  method: GET
+  detail: 查询应用定制配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 查询定制配置详情
+customConfig_QueryCustomConfigDetail_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/customConfig/queryCustomConfigDetail
+  method: GET
+  detail: 查询定制配置详情
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+    adpCode: $cache{adpCode}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 更新定制配置
+customConfig_UpdateCustomConfig_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/customConfig/update
+  method: POST
+  detail: 更新定制配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    name: 新增定制配置z
+    description: 自动化更新后描述{{get_time()}}
+    path: /page/data
+    chunkName: /data/customer
+    isMF: true
+    remoteName: abc
+    exposedModule: def
+    lang:
+      description:
+        zh_CN: 定制弹窗组件
+        zh_TW: 定製彈窗元件
+        en_US: 定制弹窗组件
+    application: ${{app2_code()}}
+    adpCode: $cache{adpCode}
+    customControl:
+      - references: []
+        type: a
+        title: b
+        icon: iconwenbenkuang
+        properties: []
+        extendInfo: {}
+        hooks: []
+        lang:
+          title:
+            en_US: ""
+            zh_CN: b
+            zh_TW: ""
+        isPlaceholderActive: false
+        isRuleActive: true
+        isHookActive: true
+        originType: a
+    shareTenantIdList: []
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询定制配置共享信息
+customConfig_QueryCustomConfigShare_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/customConfig/queryCustomConfigShare/${{app2_code()}}
+  method: GET
+  detail: 查询定制配置共享信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 删除定制配置
+customConfig_DeleteCustomConfig_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/customConfig/deleteCustomConfig
+  method: POST
+  detail: 删除定制配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    adpCode: $cache{adpCode}
+    application: ${{app2_code()}}
   dependence_case: false
   dependence_case_data:
   assert:

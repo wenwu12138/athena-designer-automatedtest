@@ -1,0 +1,987 @@
+# 公共参数
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 2.0应用详情
+  allureStory: 业务搭建-业务对象
+
+
+
+
+# 获取模型默认自定义属性
+get_ModelDefaultCustomProperties_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modelDriver/modelAssign/getModelDefaultCustomProperties
+  method: POST
+  detail: 获取模型默认自定义属性
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: true
+  data: {}
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: false
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+
+# 新增基础档业务对象
+businessDir_add_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/add
+  method: POST
+  detail: 新增基础档业务对象
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: true
+  data:
+    code: "automatedtesting_basis_${{randon_id()}}"
+    name: "自动化测试_基础档${{get_time()}}"
+    description: "自动化测试_基础档${{get_time()}}"
+    serviceCode: "DPBAS"
+    needCreateApi: true
+    customProperties: {}
+    modelType: "basic"
+    lang:
+      name:
+        zh_CN: "自动化测试_基础档${{get_time()}}"
+        zh_TW: "自動化測試_基礎檔${{get_time()}}"
+        en_US: "自动化测试_基础档${{get_time()}}"
+      description:
+        zh_CN: "自动化测试_基础档${{get_time()}}"
+        zh_TW: "自動化測試_基礎檔${{get_time()}}"
+        en_US: "自动化测试_基础档${{get_time()}}"
+    tenantId: "SYSTEM"
+    application: "${{app2_code()}}"
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: false
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: request
+      jsonpath: $.code
+      name: basic_model_code
+
+# 新增参数档业务对象
+businessDir_add_param_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/add
+  method: POST
+  detail: 新增参数档业务对象
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: true
+  data:
+    code: "autotest_param_${{randon_id()}}"
+    name: "自动化测试_参数档${{get_time()}}"
+    description: "自动化测试_参数档${{get_time()}}"
+    serviceCode: "DPBAS"
+    needCreateApi: true
+    customProperties: {}
+    modelType: "param"
+    lang:
+      name:
+        zh_CN: "自动化测试_参数档${{get_time()}}"
+        zh_TW: "自動化測試_參數檔${{get_time()}}"
+        en_US: "AutoTest_Param${{get_time()}}"
+      description:
+        zh_CN: "自动化测试_参数档${{get_time()}}"
+        zh_TW: "自動化測試_參數檔${{get_time()}}"
+        en_US: "AutoTest_Param${{get_time()}}"
+    tenantId: "SYSTEM"
+    application: "${{app2_code()}}"
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: false
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: request
+      jsonpath: $.code
+      name: param_model_code
+
+# 新增业务档业务对象
+businessDir_add_transaction_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/add
+  method: POST
+  detail: 新增业务档业务对象
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: true
+  data:
+    code: "autotest_trans_${{randon_id()}}"
+    name: "自动化测试_业务档${{get_time()}}"
+    description: "自动化测试_业务档${{get_time()}}"
+    serviceCode: "DPBAS"
+    needCreateApi: true
+    customProperties: {}
+    modelType: "transaction"
+    lang:
+      name:
+        zh_CN: "自动化测试_业务档${{get_time()}}"
+        zh_TW: "自動化測試_業務檔${{get_time()}}"
+        en_US: "AutoTest_Trans${{get_time()}}"
+      description:
+        zh_CN: "自动化测试_业务档${{get_time()}}"
+        zh_TW: "自動化測試_業務檔${{get_time()}}"
+        en_US: "AutoTest_Trans${{get_time()}}"
+    tenantId: "SYSTEM"
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: request
+      jsonpath: $.code
+      name: business_model_code
+
+
+
+
+# 查询业务目录列表
+businessDir_queryList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/queryList
+  method: POST
+  detail: 查询业务目录列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询资源树列表
+resourceTree_queryListOfSource_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/resourceTree/queryListOfSource
+  method: POST
+  detail: 查询资源树列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询模板列表
+template_all_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/template/all
+  method: GET
+  detail: 查询模板列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: PARAMS
+  is_run: true
+  data:
+    applicationCode: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询监控规则树
+task_monitorRule_getMonitorRuleTree_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/task/monitorRule/getMonitorRuleTree
+  method: GET
+  detail: 查询监控规则树
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: PARAMS
+  is_run: true
+  data:
+    appCode: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询集成自动化信息
+businessDir_queryIntegrationAutomationInfo_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/queryIntegrationAutomationInfo
+  method: POST
+  detail: 查询集成自动化信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: true
+  data:
+    type: "process"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询AI剩余次数
+ai_calculateAILeftCount_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/ai/calculateAILeftCount
+  method: GET
+  detail: 查询AI剩余次数
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: PARAMS
+  is_run: true
+  data:
+    generationType: "field"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询服务代码列表
+modelDriverTarget_servicecode_queryList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modelDriverTarget/servicecode/queryList
+  method: POST
+  detail: 查询服务代码列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询所有产品
+task_monitorRule_getAllProducts_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/task/monitorRule/getAllProducts
+  method: GET
+  detail: 查询所有产品
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: PARAMS
+  is_run: true
+  data:
+    appCode: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+
+# 查询活动配置列表
+activityConfigs_getActivityListByPatternAndApplication_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/activityConfigs/getActivityListByPatternAndApplication
+  method: GET
+  detail: 查询活动配置列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: PARAMS
+  is_run: true
+  data:
+    pattern: "DATA_ENTRY"
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询根项目
+project_getRootProjects_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/project/getRootProjects/${{app2_code()}}
+  method: GET
+  detail: 查询根项目
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: PARAMS
+  is_run: true
+  data:
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询绑定API列表配置
+pageDesignModel_QueryBindApiListConfig_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/pageDesignModel/queryBindApiListConfig
+  method: POST
+  detail: 查询页面设计模型绑定的API列表配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    modelCode: "$cache{business_model_code}"
+    serviceCode: "DPBAS"
+    customProperties: {}
+    model:
+      name: "$cache{business_model_code}"
+      comment: "业务方$cache{business_model_code}"
+      pk: "${cache{business_model_code}}_id"
+      index: []
+      fields:
+        - fieldId: "${cache{business_model_code}}_id"
+          fieldName: "业务方${cache{business_model_code}}主键"
+          fieldType: "BIGINT"
+          type: "SIMPLE"
+          size: "20"
+          notNull: true
+          unique: false
+          isPk: true
+          autoIncrement: true
+          associatedInfo:
+            associatedFields: []
+          isSystem: true
+          lang:
+            fieldName:
+              zh_TW: "業務方${cache{business_model_code}}主鍵"
+              en_US: "业务方${cache{business_model_code}}主键"
+              zh_CN: "业务方${cache{business_model_code}}主键"
+          enumValue: ""
+          sort: 0
+          _uuid: "59fb44b7-bb17-c466-2201-e48e11036851"
+        - fieldId: "manage_status"
+          fieldName: "审核状态"
+          fieldType: "VARCHAR"
+          type: "SIMPLE"
+          size: "20"
+          notNull: false
+          unique: false
+          isPk: false
+          autoIncrement: false
+          defaultValue: "N"
+          isSystem: false
+          lang:
+            fieldName:
+              zh_TW: "審核狀態"
+              en_US: "审核状态"
+              zh_CN: "审核状态"
+          dictionaryId: 4739
+          enumValue: "approve_all_status"
+          dictionaryContent: "[]"
+          sort: 1
+          _uuid: "90369bea-e419-63ee-2446-4b982d52ab6a"
+      isSystem: true
+      isPublished: false
+      createDate: "2025-11-06 17:47:36"
+      editDate: "2025-11-06 17:47:36"
+      lang:
+        comment:
+          zh_TW: "業務方$cache{business_model_code}"
+          en_US: "业务方$cache{business_model_code}"
+          zh_CN: "业务方$cache{business_model_code}"
+      customProperties: {}
+      bindApiListConfig: []
+      bmdApiListConfig: []
+      children: []
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 查询流程列表
+process_findProcessList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/process/findProcessList
+  method: GET
+  detail: 查询流程列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 查询模型信息 - 关键衔接接口
+modelDriver_queryModelByCode_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modelDriver/queryModelByCode
+  method: GET
+  detail: 查询业务对象模型信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: PARAMS
+  is_run: true
+  data:
+    code: "$cache{business_model_code}"
+    serviceCode: "DPBAS"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.objectId
+      name: business_object_id
+    - type: response
+      jsonpath: $.data.relateBusinessCode
+      name: business_code
+    - type: response
+      jsonpath: $.data.id
+      name: business_data_id
+
+# 更新业务档业务对象
+businessDir_update_transaction_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/update
+  method: POST
+  detail: 更新业务档业务对象
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: true
+  data:
+    name: "自动化测试_业务档_更新${{get_time()}}"
+    description: "自动化测试_业务档_更新${{get_time()}}"
+    serviceCode: "DPBAS"
+    needCreateApi: true
+    customProperties: {}
+    modelType: "transaction"
+    lang:
+      name:
+        zh_CN: "自动化测试_业务档_更新${{get_time()}}"
+        zh_TW: "自動化測試_業務檔_更新${{get_time()}}"
+        en_US: "AutoTest_Trans_Update${{get_time()}}"
+      description:
+        zh_CN: "自动化测试_业务档_更新${{get_time()}}"
+        zh_TW: "自動化測試_業務檔_更新${{get_time()}}"
+        en_US: "AutoTest_Trans_Update${{get_time()}}"
+    tenantId: "SYSTEM"
+    businessCode: "$cache{business_code}"
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+
+###########Api业务对象
+
+
+# 查询应用动作列表
+action_FindActionsV2_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/action/findActionsV2
+  method: POST
+  detail: 查询应用动作列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: json
+  is_run: true
+  data:
+    type: curApp
+    condition: ""
+    pageNum: 1
+    pageSize: 100
+    needEsp: true
+    appCode: "${{app2_code()}}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 获取关联API信息
+api_GetRelateApi_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/api/getRelateApi
+  method: GET
+  detail: 获取关联API信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    apiName: esp_dpbas.$cache{business_Api}.detail.get
+    serviceCode: "${{app2_code()}}"
+    labelType: EspAction
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询关联数据表
+dataEntry_QueryRelateTable_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/dataEntry/tables/query/relateTable
+  method: POST
+  detail: 查询关联数据表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: json
+  is_run: true
+  data:
+    application: "${{app2_code()}}"
+    modelId: "$cache{business_model_code}"
+    serviceCode: "${{app2_code()}}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 获取API字段信息
+api_GetFields_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/api/getFields
+  method: GET
+  detail: 获取API字段信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    apiName: esp_dpbas.$cache{business_Api}.detail.get
+    relatedType: api
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 获取模型关联预览信息
+api_GetModelRelatePreviewInfo_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/api/getModelRelatePreviewInfo
+  method: POST
+  detail: 获取模型关联预览信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: json
+  is_run: true
+  data:
+    apiName: esp_dpbas.$cache{business_Api}.detail.get
+    apiModelCode: api_modetest1
+    relateColumnList: []
+    apiModelName: api模型测试${{get_time()}}
+    serviceCode: "${{app2_code()}}"
+    application: "${{app2_code()}}"
+    lang:
+      apiModelName:
+        zh_CN: api模型测试${{get_time()}}
+        zh_TW: api模型測試${{get_time()}}
+        en_US: api模型测试${{get_time()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 新增API业务对象
+api_add_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/api/createModel
+  method: POST
+  detail: 新增API业务对象
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    apiName: "esp_dpbas.$cache{business_Api}.detail.get"
+    apiModelCode: "automatedtesting_api_${{randon_id()}}"
+    apiModelName: "自动化测试_API业务对象${{get_time()}}"
+    application: "${{app2_code()}}"
+    apiType: "detail"
+    lang:
+      apiModelName:
+        zh_CN: "自动化测试_API业务对象${{get_time()}}"
+        zh_TW: "自動化測試_API業務對象${{get_time()}}"
+        en_US: "自动化测试_API业务对象${{get_time()}}"
+    bindApiList:
+      - apiName: "esp_dpbas.{business_Api}.list.get"
+        apiType: "list"
+      - apiName: "esp_dpbas.{business_Api}.update"
+        apiType: "update"
+      - apiName: "esp_dpbas.{business_Api}.delete"
+        apiType: "delete"
+      - apiName: "esp_dpbas.{business_Api}.create"
+        apiType: "create"
+      - apiName: "esp_dpbas.{business_Api}.valid"
+        apiType: "valid"
+      - apiName: "esp_dpbas.{business_Api}.invalid"
+        apiType: "invalid"
+    serviceCode: "${{app2_code()}}"
+    relateColumnList: []
+    modelFullPathList:
+      - modelCode: "purchase_order_detail"
+        fullPath: "automatedtesting_api_${{randon_id()}}.purchase_order_detail"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: request
+      jsonpath: $.apiModelCode
+      name: api_model_code
+
+
+
+# 检查绑定关系
+tbb_checkBindRelation_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/tbb/checkBindRelation
+  method: POST
+  detail: 检查业务对象绑定关系
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: true
+  data:
+    type: "table"
+    code: "$cache{business_model_code}"
+    serviceCode: "DPBAS"
+    entrance: "delBusinessDir"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 删除业务档业务对象
+businessDir_delete_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/delete
+  method: POST
+  detail: 删除业务档业务对象
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: true
+  data:
+    type: "businessConstructor"
+    businessCode: "$cache{business_code}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+# 查询基础档模型信息
+modelDriver_queryBasicModel_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modelDriver/queryModelByCode
+  method: GET
+  detail: 查询基础档业务对象信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: PARAMS
+  is_run: true
+  data:
+    code: "$cache{basic_model_code}"
+    serviceCode: "DPBAS"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.relateBusinessCode
+      name: basic_business_code
+
+# 检查基础档绑定关系
+tbb_checkBasicBindRelation_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/tbb/checkBindRelation
+  method: POST
+  detail: 检查基础档业务对象关联关系
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: true
+  data:
+    type: "table"
+    code: "$cache{basic_model_code}"
+    serviceCode: "DPBAS"
+    entrance: "delBusinessDir"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 清理基础档业务对象
+businessDir_cleanup_basic_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/delete
+  method: POST
+  detail: 清理基础档业务对象
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: true
+  data:
+    type: "businessConstructor"
+    businessCode: "$cache{basic_business_code}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询参数档模型信息
+modelDriver_queryParamModel_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modelDriver/queryModelByCode
+  method: GET
+  detail: 查询参数档业务对象信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: PARAMS
+  is_run: true
+  data:
+    code: "$cache{param_model_code}"
+    serviceCode: "DPBAS"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.relateBusinessCode
+      name: param_business_code
+
+# 检查参数档绑定关系
+tbb_checkParamBindRelation_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/tbb/checkBindRelation
+  method: POST
+  detail: 检查参数档业务对象关联关系
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: true
+  data:
+    type: "table"
+    code: "$cache{param_model_code}"
+    serviceCode: "DPBAS"
+    entrance: "delBusinessDir"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 清理参数档业务对象
+businessDir_cleanup_param_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/delete
+  method: POST
+  detail: 清理参数档业务对象
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: true
+  data:
+    type: "businessConstructor"
+    businessCode: "$cache{param_business_code}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 检查API模型绑定关系
+api_checkModelBindRelation_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/tbb/checkBindRelation
+  method: POST
+  detail: 检查API模型绑定关系
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    content-type: application/json
+  requestType: JSON
+  is_run: true
+  data:
+    type: "table"
+    code: "$cache{api_model_code}"
+    serviceCode: "${{app2_code()}}"
+    entrance: "delBusinessDir"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 清理API模型
+api_cleanup_model_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/delete
+  method: POST
+  detail: 清理API模型
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    content-type: application/json
+  requestType: JSON
+  is_run: true
+  data:
+    type: "businessConstructor"
+    businessCode: "$cache{api_model_code}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:

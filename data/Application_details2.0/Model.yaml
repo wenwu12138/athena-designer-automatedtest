@@ -1,0 +1,836 @@
+# 公共参数
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 2.0应用详情
+  allureStory: 业务搭建-模型
+
+
+
+# 创建模型测试业务对象
+model_testing_create_business_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/add
+  method: POST
+  detail: 创建模型功能测试业务对象
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: true
+  data:
+    code: "model_test_biz_${{randon_id()}}"
+    name: "模型功能测试_业务对象${{get_time()}}"
+    description: "模型驱动功能自动化测试专用业务对象${{get_time()}}"
+    serviceCode: "DPBAS"
+    needCreateApi: true
+    customProperties: {}
+    modelType: "transaction"
+    lang:
+      name:
+        zh_CN: "模型功能测试_业务对象${{get_time()}}"
+        zh_TW: "模型功能測試_業務對象${{get_time()}}"
+        en_US: "ModelFuncTest_BizObj${{get_time()}}"
+      description:
+        zh_CN: "模型驱动功能自动化测试专用业务对象${{get_time()}}"
+        zh_TW: "模型驅動功能自動化測試專用業務對象${{get_time()}}"
+        en_US: "Business object for model-driven function testing${{get_time()}}"
+    tenantId: "SYSTEM"
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: request
+      jsonpath: $.code
+      name: model_test_biz_code
+
+# 查询模型测试业务对象信息
+model_testing_query_business_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modelDriver/queryModelByCode
+  method: GET
+  detail: 查询模型测试业务对象详情
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: PARAMS
+  is_run: true
+  data:
+    code: "$cache{model_test_biz_code}"
+    serviceCode: "DPBAS"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.relateBusinessCode
+      name: model_test_business_code
+    - type: response
+      jsonpath: $.data.objectId
+      name: model_test_object_id
+
+
+
+
+
+# 查询数据视图内容
+dataView_queryDataViewContent_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/dataView/queryDataViewContent
+  method: POST
+  detail: 查询指定模型的数据视图内容
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: true
+  data:
+    modelCode: "$cache{model_test_biz_code}"
+    serviceCode: "DPBAS"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询模型关联列表
+modelAssign_queryListV2_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modelDriver/modelAssign/queryListV2
+  method: POST
+  detail: 查询模型关联配置列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    queryType: "association"
+    type: "curApp"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 基于查询计划生成空白页面设计
+pageDesign_generateBlankPage_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/pageDesign/generatePageDesignByQueryPlan
+  method: POST
+  detail: 基于模型查询计划生成空白页面设计
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    locale: zh_CN
+  requestType: JSON
+  is_run: true
+  data:
+    name: "模型测试_空白页面${{get_time()}}"
+    dependOnGroundEnd: false
+    authorityPrefix: ""
+    application: ${{app2_code()}}
+    addPageDesignType: "blank"
+    addSourceType: "object_perspective"
+    workType: "model"
+    operateType: "append"
+    serviceCode: "DPBAS"
+    businessCode: "$cache{model_test_business_code}"
+    modelId: "$cache{model_test_biz_code}"
+    lang:
+      name:
+        zh_CN: "模型测试_空白页面${{get_time()}}"
+        zh_TW: "模型測試_空白頁面${{get_time()}}"
+        en_US: "ModelTest_BlankPage${{get_time()}}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+
+
+# 生成数据视图查询计划
+dataView_generateJustQueryPlan_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/dataView/generateJustQueryPlan
+  method: POST
+  detail: 为模型生成查询方案
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    locale: zh_CN
+  requestType: JSON
+  is_run: true
+  data:
+    modelId: "$cache{model_test_biz_code}"
+    serviceCode: "DPBAS"
+    businessCode: "$cache{model_test_business_code}"
+    application: ${{app2_code()}}
+    addSourceType: "object_perspective"
+    workType: "model"
+    operateType: "append"
+    createDataViewList:
+      - name: "全部"
+        dataViewType: "all"
+        description: "全部$cache{model_test_biz_code}"
+        sql: "SELECT ${cache{model_test_biz_code}}_id, manage_status, complete_state, serial_number, eoc_company_id, eoc_site_id, eoc_region_id, owner_dept_id, owner_dept_name, owner_emp_id, owner_emp_name, tenantsid, tenant_id, create_by, create_date, modified_by, modified_date, creator_name, modifier_name FROM $cache{model_test_biz_code} ORDER BY created_date DESC"
+        lang:
+          name:
+            zh_CN: "全部"
+            zh_TW: "全部"
+            en_US: "All"
+          description:
+            zh_CN: "全部$cache{model_test_biz_code}"
+            zh_TW: "全部$cache{model_test_biz_code}"
+            en_US: "All $cache{model_test_biz_code}"
+      - name: "已审核"
+        dataViewType: "checked"
+        description: "已审核$cache{model_test_biz_code}"
+        sql: "SELECT ${cache{model_test_biz_code}}_id, manage_status, complete_state, serial_number, eoc_company_id, eoc_site_id, eoc_region_id, owner_dept_id, owner_dept_name, owner_emp_id, owner_emp_name, tenantsid, tenant_id, create_by, create_date, modified_by, modified_date, creator_name, modifier_name FROM $cache{model_test_biz_code} WHERE manage_status = 'Y' ORDER BY created_date DESC"
+        lang:
+          name:
+            zh_CN: "已审核"
+            zh_TW: "已審核"
+            en_US: "checked"
+          description:
+            zh_CN: "已审核$cache{model_test_biz_code}"
+            zh_TW: "已審核$cache{model_test_biz_code}"
+            en_US: "checked $cache{model_test_biz_code}"
+      - name: "未审核"
+        dataViewType: "uncheck"
+        description: "未审核$cache{model_test_biz_code}"
+        sql: "SELECT ${cache{model_test_biz_code}}_id, manage_status, complete_state, serial_number, eoc_company_id, eoc_site_id, eoc_region_id, owner_dept_id, owner_dept_name, owner_emp_id, owner_emp_name, tenantsid, tenant_id, create_by, create_date, modified_by, modified_date, creator_name, modifier_name FROM $cache{model_test_biz_code} WHERE manage_status = 'N' ORDER BY created_date DESC"
+        lang:
+          name:
+            zh_CN: "未审核"
+            zh_TW: "未審核"
+            en_US: "uncheck"
+          description:
+            zh_CN: "未审核$cache{model_test_biz_code}"
+            zh_TW: "未審核$cache{model_test_biz_code}"
+            en_US: "uncheck $cache{model_test_biz_code}"
+      - name: "已作废"
+        dataViewType: "cancelled"
+        description: "已作废$cache{model_test_biz_code}"
+        sql: "SELECT ${cache{model_test_biz_code}}_id, manage_status, complete_state, serial_number, eoc_company_id, eoc_site_id, eoc_region_id, owner_dept_id, owner_dept_name, owner_emp_id, owner_emp_name, tenantsid, tenant_id, create_by, create_date, modified_by, modified_date, creator_name, modifier_name FROM $cache{model_test_biz_code} WHERE manage_status = 'V' ORDER BY created_date DESC"
+        lang:
+          name:
+            zh_CN: "已作废"
+            zh_TW: "已作廢"
+            en_US: "cancelled"
+          description:
+            zh_CN: "已作废$cache{model_test_biz_code}"
+            zh_TW: "已作廢$cache{model_test_biz_code}"
+            en_US: "cancelled $cache{model_test_biz_code}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 覆盖数据视图查询方案
+dataView_coverageQueryPlan_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/dataView/generateJustQueryPlan
+  method: POST
+  detail: 覆盖已有数据视图查询方案
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    locale: zh_CN
+  requestType: JSON
+  is_run: true
+  data:
+    modelId: "$cache{model_test_biz_code}"
+    serviceCode: "DPBAS"
+    businessCode: "$cache{model_test_business_code}"
+    application: ${{app2_code()}}
+    addSourceType: "object_perspective"
+    workType: "model"
+    operateType: "coverage"
+    createDataViewList:
+      - name: "全部"
+        dataViewType: "all"
+        description: "全部$cache{model_test_biz_code}"
+        sql: "SELECT ${cache{model_test_biz_code}}_id, manage_status, complete_state, serial_number, eoc_company_id, eoc_site_id, eoc_region_id, owner_dept_id, owner_dept_name, owner_emp_id, owner_emp_name, tenantsid, tenant_id, create_by, create_date, modified_by, modified_date, creator_name, modifier_name FROM $cache{model_test_biz_code} ORDER BY created_date DESC"
+        lang:
+          name:
+            zh_CN: "全部"
+            zh_TW: "全部"
+            en_US: "All"
+          description:
+            zh_CN: "全部$cache{model_test_biz_code}"
+            zh_TW: "全部$cache{model_test_biz_code}"
+            en_US: "All $cache{model_test_biz_code}"
+      - name: "已审核"
+        dataViewType: "checked"
+        description: "已审核$cache{model_test_biz_code}"
+        sql: "SELECT ${cache{model_test_biz_code}}_id, manage_status, complete_state, serial_number, eoc_company_id, eoc_site_id, eoc_region_id, owner_dept_id, owner_dept_name, owner_emp_id, owner_emp_name, tenantsid, tenant_id, create_by, create_date, modified_by, modified_date, creator_name, modifier_name FROM $cache{model_test_biz_code} WHERE manage_status = 'Y' ORDER BY created_date DESC"
+        lang:
+          name:
+            zh_CN: "已审核"
+            zh_TW: "已審核"
+            en_US: "checked"
+          description:
+            zh_CN: "已审核$cache{model_test_biz_code}"
+            zh_TW: "已審核$cache{model_test_biz_code}"
+            en_US: "checked $cache{model_test_biz_code}"
+      - name: "未审核"
+        dataViewType: "uncheck"
+        description: "未审核$cache{model_test_biz_code}"
+        sql: "SELECT ${cache{model_test_biz_code}}_id, manage_status, complete_state, serial_number, eoc_company_id, eoc_site_id, eoc_region_id, owner_dept_id, owner_dept_name, owner_emp_id, owner_emp_name, tenantsid, tenant_id, create_by, create_date, modified_by, modified_date, creator_name, modifier_name FROM $cache{model_test_biz_code} WHERE manage_status = 'N' ORDER BY created_date DESC"
+        lang:
+          name:
+            zh_CN: "未审核"
+            zh_TW: "未審核"
+            en_US: "uncheck"
+          description:
+            zh_CN: "未审核$cache{model_test_biz_code}"
+            zh_TW: "未審核$cache{model_test_biz_code}"
+            en_US: "uncheck $cache{model_test_biz_code}"
+      - name: "已作废"
+        dataViewType: "cancelled"
+        description: "已作废$cache{model_test_biz_code}"
+        sql: "SELECT ${cache{model_test_biz_code}}_id, manage_status, complete_state, serial_number, eoc_company_id, eoc_site_id, eoc_region_id, owner_dept_id, owner_dept_name, owner_emp_id, owner_emp_name, tenantsid, tenant_id, create_by, create_date, modified_by, modified_date, creator_name, modifier_name FROM $cache{model_test_biz_code} WHERE manage_status = 'V' ORDER BY created_date DESC"
+        lang:
+          name:
+            zh_CN: "已作废"
+            zh_TW: "已作廢"
+            en_US: "cancelled"
+          description:
+            zh_CN: "已作废$cache{model_test_biz_code}"
+            zh_TW: "已作廢$cache{model_test_biz_code}"
+            en_US: "cancelled $cache{model_test_biz_code}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询模型数据视图
+dataView_queryDataViewByModel_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/dataView/queryDataViewByModel
+  method: POST
+  detail: 查询指定模型的数据视图列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: true
+  data:
+    modelCode: "$cache{model_test_biz_code}"
+    serviceCode: "DPBAS"
+    businessCode: "$cache{model_test_business_code}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data[0].code
+      name: data_view_all_code
+    - type: response
+      jsonpath: $.data[1].code
+      name: data_view_checked_code
+    - type: response
+      jsonpath: $.data[2].code
+      name: data_view_uncheck_code
+    - type: response
+      jsonpath: $.data[3].code
+      name: data_view_cancelled_code
+
+# 基于查询的数据视图生成带查询方案的表格
+pageDesign_generateTableWithQueryPlan_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/pageDesign/generatePageDesignByQueryPlan
+  method: POST
+  detail: 基于查询的数据视图生成带查询方案的表格页面
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    locale: zh_CN
+  requestType: JSON
+  is_run: true
+  data:
+    name: "模型测试_查询方案表格${{get_time()}}"
+    dependOnGroundEnd: false
+    authorityPrefix: ""
+    application: ${{app2_code()}}
+    addPageDesignType: "dataview_table_horizontal"
+    addSourceType: "object_perspective"
+    workType: "model"
+    operateType: "append"
+    serviceCode: "DPBAS"
+    businessCode: "$cache{model_test_business_code}"
+    modelId: "$cache{model_test_biz_code}"
+    dataViewCodes: ["$cache{data_view_all_code}", "$cache{data_view_checked_code}", "$cache{data_view_uncheck_code}", "$cache{data_view_cancelled_code}"]
+    lang:
+      name:
+        zh_CN: "模型测试_查询方案表格${{get_time()}}"
+        zh_TW: "模型測試_查詢方案表格${{get_time()}}"
+        en_US: "ModelTest_QueryPlanTable${{get_time()}}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 页面设计模型默认字段
+pageDesign_modelDefaultFields_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/pageDesign/modelDefaultFields
+  method: POST
+  detail: 设置页面设计模型默认字段
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: json
+  is_run: true
+  data:
+    code: "$cache{model_test_biz_code}_detail"
+    comment: "模型功能测试_业务对象{{get_time()}}_详情"
+    lang:
+      comment:
+        en_US: "ModelFuncTest_BizObj{{get_time()}}_details"
+        zh_CN: "模型功能测试_业务对象{{get_time()}}_详情"
+        zh_TW: "模型功能測試_業務對象{{get_time()}}_詳情"
+    application: ${{app2_code()}}
+    serviceCode: "DPBAS"
+    mainModelCode: "$cache{model_test_biz_code}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 保存模型配置（完整精简版）
+modelDriver_modelAssign_update_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modelDriver/modelAssign/update
+  method: POST
+  detail: 保存模型配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: json
+  is_run: true
+  data:
+    createBy: "wenwu@digiwin.com"
+    createDate: "2025-11-12 13:23:27"
+    editBy: "wenwu@digiwin.com"
+    editDate: "2025-11-12 13:27:54"
+    objectId: "$cache{model_test_object_id}"
+    code: "$cache{model_test_biz_code}"
+    id: 1761641950409
+    name: "模型功能测试_业务对象${{get_time()}}"
+    tenantId: "athenadeveloperTest"
+    serviceCode: "DPBAS"
+    subTableCounts: 0
+    application: ${{app2_code()}}
+    dependOnGroundEnd: false
+    needCreateApi: true
+    lang:
+      name:
+        zh_TW: "模型功能測試_業務對象${{get_time()}}"
+        en_US: "ModelFuncTest_BizObj${{get_time()}}"
+        zh_CN: "模型功能测试_业务对象${{get_time()}}"
+    modelType: "transaction"
+    relateBusinessCode: "$cache{model_test_business_code}"
+    switchCfg:
+      dataPermission: "N"
+    customProperties: {}
+    generateModelSource: "manual"
+    model:
+      name: "$cache{model_test_biz_code}"
+      comment: "模型功能测试_业务对象${{get_time()}}"
+      pk: "$cache{model_test_biz_code}_id"
+      index: []
+      fields:
+        # 主键字段
+        - fieldId: "$cache{model_test_biz_code}_id"
+          fieldName: "模型功能测试_业务对象${{get_time()}}主键"
+          fieldType: "BIGINT"
+          type: "SIMPLE"
+          size: "20"
+          notNull: true
+          unique: false
+          isPk: true
+          autoIncrement: true
+          associatedInfo: {associatedFields: []}
+          isSystem: true
+          lang:
+            fieldName:
+              zh_TW: "模型功能測試_業務對象${{get_time()}}主鍵"
+              en_US: "ModelFuncTest_BizObj${{get_time()}}主键"
+              zh_CN: "模型功能测试_业务对象${{get_time()}}主键"
+          sort: 0
+        # 业务字段（示例几个关键字段）
+        - fieldId: "manage_status"
+          fieldName: "审核状态"
+          fieldType: "VARCHAR"
+          type: "SIMPLE"
+          size: "20"
+          notNull: false
+          unique: false
+          isPk: false
+          autoIncrement: false
+          defaultValue: "N"
+          isSystem: false
+          lang:
+            fieldName:
+              zh_TW: "審核狀態"
+              en_US: "审核状态"
+              zh_CN: "审核状态"
+          dictionaryId: 4739
+          enumValue: "approve_all_status"
+          dictionaryContent: "[]"
+          sort: 1
+        - fieldId: "complete_state"
+          fieldName: "签核完成状态"
+          fieldType: "VARCHAR"
+          type: "SIMPLE"
+          size: "20"
+          notNull: false
+          unique: false
+          isPk: false
+          autoIncrement: false
+          defaultValue: "0"
+          isSystem: false
+          lang:
+            fieldName:
+              zh_TW: "簽核完成狀態"
+              en_US: "签核完成状态"
+              zh_CN: "签核完成状态"
+          dictionaryId: 3869
+          enumValue: "process_complete_state"
+          dictionaryContent: "[{\"code\":\"0\",\"lang\":{\"value\":{\"zh_TW\":\"未完成\",\"en_US\":\"未完成\",\"zh_CN\":\"未完成\"}},\"value\":\"未完成\"}]"
+          sort: 2
+        # 集合字段
+        - fieldId: "$cache{model_test_biz_code}_detail"
+          fieldName: "模型功能测试_业务对象${{get_time()}}_详情"
+          type: "COLLECTION"
+          notNull: false
+          unique: false
+          isPk: false
+          autoIncrement: false
+          isSystem: false
+          lang:
+            fieldName:
+              en_US: "ModelFuncTest_BizObj${{get_time()}}_details"
+              zh_CN: "模型功能测试_业务对象${{get_time()}}_详情"
+              zh_TW: "模型功能測試_業務對象${{get_time()}}_詳情"
+          associatedInfo:
+            tableName: "$cache{model_test_biz_code}_detail"
+            associatedFields: []
+        # 系统字段（示例）
+        - fieldId: "tenantsid"
+          fieldName: "租户sid"
+          fieldType: "BIGINT"
+          type: "SIMPLE"
+          size: "20"
+          notNull: true
+          unique: false
+          isPk: false
+          autoIncrement: false
+          associatedInfo: {associatedFields: []}
+          isSystem: true
+          lang:
+            fieldName:
+              zh_TW: "租戶sid"
+              en_US: "租户sid"
+              zh_CN: "租户sid"
+          sort: 11
+      isSystem: true
+      isPublished: true
+      createDate: "2025-11-12 13:23:27"
+      editDate: "2025-11-12 13:27:27"
+      lang:
+        comment:
+          zh_TW: "模型功能測試_業務對象${{get_time()}}"
+          en_US: "ModelFuncTest_BizObj${{get_time()}}"
+          zh_CN: "模型功能测试_业务对象${{get_time()}}"
+      customProperties: {}
+      bindApiListConfig:
+        - apiName: "esp_dpbas.$cache{model_test_biz_code}.list.get"
+          apiType: "list"
+          apiDescription: "模型功能测试_业务对象${{get_time()}}"
+          tableName: "$cache{model_test_biz_code}"
+          apiConfig:
+            serviceName: "dpbas.$cache{model_test_biz_code}.list.get"
+            response_object: []
+            request_parameters: []
+          isCustom: false
+      bmdApiListConfig: []
+      children:
+        - name: "$cache{model_test_biz_code}_detail"
+          comment: "模型功能测试_业务对象${{get_time()}}_详情"
+          pk: "$cache{model_test_biz_code}_detail_id"
+          fields:
+            - fieldId: "$cache{model_test_biz_code}_detail_id"
+              fieldName: "主键"
+              fieldType: "BIGINT"
+              type: "SIMPLE"
+              size: "20"
+              notNull: true
+              unique: false
+              isPk: true
+              autoIncrement: true
+              associatedInfo: {associatedFields: []}
+              isSystem: true
+              lang:
+                fieldName:
+                  zh_TW: "主鍵"
+                  en_US: "主键"
+                  zh_CN: "主键"
+            - fieldId: "$cache{model_test_biz_code}_id"
+              fieldName: "$cache{model_test_biz_code}主键"
+              fieldType: "BIGINT"
+              type: "QUOTE"
+              size: "20"
+              notNull: true
+              unique: false
+              isPk: false
+              autoIncrement: false
+              associatedInfo:
+                associatedFields: []
+                tableName: "$cache{model_test_biz_code}"
+              isSystem: false
+              lang:
+                fieldName:
+                  zh_CN: "$cache{model_test_biz_code}主键"
+                  zh_TW: "$cache{model_test_biz_code}主鍵"
+                  en_US: "$cache{model_test_biz_code} PK"
+              sort: 0
+          isSystem: false
+          createDate: "2025-11-12 13:33:59"
+          lang:
+            comment:
+              en_US: "ModelFuncTest_BizObj${{get_time()}}_details"
+              zh_CN: "模型功能测试_业务对象${{get_time()}}_详情"
+              zh_TW: "模型功能測試_業務對象${{get_time()}}_詳情"
+          children: []
+          bindApiListConfig: []
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 查询资源树刷新列表
+resourceTree_queryRefreshList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/resourceTree/queryListOfSourceRefresh
+  method: POST
+  detail: 查询模型设计资源树刷新列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    content-type: application/json
+    locale: zh_CN
+  requestType: json
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    type: "modelDesign"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 刷新业务目录资源
+businessDir_refreshResource_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/part/refresh
+  method: POST
+  detail: 刷新指定业务目录的资源
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    content-type: application/json
+    locale: zh_CN
+  requestType: json
+  is_run: true
+  data:
+    businessCode: "$cache{model_test_business_code}"
+    type: "modelDesign"
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 模型单发布
+modulePublish_modelSingle_publish_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modulePublish/modelSingle/publish
+  method: POST
+  detail: 模型单发布
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: json
+  is_run: true
+  data:
+    pkValue: "$cache{model_test_biz_code}"
+    module: "modelDriven"
+    application: ${{app2_code()}}
+    tenantUsers:
+      - tenantId: "athenadeveloperTest"
+        tenantSid: 847600433497088
+        tenantName: "配置测试器"
+    serviceCode: "DPBAS"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询模型操作记录
+operationRecord_get_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/operationRecord/get
+  method: GET
+  detail: 查询模型操作记录
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: params
+  is_run: true
+  data:
+    code: "$cache{model_test_biz_code}"
+    collection: "pageDesignModel"
+    appCode: ${{app2_code()}}
+    serviceCode: "DPBAS"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 模型SQL导出
+dataEntry_modelSqlExport_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/dataEntry/tables/sql/modelExport
+  method: POST
+  detail: 导出模型SQL
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: json
+  is_run: false
+  data:
+    application: ${{app2_code()}}
+    code: "$cache{model_test_biz_code}"
+    serviceCode: "DPBAS"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 检查模型测试业务对象绑定关系
+model_testing_check_bindings_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/tbb/checkBindRelation
+  method: POST
+  detail: 检查模型测试业务对象关联关系
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    locale: zh_CN
+  requestType: JSON
+  is_run: true
+  data:
+    type: "table"
+    code: "$cache{model_test_biz_code}"
+    serviceCode: "DPBAS"
+    entrance: "delBusinessDir"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 清理模型测试业务对象
+model_testing_cleanup_business_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/delete
+  method: POST
+  detail: 清理模型测试业务对象
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: True
+  data:
+    type: "businessConstructor"
+    businessCode: "$cache{model_test_business_code}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:

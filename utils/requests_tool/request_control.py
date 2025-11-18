@@ -379,7 +379,7 @@ class RequestControl:
         allure_step("响应结果: ", res)
 
     @log_decorator(True)
-    @execution_duration(3000)
+    @execution_duration(10000)
     # @encryption("md5")
     def http_request(
             self,

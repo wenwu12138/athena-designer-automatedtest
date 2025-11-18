@@ -92,3 +92,26 @@ query_SwitchProcess_001:
       value: 0
       AssertType:
 
+# 查询分支创建进度
+# 查询分支信息
+query_BranchInfo_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/multiBranch/$cache{BranchApp}/getBranchInfo
+  method: GET
+  detail: 查询分支创建进度
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: PARAMS
+  is_run: true
+  data:
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: false
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:

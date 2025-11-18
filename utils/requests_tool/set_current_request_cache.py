@@ -24,7 +24,7 @@ class SetCurrentRequestCache:
             response_data
     ):
         self.current_request_set_cache = current_request_set_cache
-        self.request_data = {"data": request_data}
+        self.request_data = request_data
         self.response_data = response_data.text
 
     def set_request_cache(

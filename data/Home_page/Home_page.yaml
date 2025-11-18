@@ -209,7 +209,7 @@ basis_CreateApp_001:
   is_run: true
   data:
     application:
-      code: "AAutoTestDelAT"
+      code: "${{TestApp_code()}}"
       name: "自动化删除测试应用"
       description: "自动化测试专用-用于删除流程验证"
       iconName: "1.png"
@@ -227,7 +227,7 @@ basis_CreateApp_001:
           zh_CN: "自动化测试专用-用于删除流程验证"
           zh_TW: "自動化測試專用-用於刪除流程驗證"
           en_US: "Auto test for delete flow verification"
-    code: "AAutoTestDelAT"
+    code: "${{TestApp_code()}}"
     name: "自动化删除测试应用"
     description: "自动化测试专用-用于删除流程验证"
     iconName: "1.png"
@@ -257,7 +257,7 @@ basis_AppAuthUser_001:
   requestType: json
   is_run: true
   data:
-    code: "AAutoTestDelAT"
+    code: "${{TestApp_code()}}"
   dependence_case: False
   dependence_case_data:
   assert:
@@ -267,31 +267,11 @@ basis_AppAuthUser_001:
       value: 0
       AssertType:
 
-# 查询最近访问记录接口
-basis_QueryRecentVisit_001:
-  host: ${{athena_designer_host()}}
-  url: /athena-designer/application/queryRecentVisit?searchAppAuth=&appType=&condition=&num=20
-  method: GET
-  detail: 2.0应用基础功能验证_查询最近访问
-  headers:
-    authorization: $cache{token}
-    digi-middleware-auth-user: $cache{token}
-  requestType: json
-  is_run: true
-  data: {}
-  dependence_case: False
-  dependence_case_data:
-  assert:
-    code:
-      jsonpath: $.code
-      type: ==
-      value: 0
-      AssertType:
 
 # 删除应用接口
 basis_DeleteApp_001:
   host: ${{athena_designer_host()}}
-  url: /athena-designer/application/delete/v2/AAutoTestDelAT
+  url: /athena-designer/application/delete/v2/${{TestApp_code()}}
   method: GET
   detail: 1.0应用基础功能验证_删除应用
   headers:
@@ -321,7 +301,7 @@ basis_QueryDeleteLog_001:
   requestType: json
   is_run: true
   data:
-    applicationCode: "AAutoTestDelAT"
+    applicationCode: "${{TestApp_code()}}"
     deleteNo: $cache{compileDataCode}
   dependence_case: False
   dependence_case_data:
@@ -344,7 +324,7 @@ basis_QueryDeleteProgress_001:
   requestType: json
   is_run: true
   data:
-    applicationCode: "AAutoTestDelAT"
+    applicationCode: "${{TestApp_code()}}"
     deleteNo: $cache{compileDataCode}
   dependence_case: False
   dependence_case_data:

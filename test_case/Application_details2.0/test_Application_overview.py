@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time   : 2025-10-24 10:42:20
+# @Time   : 2025-11-17 17:10:14
 
 
 import allure
@@ -16,13 +16,13 @@ import datetime
 import json
 
 
-case_id = ['basis_QueryParadigm_001', 'basis_AccessRecord_001', 'basis_AuthAppInfo_001', 'basis_QueryAuthPolicy_001', 'basis_QueryAppAuthPolicy_001', 'basis_QueryDataStandardAuth_001', 'basis_GetPresetData_001', 'basis_QueryApplicationDetail_001', 'basis_QueryServiceCodeList_001', 'basis_UpdateApplicationV3_001']
+case_id = ['basis_QueryParadigm_001', 'basis_AccessRecord_001', 'basis_AuthAppInfo_001', 'basis_QueryAuthPolicy_001', 'basis_QueryAppAuthPolicy_001', 'basis_QueryDataStandardAuth_001', 'basis_GetPresetData_001', 'basis_QueryApplicationDetail_001', 'basis_QueryServiceCodeList_001', 'basis_UpdateApplicationV3_001', 'asset_QueryAllAssetList_001', 'asset_QueryDTDAssetList_001', 'asset_QueryAllExternalDependentAssets_001', 'asset_QueryDTDExternalDependentAssets_001', 'modelDriver_GetAppBackendInfo_001', 'customConfig_AddCustomConfig_001', 'customConfig_QueryCustomConfig_001', 'customConfig_QueryCustomConfigDetail_001', 'customConfig_UpdateCustomConfig_001', 'customConfig_QueryCustomConfigShare_001', 'customConfig_DeleteCustomConfig_001']
 TestData = GetTestCase.case_data(case_id)
 re_data = regular(str(TestData))
 
 
 @allure.epic("开发平台接口")
-@allure.feature("应用总览")
+@allure.feature("2.0应用详情")
 class TestApplicationOverview:
 
     @allure.story("应用总览")
@@ -39,15 +39,14 @@ class TestApplicationOverview:
                         如果是的话循环调用查询接口，设定超时次数为100次 100次以内没满足条件抛异常
         """
         # 如果是编译接口那么就存储存储编译包信息给后面用
-        if any(i in in_data for i in ["compile"] ):
-            CacheHandler.update_cache(cache_name='compileDataCode', value=json.loads(res.response_data)["data"])
         TearDownHandler(res).teardown_handle()
         Assert(assert_data=in_data['assert_data'],
                sql_data=res.sql_data,
                request_data=res.body,
                response_data=res.response_data,
                status_code=res.status_code).assert_type_handle()
-        AsynchronousAssert(in_data=in_data, in_data_res=res).deployer_assert()
+        # 异步断言
+        assert AsynchronousAssert(in_data=in_data, in_data_res=res).deployer_assert() == True
 
 
 if __name__ == '__main__':

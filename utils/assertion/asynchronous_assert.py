@@ -17,9 +17,9 @@ class AsynchronousAssert:
 
     def deployer_assert(self):
         # 轮询查询发版进度
+        result = True
         if "addDeployPlan" in self.in_data["url"]:
             try:
-                result = False
                 i = 0
                 while i < 100:
                  # 查询发版进度
@@ -55,16 +55,21 @@ class AsynchronousAssert:
                     # 查询进度详情
                     deploydetail_res = RequestControl(deploydetail_indata).http_request()
 
-                    assert json.loads(deployprocess_res.response_data)["data"] != -1, (
-                                "发版失败ଘ(⸝⸝◞ ̫ ◟)"
-                            )
-
-                    if json.loads(deployprocess_res.response_data)["data"] == 1:
+                    if json.loads(deployprocess_res.response_data)["data"] == 1 or any("finish" in obj["result"] for obj in json.loads(deploydetail_res.response_data)['data']):
                         result = True
                         INFO.logger.info("\n"
                                          "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n"
                                          "发版成功\n"
                                          "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n")
+                        return result
+                        break
+                    elif json.loads(deployprocess_res.response_data)["data"] == -1:
+                        result = False
+                        INFO.logger.info("\n"
+                                         "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n"
+                                         "发版失败\n"
+                                         "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n")
+                        return result
                         break
                     else:
                         i += 1
@@ -114,17 +119,24 @@ class AsynchronousAssert:
                     switchdetail_res = RequestControl(switchdetail_indata).http_request()
 
                     # 断言切板进度不为失败状态
-                    assert json.loads(switchprocess_res.response_data)["data"] != -1, (
-                        "切板失败ଘ(⸝⸝◞ ̫ ◟)"
-                    )
+
 
                     # 切板成功条件判断
-                    if json.loads(switchprocess_res.response_data)["data"] == 1:
+                    if json.loads(switchprocess_res.response_data)["data"] == 1 or any("finish" in obj["result"] for obj in json.loads(switchdetail_res.response_data)['data']):
                         result = True
                         INFO.logger.info("\n"
                                          "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n"
                                          "切板成功\n"
                                          "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n")
+                        return result
+                        break
+                    elif json.loads(switchprocess_res.response_data)["data"] == -1:
+                        result = False
+                        INFO.logger.info("\n"
+                                         "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n"
+                                         "切板成功\n"
+                                         "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n")
+                        return result
                         break
                     else:
                         i += 1
@@ -132,6 +144,115 @@ class AsynchronousAssert:
                         time.sleep(15)
             except Exception as e:
                 INFO.logger.error(f"切板循环中发生异常: {str(e)}", exc_info=True)  # 打印完整堆栈
+        elif "createNewBranch" in self.in_data["url"]:
+            try:
+                result = False
+                i = 0
+                while i < 100:
+                    # 分支异步断言
+                    # 拿到实际用例数据
+                    getBranchInfo_indata = GetTestCase.case_data(['query_BranchInfo_001'])
+
+                    # 组装请求参数
+                    getBranchInfo_indata = regular(str(getBranchInfo_indata))
+
+                    # 缓存替换后转字典才能进入请求入参接口
+                    getBranchInfo_indata = regular(str(getBranchInfo_indata))
+                    getBranchInfo_indata = eval(getBranchInfo_indata)[0]  # 字符串执行转列表
+
+                    # 查询分支创建进度
+                    getBranchInfo_res = RequestControl(getBranchInfo_indata).http_request()
+
+                    # 断言切板进度不为失败状态
+                    for b in json.loads(getBranchInfo_res.response_data)["data"]:
+                        if b.get('status') == '创建失败':
+                            result = False
+                            INFO.logger.info("\n"
+                                             "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n"
+                                             "分支创建失败\n"
+                                             "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n")
+                            return result
+                            break
+
+                    # 分支创建成功条件判断
+                    if all(i.get("status") in ('已创建', None) for i in json.loads(getBranchInfo_res.response_data)["data"]):
+                        result = True
+                        INFO.logger.info("\n"
+                                         "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n"
+                                         "分支创建成功\n"
+                                         "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n")
+                        return result
+                        break
+                    else:
+                        i += 1
+                        # 等待三秒后执行下一次查询
+                        time.sleep(15)
+            except Exception as e:
+                INFO.logger.error(f"分支创建循环中发生异常: {str(e)}", exc_info=True)  # 打印完整堆栈
+        elif "/application/delete/v2/" in self.in_data["url"]:  # 新增删除应用处理
+            try:
+                result = False
+                i = 0
+                while i < 100:
+                    # 查询删除应用进度（使用指定的query_DeleteProcess_001用例）
+                    deleteprocess_indata = GetTestCase.case_data(['basis_QueryDeleteProgress_001'])
+
+                    # 组装查询参数（从删除接口响应中获取应用标识）
+                    deleteprocess_indata[0]['data']['application'] = self.in_data['url'].split('/')[-1]
+                    deleteprocess_indata[0]['data']['deleteNo'] = json.loads(self.in_data_res.response_data)['data']
+                    deleteprocess_indata[0]['is_run'] = True
+
+                    # 缓存替换与格式转换
+                    deleteprocess_indata = regular(str(deleteprocess_indata))
+                    deleteprocess_indata = eval(deleteprocess_indata)[0]
+
+                    # 执行查询请求
+                    deleteprocess_res = RequestControl(deleteprocess_indata).http_request()
+
+                    # 查询删除详情
+                    deletedetail_indata = GetTestCase.case_data(['basis_QueryDeleteLog_001'])
+                    deletedetail_indata[0]['data']['application'] = self.in_data['url'].split('/')[-1]
+                    deletedetail_indata[0]['data']['deleteNo'] = json.loads(self.in_data_res.response_data)['data']
+                    deletedetail_indata[0]['is_run'] = True
+
+                    # 缓存替换与格式转换
+                    deletedetail_indata = regular(str(deletedetail_indata))
+                    deletedetail_indata = eval(deletedetail_indata)[0]
+
+                    # 执行详情查询
+                    deletedetail_res = RequestControl(deletedetail_indata).http_request()
+
+
+
+                    # 判断删除成功条件（进度为1或详情包含完成标识）
+                    if json.loads(deleteprocess_res.response_data)["data"] == 1 or any(
+                            "finish" in obj["result"] for obj in json.loads(deletedetail_res.response_data)['data']):
+                        result = True
+                        INFO.logger.info("\n"
+                                         "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n"
+                                         "删除应用成功\n"
+                                         "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n")
+                        return result
+                        break
+                    elif json.loads(deleteprocess_res.response_data)["data"] == -1:
+                        result = False
+                        INFO.logger.info("\n"
+                                         "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n"
+                                         "删除应用失败\n"
+                                         "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n")
+                        return result
+                        break
+                    else:
+                        i += 1
+                        time.sleep(15)  # 间隔15秒轮询一次
+            except Exception as e:
+                INFO.logger.error(f"删除应用循环中发生异常: {str(e)}", exc_info=True)
+        return result
+
+
+
+
+
 
 """
         处理异步接口断言

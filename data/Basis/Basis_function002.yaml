@@ -38,6 +38,12 @@ basis_AddBranch_002:
       type: ==
       value: 0
       AssertType:
+  current_request_set_cache:
+    # type 指定获取缓存路径及方式
+    - type: request
+      jsonpath: $.application
+      # 自定义缓存名称
+      name: BranchApp
 
 
 # 2.0应用根据备份分支编译
