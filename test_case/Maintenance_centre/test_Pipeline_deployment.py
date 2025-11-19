@@ -16,18 +16,18 @@ import datetime
 import json
 
 
-case_id = ['basis_QueryTenantPipeline4IndexPage_001', 'basis_QuerySolutionCards_001', 'basis_QueryAllMessageNotification_001', 'basis_QueryRecentVisit_001', 'basis_QueryRecentCreate_001', 'basis_VerifyPermission_001', 'basis_GetServiceCode_001', 'basis_Translate_001', 'basis_CreateApp_001', 'basis_AppAuthUser_001', 'basis_DeleteApp_001', 'basis_QueryDeleteLog_001', 'basis_QueryDeleteProgress_001']
+case_id = ['basis_QueryTenantPipeline_001', 'basis_QueryDeployLogByEnv_001', 'basis_QueryAllAppInTenant_001', 'basis_QueryApplicationLatestCompileInfo_001', 'basis_GetBranchInfo_001', 'basis_QueryCompileLog_001', 'basis_QueryDeployLog_001', 'basis_QueryTenantVersion_001']
 TestData = GetTestCase.case_data(case_id)
 re_data = regular(str(TestData))
 
 
 @allure.epic("开发平台接口")
-@allure.feature("首页")
-class TestHomePage:
+@allure.feature("运维中心")
+class TestPipelineDeployment:
 
-    @allure.story("首页")
+    @allure.story("流水线部署")
     @pytest.mark.parametrize('in_data', eval(re_data), ids=[i['detail'] for i in TestData])
-    def test_Home_page(self, in_data, case_skip):
+    def test_Pipeline_deployment(self, in_data, case_skip):
         """
         :param :
         :return:
@@ -50,4 +50,4 @@ class TestHomePage:
 
 
 if __name__ == '__main__':
-    pytest.main(['test_test_Home_page.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])
+    pytest.main(['test_test_Pipeline_deployment.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])

@@ -412,12 +412,12 @@ event_testing_save_event_001:
 
 
 
-# 新增事件模型
+# 新增事件
 event_testing_add_model_001:
   host: ${{athena_designer_host()}}
   url: /athena-designer/event/eventAddOrUpdate
   method: POST
-  detail: 新增事件模型
+  detail: 新增事件
   headers:
     digi-middleware-auth-user: $cache{token}
     authorization: $cache{token}
@@ -452,24 +452,26 @@ event_testing_add_model_001:
     - type: request
       jsonpath: $.customCode
       name: event_test_custom_code
+  sleep: 3
 
 
-
-# 查询事件列表
-event_testing_query_list_001:
+#刷新获取事件列表
+businessDir_RefreshEventList_001:
   host: ${{athena_designer_host()}}
-  url: /athena-designer/businessDir/getBusinessDirTree
-  method: GET
-  detail: 查询事件列表
+  url: /athena-designer/businessDir/part/refresh
+  method: POST
+  detail: 刷新获取事件列表
   headers:
     digi-middleware-auth-user: $cache{token}
-    authorization: $cache{token}
+    token: $cache{token}
     locale: zh_CN
-  requestType: PARAMS
-  is_run: false
+    content-type: application/json
+  requestType: json
+  is_run: true
   data:
-    application: "${{app2_code()}}"
+    businessCode: "$cache{event_test_business_code}"
     type: "event"
+    application: ${{app2_code()}}
   dependence_case: false
   dependence_case_data:
   assert:
@@ -479,9 +481,10 @@ event_testing_query_list_001:
       value: 0
       AssertType:
   current_request_set_cache:
+    # 缓存最后一个事件的businessSubCode（自定义事件），用于后续事件更新和发布操作
     - type: response
-      jsonpath: $..businessDirTree[?(@.businessSubName=='$cache{event_test_biz_code}')]..businessSubCode
-      name: event_test_id
+      jsonpath: $.data.businessDirTree[-1:].businessSubCode
+      name: Event_businessSubCode
 
 # 发布事件模型
 event_testing_publish_model_001:
@@ -494,9 +497,9 @@ event_testing_publish_model_001:
     authorization: $cache{token}
     locale: zh_CN
   requestType: JSON
-  is_run: false
+  is_run: true
   data:
-    pkValue: "$cache{event_test_id}"
+    pkValue: "$cache{Event_businessSubCode}"
     module: "event"
     application: "${{app2_code()}}"
     tenantUsers:
@@ -523,9 +526,9 @@ event_testing_delete_event_001:
     authorization: $cache{token}
     locale: zh_CN
   requestType: JSON
-  is_run: false
+  is_run: true
   data:
-    id: "$cache{event_test_id}"
+    id: "$cache{Event_businessSubCode}"
   dependence_case: false
   dependence_case_data:
   assert:
@@ -535,3 +538,27 @@ event_testing_delete_event_001:
       value: 0
       AssertType:
 
+
+# 清理事件测试模型
+event_testing_cleanup_model_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/delete
+  method: POST
+  detail: 清理事件测试模型-删除事件测试过程中创建的事件模型
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    type: "eventBusiness"
+    businessCode: "$cache{event_test_business_code}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
