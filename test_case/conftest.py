@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time   : 2022/3/30 14:12
-# @Author : 余少琪
+# @Author : 闻武
 import pytest
 import time
 import allure
@@ -135,6 +135,19 @@ def case_skip(in_data):
         allure_step("预期数据: ", in_data.assert_data)
         pytest.skip()
 
+def pytest_sessionstart(session):
+    """测试会话开始时记录时间"""
+    global _session_start_time
+    _session_start_time = time.time()
+    print(f"测试开始时间: {time.strftime('%Y-%m-%d %H:%M:%S')}")
+
+def pytest_sessionfinish(session, exitstatus):
+    """测试会话结束时记录时间"""
+    global _session_start_time
+    if _session_start_time:
+        duration = time.time() - _session_start_time
+        print(f"测试结束时间: {time.strftime('%Y-%m-%d %H:%M:%S')}")
+
 
 def pytest_terminal_summary(terminalreporter):
     """
@@ -142,6 +155,13 @@ def pytest_terminal_summary(terminalreporter):
     """
     session_start = terminalreporter._session_start
     session_start_timestamp = time.mktime(session_start.timetuple()) if isinstance(session_start, datetime) else 0
+    #计算使用时间
+    global _session_start_time
+
+    if _session_start_time:
+        duration = time.time() - _session_start_time
+    else:
+        duration = 0
 
 
     _PASSED = len([i for i in terminalreporter.stats.get('passed', []) if i.when != 'teardown'])
@@ -154,7 +174,7 @@ def pytest_terminal_summary(terminalreporter):
     INFO.logger.error(f"异常用例数: {_ERROR}")
     ERROR.logger.error(f"失败用例数: {_FAILED}")
     WARNING.logger.warning(f"跳过用例数: {_SKIPPED}")
-    INFO.logger.info("用例执行时长: %.2f" % _TIMES + " s")
+    INFO.logger.info(f"测试总时长: {duration:.2f}秒")
 
     try:
         _RATE = _PASSED / _TOTAL * 100

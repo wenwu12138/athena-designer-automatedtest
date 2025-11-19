@@ -1,0 +1,899 @@
+# 公共参数
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 2.0应用详情
+  allureStory: 业务搭建-查询方案（视图）
+
+
+# 创建视图测试业务对象
+dataView_testing_create_business_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/add
+  method: POST
+  detail: 创建视图功能测试业务对象
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    code: "data_view_test_${{random_id()}}"
+    name: "视图功能测试${{get_time()}}"
+    description: "视图功能测试${{get_time()}}"
+    serviceCode: "DPBAS"
+    needCreateApi: true
+    customProperties: {}
+    modelType: "transaction"
+    lang:
+      name:
+        zh_CN: "视图功能测试${{get_time()}}"
+        zh_TW: "視圖功能測試${{get_time()}}"
+        en_US: "ViewFuncTest${{get_time()}}"
+      description:
+        zh_CN: "视图功能测试${{get_time()}}"
+        zh_TW: "視圖功能測試${{get_time()}}"
+        en_US: "ViewFuncTest${{get_time()}}"
+    tenantId: "SYSTEM"
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: request
+      jsonpath: $.code
+      name: data_view_test_code
+
+# 查询视图测试业务对象信息
+dataView_testing_query_business_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modelDriver/queryModelByCode
+  method: GET
+  detail: 查询视图测试业务对象详情
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+    code: "$cache{data_view_test_code}"
+    serviceCode: "DPBAS"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.relateBusinessCode
+      name: data_view_test_business_code
+
+# 为视图测试生成查询方案
+dataView_testing_generate_plan_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/dataView/generateJustQueryPlan
+  method: POST
+  detail: 为视图测试生成查询方案
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    locale: zh_CN
+  requestType: json
+  is_run: true
+  data:
+    modelId: "$cache{data_view_test_code}"
+    serviceCode: "DPBAS"
+    businessCode: "$cache{data_view_test_business_code}"
+    application: ${{app2_code()}}
+    addSourceType: "object_perspective"
+    workType: "model"
+    operateType: "append"
+    createDataViewList:
+      - name: "视图测试全部${{get_time()}}"
+        dataViewType: "all"
+        description: "视图测试全部${{get_time()}}"
+        sql: "SELECT * FROM $cache{data_view_test_code}"
+        lang:
+          name:
+            zh_CN: "视图测试全部${{get_time()}}"
+            zh_TW: "視圖測試全部${{get_time()}}"
+            en_US: "ViewTestAll${{get_time()}}"
+          description:
+            zh_CN: "视图测试全部${{get_time()}}"
+            zh_TW: "視圖測試全部${{get_time()}}"
+            en_US: "ViewTestAll${{get_time()}}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 查询业务目录列表并缓存视图code
+businessDir_query_list_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/queryList
+  method: POST
+  detail: 查询业务目录列表并缓存第一个视图code
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data[0].businessDirTree[1].businessDirTree[0].businessSubCode
+      name: data_view_code
+
+# 获取数据视图详情（使用缓存的视图code）
+dataView_get_detail_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/dataView/getDataViewDetail
+  method: GET
+  detail: 获取数据视图详情
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+    viewCode: "$cache{data_view_code}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询数据视图字段（使用缓存的模型ID）
+dataView_query_fields_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/dataView/queryDataViewFields
+  method: POST
+  detail: 查询数据视图字段
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    modelId: "$cache{data_view_test_code}"
+    productCode: "DPBAS"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 获取预设数据对象 - 过滤参数规则
+presetData_get_filter_rule_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/presetData/getPresetDataObject
+  method: GET
+  detail: 获取过滤参数规则预设数据
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+    key: "filter-param-rule"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 获取预设数据对象 - 查询计划MySQL函数
+presetData_get_mysql_function_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/presetData/getPresetDataObject
+  method: GET
+  detail: 获取查询计划MySQL函数预设数据
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+    key: "query_Plan_Mysql_Function"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 检查视图绑定关系
+tbb_check_bind_relation_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/tbb/checkBindRelation
+  method: POST
+  detail: 检查数据视图绑定关系
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    type: "view"
+    code: "$cache{data_view_code}"
+    serviceCode: "DPBAS"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 保存数据视图配置
+dataView_save_data_view_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/dataView/saveDataView
+  method: POST
+  detail: 保存数据视图配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    createBy: "wenwu@digiwin.com"
+    createDate: "2025-11-18 11:18:48"
+    editBy: "wenwu@digiwin.com"
+    editDate: "2025-11-18 11:18:48"
+    code: "$cache{data_view_code}"
+    viewType: "queryPlan"
+    name: "全部"
+    description: "全部$cache{data_view_test_code}${{get_time()}}"
+    modelId: "$cache{data_view_test_code}"
+    productCode: "DPBAS"
+    application: ${{app2_code()}}
+    lang:
+      name:
+        zh_CN: "全部"
+        zh_TW: "全部"
+        en_US: "全部"
+      description:
+        zh_CN: "全部$cache{data_view_test_code}${{get_time()}}"
+        zh_TW: "全部$cache{data_view_test_code}${{get_time()}}"
+        en_US: "全部$cache{data_view_test_code}${{get_time()}}"
+    sort: 1
+    returnFields:
+      table: "$cache{data_view_test_code}"
+      fields:
+        - fieldId: "${cache{data_view_test_code}}_id"
+          fieldType: "BIGINT"
+          fullPath: "${cache{data_view_test_code}}_id"
+          type: "SIMPLE"
+          needRemove: false
+        - fieldId: "manage_status"
+          fullPath: "manage_status"
+          type: "SIMPLE"
+          needRemove: false
+        - fieldId: "complete_state"
+          fullPath: "complete_state"
+          type: "SIMPLE"
+          needRemove: false
+        - fieldId: "serial_number"
+          fullPath: "serial_number"
+          type: "SIMPLE"
+          needRemove: false
+        - fieldId: "eoc_company_id"
+          fullPath: "eoc_company_id"
+          type: "SIMPLE"
+          needRemove: false
+        - fieldId: "eoc_site_id"
+          fullPath: "eoc_site_id"
+          type: "SIMPLE"
+          needRemove: false
+        - fieldId: "eoc_region_id"
+          fullPath: "eoc_region_id"
+          type: "SIMPLE"
+          needRemove: false
+        - fieldId: "owner_dept_id"
+          fullPath: "owner_dept_id"
+          type: "SIMPLE"
+          needRemove: false
+        - fieldId: "owner_dept_name"
+          fullPath: "owner_dept_name"
+          type: "SIMPLE"
+          needRemove: false
+        - fieldId: "owner_emp_id"
+          fullPath: "owner_emp_id"
+          type: "SIMPLE"
+          needRemove: false
+        - fieldId: "owner_emp_name"
+          fullPath: "owner_emp_name"
+          type: "SIMPLE"
+          needRemove: false
+        - fieldId: "tenantsid"
+          fullPath: "tenantsid"
+          type: "SIMPLE"
+          needRemove: false
+        - fieldId: "tenant_id"
+          fullPath: "tenant_id"
+          type: "SIMPLE"
+          needRemove: false
+    tables:
+      - table: "$cache{data_view_test_code}"
+        path: "$cache{data_view_test_code}"
+        isMain: true
+    isDefault: true
+    autoGenerateFlag: true
+    businessCode: "$cache{data_view_test_business_code}"
+    checkbox: true
+    generateModelSource: "manual"
+    type: "manual"
+    relateFlag: false
+    originalModelId: "$cache{data_view_test_code}"
+    dataViewType: "all"
+    conditionList: []
+    queryConditions: []
+    orderList:
+      - schema: "create_date"
+        table_path: "$cache{data_view_test_code}"
+        orderType: "desc"
+        order: 1
+        sortType: "Simple"
+    viewShowFields:
+      data_code: "$cache{data_view_code}"
+      data_name: "全部"
+      service_code: "DPBAS"
+      lang:
+        data_name:
+          zh_CN: "全部"
+          zh_TW: "全部"
+          en_US: "全部"
+      field:
+        - data_name: "complete_state"
+          alias: "签核完成状态"
+          data_type: "string"
+          description: "签核完成状态"
+          lang:
+            description:
+              zh_CN: "签核完成状态"
+              zh_TW: "簽核完成狀態"
+              en_US: "签核完成状态"
+            alias:
+              zh_CN: "签核完成状态"
+              zh_TW: "簽核完成狀態"
+              en_US: "签核完成状态"
+          fullPath: "$cache{data_view_test_code}.complete_state"
+          dapFullPath: "complete_state"
+          is_datakey: "false"
+          can_sort: true
+          can_filter: true
+          isOperate: false
+          field_dsl:
+            type: "INPUT"
+            width: 160
+            editable: false
+          needRemove: false
+        - data_name: "serial_number"
+          alias: "签核进度"
+          data_type: "string"
+          description: "签核进度"
+          lang:
+            description:
+              zh_CN: "签核进度"
+              zh_TW: "簽核進度"
+              en_US: "签核进度"
+            alias:
+              zh_CN: "签核进度"
+              zh_TW: "簽核進度"
+              en_US: "签核进度"
+          fullPath: "$cache{data_view_test_code}.serial_number"
+          dapFullPath: "serial_number"
+          is_datakey: "false"
+          can_sort: true
+          can_filter: true
+          isOperate: false
+          field_dsl:
+            type: "WORKFLOW_PROGRESS"
+            width: 160
+            schema: "serial_number"
+            path: "$cache{data_view_test_code}"
+            headerName: "签核进度"
+            lang:
+              headerName:
+                zh_CN: "签核进度"
+                zh_TW: "簽核進度"
+                en_US: "签核进度"
+            editable: false
+          needRemove: false
+        - data_name: "eoc_company_id"
+          alias: "营运公司编号"
+          data_type: "string"
+          description: "营运公司编号"
+          lang:
+            description:
+              zh_CN: "营运公司编号"
+              zh_TW: "營運公司編號"
+              en_US: "营运公司编号"
+            alias:
+              zh_CN: "营运公司编号"
+              zh_TW: "營運公司編號"
+              en_US: "营运公司编号"
+          fullPath: "$cache{data_view_test_code}.eoc_company_id"
+          dapFullPath: "eoc_company_id"
+          is_datakey: "false"
+          can_sort: true
+          can_filter: true
+          isOperate: false
+          field_dsl:
+            type: "EOC_SELECT"
+            width: 160
+            schema: "eoc_company_id"
+            path: "$cache{data_view_test_code}"
+            headerName: "营运公司编号"
+            lang:
+              headerName:
+                zh_CN: "营运公司编号"
+                zh_TW: "營運公司編號"
+                en_US: "营运公司编号"
+            schemas: ["eoc_company_id", "eoc_site_id", "eoc_region_id"]
+            editable: false
+          needRemove: false
+        - data_name: "eoc_site_id"
+          alias: "营运据点编号"
+          data_type: "string"
+          description: "营运据点编号"
+          lang:
+            description:
+              zh_CN: "营运据点编号"
+              zh_TW: "營運據點編號"
+              en_US: "营运据点编号"
+            alias:
+              zh_CN: "营运据点编号"
+              zh_TW: "營運據點編號"
+              en_US: "营运据点编号"
+          fullPath: "$cache{data_view_test_code}.eoc_site_id"
+          dapFullPath: "eoc_site_id"
+          is_datakey: "false"
+          can_sort: true
+          can_filter: true
+          isOperate: false
+          field_dsl:
+            type: "INPUT"
+            width: 160
+            editable: false
+          needRemove: false
+        - data_name: "eoc_region_id"
+          alias: "营运域编号"
+          data_type: "string"
+          description: "营运域编号"
+          lang:
+            description:
+              zh_CN: "营运域编号"
+              zh_TW: "營運域編號"
+              en_US: "营运域编号"
+            alias:
+              zh_CN: "营运域编号"
+              zh_TW: "營運域編號"
+              en_US: "营运域编号"
+          fullPath: "$cache{data_view_test_code}.eoc_region_id"
+          dapFullPath: "eoc_region_id"
+          is_datakey: "false"
+          can_sort: true
+          can_filter: true
+          isOperate: false
+          field_dsl:
+            type: "INPUT"
+            width: 160
+            editable: false
+          needRemove: false
+        - data_name: "owner_dept_id"
+          alias: "部门id"
+          data_type: "string"
+          description: "部门id"
+          lang:
+            description:
+              zh_CN: "部门id"
+              zh_TW: "部門id"
+              en_US: "部门id"
+            alias:
+              zh_CN: "部门id"
+              zh_TW: "部門id"
+              en_US: "部门id"
+          fullPath: "$cache{data_view_test_code}.owner_dept_id"
+          dapFullPath: "owner_dept_id"
+          is_datakey: "false"
+          can_sort: true
+          can_filter: true
+          isOperate: false
+          field_dsl:
+            type: "INPUT"
+            width: 160
+            editable: false
+          needRemove: false
+        - data_name: "owner_dept_name"
+          alias: "部门名称"
+          data_type: "string"
+          description: "部门名称"
+          lang:
+            description:
+              zh_CN: "部门名称"
+              zh_TW: "部門名稱"
+              en_US: "部门名称"
+            alias:
+              zh_CN: "部门名称"
+              zh_TW: "部門名稱"
+              en_US: "部门名称"
+          fullPath: "$cache{data_view_test_code}.owner_dept_name"
+          dapFullPath: "owner_dept_name"
+          is_datakey: "false"
+          can_sort: true
+          can_filter: true
+          isOperate: false
+          field_dsl:
+            type: "INPUT"
+            width: 160
+            schema: "owner_dept_name"
+            path: "$cache{data_view_test_code}"
+            headerName: "部门名称"
+            lang:
+              headerName:
+                zh_CN: "部门名称"
+                zh_TW: "部門名稱"
+                en_US: "部门名称"
+            editable: false
+          needRemove: false
+        - data_name: "owner_emp_id"
+          alias: "员工id"
+          data_type: "string"
+          description: "员工id"
+          lang:
+            description:
+              zh_CN: "员工id"
+              zh_TW: "員工id"
+              en_US: "员工id"
+            alias:
+              zh_CN: "员工id"
+              zh_TW: "員工id"
+              en_US: "员工id"
+          fullPath: "$cache{data_view_test_code}.owner_emp_id"
+          dapFullPath: "owner_emp_id"
+          is_datakey: "false"
+          can_sort: true
+          can_filter: true
+          isOperate: false
+          field_dsl:
+            type: "INPUT"
+            width: 160
+            schema: "owner_emp_id"
+            path: "$cache{data_view_test_code}"
+            headerName: "员工id"
+            lang:
+              headerName:
+                zh_CN: "员工id"
+                zh_TW: "員工id"
+                en_US: "员工id"
+            editable: false
+          needRemove: false
+        - data_name: "owner_emp_name"
+          alias: "员工名称"
+          data_type: "string"
+          description: "员工名称"
+          lang:
+            description:
+              zh_CN: "员工名称"
+              zh_TW: "員工名稱"
+              en_US: "员工名称"
+            alias:
+              zh_CN: "员工名称"
+              zh_TW: "員工名稱"
+              en_US: "员工名称"
+          fullPath: "$cache{data_view_test_code}.owner_emp_name"
+          dapFullPath: "owner_emp_name"
+          is_datakey: "false"
+          can_sort: true
+          can_filter: true
+          isOperate: false
+          field_dsl:
+            type: "INPUT"
+            width: 160
+            schema: "owner_emp_name"
+            path: "$cache{data_view_test_code}"
+            headerName: "员工名称"
+            lang:
+              headerName:
+                zh_CN: "员工名称"
+                zh_TW: "員工名稱"
+                en_US: "员工名称"
+            editable: false
+          needRemove: false
+        - data_name: "tenantsid"
+          alias: "租户sid"
+          data_type: "number"
+          description: "租户sid"
+          lang:
+            description:
+              zh_CN: "租户sid"
+              zh_TW: "租戶sid"
+              en_US: "租户sid"
+            alias:
+              zh_CN: "租户sid"
+              zh_TW: "租戶sid"
+              en_US: "租户sid"
+          fullPath: "$cache{data_view_test_code}.tenantsid"
+          dapFullPath: "tenantsid"
+          is_datakey: "false"
+          can_sort: true
+          can_filter: true
+          isOperate: false
+          field_dsl:
+            type: "INPUT"
+            width: 80
+            editable: false
+          needRemove: false
+        - data_name: "tenant_id"
+          alias: "租户Id"
+          data_type: "string"
+          description: "租户Id"
+          lang:
+            description:
+              zh_CN: "租户Id"
+              zh_TW: "租戶Id"
+              en_US: "租户Id"
+            alias:
+              zh_CN: "租户Id"
+              zh_TW: "租戶Id"
+              en_US: "租户Id"
+          fullPath: "$cache{data_view_test_code}.tenant_id"
+          dapFullPath: "tenant_id"
+          is_datakey: "false"
+          can_sort: true
+          can_filter: true
+          isOperate: false
+          field_dsl:
+            type: "INPUT"
+            width: 160
+            editable: false
+          needRemove: false
+        - data_name: "manage_status"
+          alias: "审核状态"
+          data_type: "string"
+          description: "审核状态"
+          lang:
+            description:
+              zh_CN: "审核状态"
+              zh_TW: "審核狀態"
+              en_US: "审核状态"
+            alias:
+              zh_CN: "审核状态"
+              zh_TW: "審核狀態"
+              en_US: "审核状态"
+          fullPath: "$cache{data_view_test_code}.manage_status"
+          dapFullPath: "manage_status"
+          is_datakey: "false"
+          can_sort: true
+          can_filter: true
+          isOperate: false
+          field_dsl:
+            type: "SELECT"
+            width: 160
+            schema: "manage_status"
+            path: "$cache{data_view_test_code}"
+            headerName: "审核状态"
+            lang:
+              headerName:
+                zh_CN: "审核状态"
+                zh_TW: "審核狀態"
+                en_US: "审核状态"
+            options: []
+            enumKey: "athenaPaaSDesigner-approve_all_status"
+            editable: false
+          needRemove: false
+    viewShowFieldsMobile:
+      data_code: "$cache{data_view_code}"
+      data_name: "全部"
+      service_code: "DPBAS"
+      lang:
+        data_name:
+          zh_CN: "全部"
+          zh_TW: "全部"
+          en_US: "全部"
+      field: []
+      canAddData: false
+    operationFields:
+      field: []
+      can_filter: true
+      can_sort: true
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 再次检查视图绑定关系
+tbb_check_bind_relation_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/tbb/checkBindRelation
+  method: POST
+  detail: 再次检查数据视图绑定关系
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    type: "view"
+    code: "$cache{data_view_code}"
+    serviceCode: "DPBAS"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询客户租户列表
+tenant_query_customer_tenants_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/tenant/queryCustomerTenants
+  method: GET
+  detail: 查询客户租户列表用于发布
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 发布数据视图模块
+module_publish_data_view_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modulePublish/modelSingle/publish
+  method: POST
+  detail: 发布数据视图模块
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    pkValue: "$cache{data_view_code}"
+    module: "dataView"
+    application: ${{app2_code()}}
+    tenantUsers:
+      - tenantId: "athenadeveloperTest"
+        tenantSid: 847600433497088
+        tenantName: "配置测试器"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+
+# 视图测试模型单发布
+modulePublish_modelSingle_publish_view_test_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modulePublish/modelSingle/publish
+  method: POST
+  detail: 视图测试模型单发布
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: json
+  is_run: true
+  data:
+    pkValue: "$cache{data_view_test_code}"
+    module: "modelDriven"
+    application: ${{app2_code()}}
+    tenantUsers:
+      - tenantId: "athenadeveloperTest"
+        tenantSid: 847600433497088
+        tenantName: "配置测试器"
+    serviceCode: "DPBAS"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 获取数据视图预览查询配置
+dataView_get_preview_config_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/dataView/getPreviewQueryConfig
+  method: GET
+  detail: 获取数据视图预览查询配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+    viewCode: "$cache{data_view_code}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 获取数据视图预览结果
+dataView_get_preview_result_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/dataView/getPreviewResult
+  method: POST
+  detail: 获取数据视图预览结果
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    queryConditionValues: []
+    viewCode: "$cache{data_view_code}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 清理视图测试业务对象
+dataView_testing_cleanup_business_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/delete
+  method: POST
+  detail: 清理视图测试业务对象
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    type: "businessConstructor"
+    businessCode: "$cache{data_view_test_business_code}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:

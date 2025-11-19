@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time   : 2022/3/29 15:01
-# @Author : 余少琪
+# @Author : 闻武
 import os
 import sys
 import traceback
@@ -15,6 +15,8 @@ from utils.notify.send_mail import SendEmail
 from utils.notify.lark import FeiShuTalkChatBot
 from utils.other_tools.allure_data.error_case_excel import ErrorCaseExcel
 from utils import config
+from utils.other_tools.ReportServer import ReportServer
+from common.setting import ensure_path_sep
 
 
 def run():
@@ -103,6 +105,10 @@ def run():
 
         # 程序运行之后，自动启动报告，如果不想启动报告，可注释这段代码
         os.system(f"allure serve ./report/tmp -h 127.0.0.1 -p 9999")
+
+        #启动本地服务供内网查看报告
+        server = ReportServer(report_path=ensure_path_sep("\\report\\html"), port=9999, host='0.0.0.0')
+        server.start_server()
 
     except Exception:
         # 如有异常，相关异常发送邮件

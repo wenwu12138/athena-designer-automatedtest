@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 # @Time   : 2022/3/29 14:59
-# @Author : 余少琪
+# @Author : 闻武
 描述: 发送企业微信通知
 """
 
@@ -13,6 +13,7 @@ from utils.times_tool.time_control import now_time
 from utils.other_tools.get_local_ip import get_host_ip
 from utils.other_tools.exceptions import SendMessageError, ValueTypeError
 from utils import config
+from utils.other_tools.ReportServer import ReportServer
 
 
 class WeChatSend:
@@ -100,7 +101,7 @@ class WeChatSend:
                                     >时间：<font color=\"comment\">{now_time()}</font>
                                     >
                                     >非相关负责人员可忽略此消息。
-                                    >测试报告，点击查看>>[测试报告入口](http://{get_host_ip()}:9999/index.html)"""
+                                    >测试报告，点击查看>>[测试报告入口](http://{ReportServer.get_local_ip()}:9999)"""
 
         WeChatSend(AllureFileClean().get_case_count()).send_markdown(text)
 

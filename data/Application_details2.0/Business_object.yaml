@@ -42,7 +42,7 @@ businessDir_add_001:
   requestType: JSON
   is_run: true
   data:
-    code: "automatedtesting_basis_${{randon_id()}}"
+    code: "automatedtesting_basis_${{random_id()}}"
     name: "自动化测试_基础档${{get_time()}}"
     description: "自动化测试_基础档${{get_time()}}"
     serviceCode: "DPBAS"
@@ -86,7 +86,7 @@ businessDir_add_param_001:
   requestType: JSON
   is_run: true
   data:
-    code: "autotest_param_${{randon_id()}}"
+    code: "autotest_param_${{random_id()}}"
     name: "自动化测试_参数档${{get_time()}}"
     description: "自动化测试_参数档${{get_time()}}"
     serviceCode: "DPBAS"
@@ -130,7 +130,7 @@ businessDir_add_transaction_001:
   requestType: JSON
   is_run: true
   data:
-    code: "autotest_trans_${{randon_id()}}"
+    code: "autotest_trans_${{random_id()}}"
     name: "自动化测试_业务档${{get_time()}}"
     description: "自动化测试_业务档${{get_time()}}"
     serviceCode: "DPBAS"
@@ -164,12 +164,12 @@ businessDir_add_transaction_001:
 
 
 
-# 查询业务目录列表
+# 查询业务目录列表(按对象)
 businessDir_queryList_001:
   host: ${{athena_designer_host()}}
   url: /athena-designer/businessDir/queryList
   method: POST
-  detail: 查询业务目录列表
+  detail: 查询业务目录列表(按对象)
   headers:
     digi-middleware-auth-user: $cache{token}
   requestType: JSON
@@ -707,7 +707,7 @@ api_add_001:
   is_run: true
   data:
     apiName: "esp_dpbas.$cache{business_Api}.detail.get"
-    apiModelCode: "automatedtesting_api_${{randon_id()}}"
+    apiModelCode: "automatedtesting_api_${{random_id()}}"
     apiModelName: "自动化测试_API业务对象${{get_time()}}"
     application: "${{app2_code()}}"
     apiType: "detail"
@@ -733,7 +733,7 @@ api_add_001:
     relateColumnList: []
     modelFullPathList:
       - modelCode: "purchase_order_detail"
-        fullPath: "automatedtesting_api_${{randon_id()}}.purchase_order_detail"
+        fullPath: "automatedtesting_api_${{random_id()}}.purchase_order_detail"
   dependence_case: false
   dependence_case_data:
   assert:

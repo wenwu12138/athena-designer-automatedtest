@@ -1,0 +1,438 @@
+# 公共参数
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 2.0应用详情
+  allureStory: 界面设计
+
+
+# 创建界面设计测试业务对象
+pageDesign_testing_create_business_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/add
+  method: POST
+  detail: 创建界面设计功能测试业务对象
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: true
+  data:
+    code: "page_design_test_biz_${{random_id()}}"
+    name: "界面设计功能测试_业务对象${{get_time()}}"
+    description: "界面设计功能自动化测试专用业务对象${{get_time()}}"
+    serviceCode: "DPBAS"
+    needCreateApi: true
+    customProperties: {}
+    modelType: "transaction"
+    lang:
+      name:
+        zh_CN: "界面设计功能测试_业务对象${{get_time()}}"
+        zh_TW: "界面設計功能測試_業務對象${{get_time()}}"
+        en_US: "PageDesignFuncTest_BizObj${{get_time()}}"
+      description:
+        zh_CN: "界面设计功能自动化测试专用业务对象${{get_time()}}"
+        zh_TW: "界面設計功能自動化測試專用業務對象${{get_time()}}"
+        en_US: "Business object for page design function testing${{get_time()}}"
+    tenantId: "SYSTEM"
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: request
+      jsonpath: $.code
+      name: page_design_test_biz_code
+
+# 查询界面设计测试业务对象信息
+pageDesign_testing_query_business_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modelDriver/queryModelByCode
+  method: GET
+  detail: 查询界面设计测试业务对象详情
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: PARAMS
+  is_run: true
+  data:
+    code: "$cache{page_design_test_biz_code}"
+    serviceCode: "DPBAS"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.relateBusinessCode
+      name: page_design_test_business_code
+    - type: response
+      jsonpath: $.data.objectId
+      name: page_design_test_object_id
+
+# 为界面设计业务对象生成数据视图查询计划
+pageDesign_generateQueryPlan_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/dataView/generateJustQueryPlan
+  method: POST
+  detail: 为界面设计业务对象生成查询方案
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    locale: zh_CN
+  requestType: JSON
+  is_run: true
+  data:
+    modelId: "$cache{page_design_test_biz_code}"
+    serviceCode: "DPBAS"
+    businessCode: "$cache{page_design_test_business_code}"
+    application: ${{app2_code()}}
+    addSourceType: "object_perspective"
+    workType: "model"
+    operateType: "append"
+    createDataViewList:
+      - name: "界面设计数据视图"
+        dataViewType: "page_design_view"
+        description: "界面设计数据视图${{get_time()}}"
+        sql: "SELECT $cache{page_design_test_biz_code}_id, manage_status, complete_state, serial_number, eoc_company_id, eoc_site_id, eoc_region_id, owner_dept_id, owner_dept_name, owner_emp_id, owner_emp_name, tenantsid, tenant_id, create_by, create_date, modified_by, modified_date, creator_name, modifier_name FROM $cache{page_design_test_biz_code} ORDER BY created_date DESC"
+        lang:
+          name:
+            zh_CN: "界面设计数据视图"
+            zh_TW: "界面設計數據視圖"
+            en_US: "PageDesignDataView"
+          description:
+            zh_CN: "界面设计数据视图${{get_time()}}"
+            zh_TW: "界面設計數據視圖${{get_time()}}"
+            en_US: "PageDesignDataView${{get_time()}}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询界面设计数据视图
+pageDesign_queryDataViewByModel_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/dataView/queryDataViewByModel
+  method: POST
+  detail: 查询界面设计模型的数据视图列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: true
+  data:
+    modelCode: "$cache{page_design_test_biz_code}"
+    serviceCode: "DPBAS"
+    businessCode: "$cache{page_design_test_business_code}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data[0].code
+      name: page_design_data_view_code
+
+# 基于界面设计数据视图生成带查询方案的表格
+pageDesign_generateFormWithQueryPlan_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/pageDesign/generatePageDesignByQueryPlan
+  method: POST
+  detail: 基于界面设计数据视图生成带查询方案的表格页面
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    locale: zh_CN
+  requestType: JSON
+  is_run: true
+  data:
+    name: "界面设计测试_查询方案表格${{get_time()}}"
+    dependOnGroundEnd: false
+    authorityPrefix: ""
+    application: ${{app2_code()}}
+    addPageDesignType: "dataview_table_horizontal"
+    addSourceType: "object_perspective"
+    workType: "model"
+    operateType: "append"
+    serviceCode: "DPBAS"
+    businessCode: "$cache{page_design_test_business_code}"
+    modelId: "$cache{page_design_test_biz_code}"
+    dataViewCodes: ["$cache{page_design_data_view_code}"]
+    lang:
+      name:
+        zh_CN: "界面设计测试_查询方案表格${{get_time()}}"
+        zh_TW: "界面設計測試_查詢方案表格${{get_time()}}"
+        en_US: "PageDesignTest_QueryPlanTable${{get_time()}}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.code
+      name: page_design_table_code
+
+
+# 查询应用下的业务对象列表
+businessDir_queryList_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/queryList
+  method: POST
+  detail: 查询应用下的业务对象列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    authorization: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data[0].businessDirTree[2].businessDirTree[0].businessSubCode
+      name: page_design_table_code
+
+
+# 更新页面设计配置
+pageDesign_updatePageConfig_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/pageDesign/update
+  method: POST
+  detail: 更新页面设计配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    authorization: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    createDate: "${{get_time()}}"
+    editBy: "wenwu@digiwin.com"
+    editDate: "${{get_time()}}"
+    objectId: "691c27221d5fa11b6d5f32ba"
+    code: "$cache{page_design_table_code}"
+    application: ${{app2_code()}}
+    name: "界面设计测试_查询方案表格${{get_time()}}"
+    lang:
+      businessSubName:
+        zh_CN: "界面设计测试_查询方案表格${{get_time()}}"
+        zh_TW: "界面設計測試_查詢方案表格${{get_time()}}"
+        en_US: "PageDesignTest_QueryPlanTable${{get_time()}}"
+      name:
+        zh_CN: "界面设计测试_查询方案表格${{get_time()}}"
+        zh_TW: "界面設計測試_查詢方案表格${{get_time()}}"
+        en_US: "PageDesignTest_QueryPlanTable${{get_time()}}"
+    pageDsl:
+      dataSources:
+        $cache{page_design_table_code}_index:
+          sequence: 0
+          title: "索引页"
+          type: "ESP"
+          actionId: "esp_modeldriven.commons.eai.dataview.get"
+          serviceName: "modeldriven.commons.eai.dataview.get"
+          productName: "DPBAS"
+          paras:
+            dataViewList: []
+            type: "total"
+          lang:
+            title:
+              zh_CN: "索引页"
+              zh_TW: "索引頁"
+              en_US: "index page"
+          override: false
+          metadataFields: []
+          enablePaging: true
+          dataViewQuery:
+            isDefault: "true"
+            code: "index"
+            type: "manual"
+          viewCode: "index"
+      style: {}
+      rules: []
+      dataSourceName: "$cache{page_design_table_code}_index"
+      dataSourceNames: ["$cache{page_design_table_code}_index"]
+      groupSchemaList: []
+    detailDsl:
+      dataSources:
+        $cache{page_design_test_biz_code}_detail:
+          sequence: 0
+          title: "界面设计功能测试_业务对象${{get_time()}}"
+          type: "ESP"
+          actionId: "esp_dpbas.$cache{page_design_test_biz_code}.detail.get"
+          serviceName: "dpbas.$cache{page_design_test_biz_code}.detail.get"
+          actionParams:
+            - name: "$cache{page_design_test_biz_code}.$cache{page_design_test_biz_code}_id"
+              type: "ACTIVE_ROW"
+              value: "$cache{page_design_test_biz_code}_id"
+          lang:
+            title:
+              zh_CN: "界面设计功能测试_业务对象${{get_time()}}"
+              zh_TW: "界面設計功能測試_業務對象${{get_time()}}"
+              en_US: "PageDesignFuncTest_BizObj${{get_time()}}"
+          override: false
+          dataViewQuery:
+            code: "$cache{page_design_table_code}_00c5eca75b9444698aae20bd106ddac0"
+      style: {}
+      rules: []
+      dataSourceNames: ["$cache{page_design_test_biz_code}_detail"]
+      groupSchemaList: []
+    type: "DOUBLE-DOCUMENT-FORM"
+    sourceType: "MODEL_DRIVEN"
+    dependOnGroundEnd: false
+    authorityPrefix: ""
+    generateDslAction: true
+    serviceCode: "DPBAS"
+    simpleModelCode: "$cache{page_design_test_biz_code}"
+    simpleModelServiceCode: "DPBAS"
+    supportNavigateFlag: false
+    category: "DOUBLE-DOCUMENT-FORM"
+    autoGenerateFlag: true
+    businessCode: "$cache{page_design_test_business_code}"
+    modelType: "transaction"
+    tenantId: "SYSTEM"
+    workType: "model"
+    comeFromBusinessFlag: false
+    pageDesignVersion: "1"
+    pageUIElement: []
+    masterFromDataSourceName: true
+    operateTemplateRelates: []
+    operateCustomTemplateRelates: []
+    iamCondition: []
+    customComponentContainsFlag: false
+    indexDirection: "horizontal"
+    addPageDesignType: "dataview_table_horizontal"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 批量更新子页面
+pageDesign_batchUpdateSubpage_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/subpage/subpageBatchUpdate
+  method: POST
+  detail: 批量更新子页面
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    authorization: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    subPageList: []
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询页面设计操作记录
+pageDesign_getOperationRecord_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/operationRecord/get
+  method: GET
+  detail: 查询页面设计操作记录
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    authorization: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    code: "$cache{page_design_table_code}"
+    collection: "pageDesign"
+    appCode: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 发布模块到租户
+modulePublish_publish_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modulePublish/publish
+  method: POST
+  detail: 发布页面设计模块到租户
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    authorization: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    pkValue: "$cache{page_design_table_code}"
+    module: "DataEntry"
+    application: ${{app2_code()}}
+    tenantUsers:
+      - tenantId: "athenadeveloperTest"
+        tenantSid: 847600433497088
+        tenantName: "配置测试器"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 清理界面设计测试业务对象
+pageDesign_testing_cleanup_business_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/delete
+  method: POST
+  detail: 清理界面设计测试业务对象
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: True
+  data:
+    type: "businessConstructor"
+    businessCode: "$cache{page_design_test_business_code}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:

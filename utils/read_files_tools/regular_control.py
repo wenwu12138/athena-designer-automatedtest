@@ -1,7 +1,7 @@
 """
 Desc : 自定义函数调用
 # @Time : 2022/4/2 9:32 上午
-# @Author : 余少琪
+# @Author : 闻武
 """
 import re
 import datetime
@@ -20,7 +20,7 @@ class Context:
         self.faker = Faker(locale='zh_CN')
 
     @classmethod
-    def randon_id(self):
+    def random_id(self):
         length = random.randint(5, 10)  #随机生成长度5~10
         characters = string.ascii_lowercase + string.digits  # 创建一个字母和数字的小写字符集
         Id = ''.join(random.choice(characters) for _ in range(length))
@@ -282,5 +282,5 @@ if __name__ == '__main__':
 
     print(cache_regular("weweweweew:$cache{test}"))
 
-    print("随机的id：",Context().randon_id())
+    print("随机的id：",Context().random_id())
 

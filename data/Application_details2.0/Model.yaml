@@ -17,7 +17,7 @@ model_testing_create_business_001:
   requestType: JSON
   is_run: true
   data:
-    code: "model_test_biz_${{randon_id()}}"
+    code: "model_test_biz_${{random_id()}}"
     name: "模型功能测试_业务对象${{get_time()}}"
     description: "模型驱动功能自动化测试专用业务对象${{get_time()}}"
     serviceCode: "DPBAS"

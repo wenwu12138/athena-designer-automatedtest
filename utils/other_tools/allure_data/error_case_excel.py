@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 # @Time    : 2022/5/8 21:37
-# @Author  : 余少琪
+# @Author  : 闻武
 # @Email   : 1603453211@qq.com
 # @File    : error_case_excel
 # @describe:

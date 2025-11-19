@@ -1,0 +1,537 @@
+# 公共参数
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 2.0应用详情
+  allureStory: 事件相关
+
+# 创建事件测试业务对象
+event_testing_create_business_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/add
+  method: POST
+  detail: 创建事件功能测试业务对象
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: JSON
+  is_run: true
+  data:
+    code: "event_test_biz_${{random_id()}}"
+    name: "事件功能测试_业务对象${{get_time()}}"
+    description: "事件驱动功能自动化测试专用业务对象${{get_time()}}"
+    serviceCode: "DPBAS"
+    needCreateApi: true
+    customProperties: {}
+    modelType: "transaction"
+    lang:
+      name:
+        zh_CN: "事件功能测试_业务对象${{get_time()}}"
+        zh_TW: "事件功能測試_業務對象${{get_time()}}"
+        en_US: "EventFuncTest_BizObj${{get_time()}}"
+      description:
+        zh_CN: "事件驱动功能自动化测试专用业务对象${{get_time()}}"
+        zh_TW: "事件驅動功能自動化測試專用業務對象${{get_time()}}"
+        en_US: "Business object for event-driven function testing${{get_time()}}"
+    tenantId: "SYSTEM"
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: request
+      jsonpath: $.code
+      name: event_test_biz_code
+
+# 查询事件测试业务对象信息
+event_testing_query_business_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modelDriver/queryModelByCode
+  method: GET
+  detail: 查询事件测试业务对象详情
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: PARAMS
+  is_run: true
+  data:
+    code: "$cache{event_test_biz_code}"
+    serviceCode: "DPBAS"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.relateBusinessCode
+      name: event_test_business_code
+    - type: response
+      jsonpath: $.data.objectId
+      name: event_test_object_id
+
+# 保存事件定义
+event_testing_save_event_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/event/eventAddOrUpdate
+  method: POST
+  detail: 保存事件定义
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: JSON
+  is_run: true
+  data:
+    createDate: "2025-11-18 17:33:59"
+    editBy: "wenwu@digiwin.com"
+    editDate: "2025-11-18 17:33:59"
+    eventId: "/${{app2_code()}}/md/DPBAS/$cache{event_test_biz_code}/delete"
+    eventName: "删除事件${{get_time()}}"
+    eventLevel: "application"
+    eventType: "standard"
+    eventOwner: "${{app2_code()}}"
+    lang:
+      businessName:
+        zh_CN: "事件功能测试_业务对象${{get_time()}}"
+        zh_TW: "事件功能測試_業務對象${{get_time()}}"
+        en_US: "EventFuncTest_BizObj${{get_time()}}"
+      eventName:
+        zh_CN: "删除事件${{get_time()}}"
+        zh_TW: "刪除事件${{get_time()}}"
+        en_US: "Delete Event${{get_time()}}"
+    eventEnable: "Y"
+    adpTenantId: "athenadeveloperTest"
+    application: "${{app2_code()}}"
+    bizCode: "$cache{event_test_business_code}"
+    businessName: "事件功能测试_业务对象${{get_time()}}"
+    dataStruct: "standard"
+    supportExtend: false
+    eventBodyExplain:
+      data_name: "$cache{event_test_biz_code}"
+      data_type: "object"
+      required: "true"
+      description: "事件功能测试_业务对象${{get_time()}}"
+      lang:
+        description:
+          zh_CN: "事件功能测试_业务对象${{get_time()}}"
+          zh_TW: "事件功能測試_業務對象${{get_time()}}"
+          en_US: "EventFuncTest_BizObj${{get_time()}}"
+      field:
+        - data_name: "${cache{event_test_biz_code}}_id"
+          data_type: "number"
+          description: "事件功能测试_业务对象${{get_time()}}主键"
+          lang:
+            description:
+              zh_CN: "事件功能测试_业务对象${{get_time()}}主键"
+              zh_TW: "事件功能測試_業務對象${{get_time()}}主鍵"
+              en_US: "EventFuncTest_BizObj${{get_time()}} Primary Key"
+          fullPath: "$cache{event_test_biz_code}.${cache{event_test_biz_code}}_id"
+          unique: false
+          isSystem: true
+          is_datakey: "true"
+          is_array: false
+          is_businesskey: true
+        - data_name: "manage_status"
+          data_type: "string"
+          description: "审核状态"
+          lang:
+            description:
+              zh_CN: "审核状态"
+              zh_TW: "審核狀態"
+              en_US: "Approval Status"
+          fullPath: "$cache{event_test_biz_code}.manage_status"
+          unique: false
+          isSystem: false
+          is_datakey: "false"
+          is_array: false
+          is_businesskey: false
+        - data_name: "complete_state"
+          data_type: "string"
+          description: "签核完成状态"
+          lang:
+            description:
+              zh_CN: "签核完成状态"
+              zh_TW: "簽核完成狀態"
+              en_US: "Sign-off Complete Status"
+          fullPath: "$cache{event_test_biz_code}.complete_state"
+          unique: false
+          isSystem: false
+          is_datakey: "false"
+          is_array: false
+          is_businesskey: false
+        - data_name: "serial_number"
+          data_type: "string"
+          description: "签核进度"
+          lang:
+            description:
+              zh_CN: "签核进度"
+              zh_TW: "簽核進度"
+              en_US: "Sign-off Progress"
+          fullPath: "$cache{event_test_biz_code}.serial_number"
+          unique: false
+          isSystem: false
+          is_datakey: "false"
+          is_array: false
+          is_businesskey: false
+        - data_name: "eoc_company_id"
+          data_type: "string"
+          description: "营运公司编号"
+          lang:
+            description:
+              zh_CN: "营运公司编号"
+              zh_TW: "營運公司編號"
+              en_US: "Operating Company Code"
+          fullPath: "$cache{event_test_biz_code}.eoc_company_id"
+          unique: false
+          isSystem: false
+          is_datakey: "false"
+          is_array: false
+          is_businesskey: false
+        - data_name: "eoc_site_id"
+          data_type: "string"
+          description: "营运据点编号"
+          lang:
+            description:
+              zh_CN: "营运据点编号"
+              zh_TW: "營運據點編號"
+              en_US: "Operating Site Code"
+          fullPath: "$cache{event_test_biz_code}.eoc_site_id"
+          unique: false
+          isSystem: false
+          is_datakey: "false"
+          is_array: false
+          is_businesskey: false
+        - data_name: "eoc_region_id"
+          data_type: "string"
+          description: "营运域编号"
+          lang:
+            description:
+              zh_CN: "营运域编号"
+              zh_TW: "營運域編號"
+              en_US: "Operating Region Code"
+          fullPath: "$cache{event_test_biz_code}.eoc_region_id"
+          unique: false
+          isSystem: false
+          is_datakey: "false"
+          is_array: false
+          is_businesskey: false
+        - data_name: "owner_dept_id"
+          data_type: "string"
+          description: "部门id"
+          lang:
+            description:
+              zh_CN: "部门id"
+              zh_TW: "部門id"
+              en_US: "Department ID"
+          fullPath: "$cache{event_test_biz_code}.owner_dept_id"
+          unique: false
+          isSystem: false
+          is_datakey: "false"
+          is_array: false
+          is_businesskey: false
+        - data_name: "owner_dept_name"
+          data_type: "string"
+          description: "部门名称"
+          lang:
+            description:
+              zh_CN: "部门名称"
+              zh_TW: "部門名稱"
+              en_US: "Department Name"
+          fullPath: "$cache{event_test_biz_code}.owner_dept_name"
+          unique: false
+          isSystem: false
+          is_datakey: "false"
+          is_array: false
+          is_businesskey: false
+        - data_name: "owner_emp_id"
+          data_type: "string"
+          description: "员工id"
+          lang:
+            description:
+              zh_CN: "员工id"
+              zh_TW: "員工id"
+              en_US: "Employee ID"
+          fullPath: "$cache{event_test_biz_code}.owner_emp_id"
+          unique: false
+          isSystem: false
+          is_datakey: "false"
+          is_array: false
+          is_businesskey: false
+        - data_name: "owner_emp_name"
+          data_type: "string"
+          description: "员工名称"
+          lang:
+            description:
+              zh_CN: "员工名称"
+              zh_TW: "員工名稱"
+              en_US: "Employee Name"
+          fullPath: "$cache{event_test_biz_code}.owner_emp_name"
+          unique: false
+          isSystem: false
+          is_datakey: "false"
+          is_array: false
+          is_businesskey: false
+        - data_name: "tenantsid"
+          data_type: "number"
+          description: "租户sid"
+          lang:
+            description:
+              zh_CN: "租户sid"
+              zh_TW: "租戶sid"
+              en_US: "Tenant SID"
+          fullPath: "$cache{event_test_biz_code}.tenantsid"
+          unique: false
+          isSystem: true
+          is_datakey: "false"
+          is_array: false
+          is_businesskey: false
+        - data_name: "tenant_id"
+          data_type: "string"
+          description: "租户Id"
+          lang:
+            description:
+              zh_CN: "租户Id"
+              zh_TW: "租戶Id"
+              en_US: "Tenant ID"
+          fullPath: "$cache{event_test_biz_code}.tenant_id"
+          unique: false
+          isSystem: true
+          is_datakey: "false"
+          is_array: false
+          is_businesskey: false
+        - data_name: "create_by"
+          data_type: "string"
+          description: "创建者"
+          lang:
+            description:
+              zh_CN: "创建者"
+              zh_TW: "創建者"
+              en_US: "Creator"
+          fullPath: "$cache{event_test_biz_code}.create_by"
+          unique: false
+          isSystem: true
+          is_datakey: "false"
+          is_array: false
+          is_businesskey: false
+        - data_name: "create_date"
+          data_type: "datetime"
+          description: "创建时间"
+          lang:
+            description:
+              zh_CN: "创建时间"
+              zh_TW: "創建時間"
+              en_US: "Create Time"
+          fullPath: "$cache{event_test_biz_code}.create_date"
+          unique: false
+          isSystem: true
+          is_datakey: "false"
+          is_array: false
+          is_businesskey: false
+        - data_name: "modified_by"
+          data_type: "string"
+          description: "修改者"
+          lang:
+            description:
+              zh_CN: "修改者"
+              zh_TW: "修改者"
+              en_US: "Modifier"
+          fullPath: "$cache{event_test_biz_code}.modified_by"
+          unique: false
+          isSystem: true
+          is_datakey: "false"
+          is_array: false
+          is_businesskey: false
+        - data_name: "modified_date"
+          data_type: "datetime"
+          description: "修改时间"
+          lang:
+            description:
+              zh_CN: "修改时间"
+              zh_TW: "修改時間"
+              en_US: "Modify Time"
+          fullPath: "$cache{event_test_biz_code}.modified_date"
+          unique: false
+          isSystem: true
+          is_datakey: "false"
+          is_array: false
+          is_businesskey: false
+        - data_name: "creator_name"
+          data_type: "string"
+          description: "创建者名称"
+          lang:
+            description:
+              zh_CN: "创建者名称"
+              zh_TW: "創建者名稱"
+              en_US: "Creator Name"
+          fullPath: "$cache{event_test_biz_code}.creator_name"
+          unique: false
+          isSystem: true
+          is_datakey: "false"
+          is_array: false
+          is_businesskey: false
+        - data_name: "modifier_name"
+          data_type: "string"
+          description: "修改者名称"
+          lang:
+            description:
+              zh_CN: "修改者名称"
+              zh_TW: "修改者名稱"
+              en_US: "Modifier Name"
+          fullPath: "$cache{event_test_biz_code}.modifier_name"
+          unique: false
+          isSystem: true
+          is_datakey: "false"
+          is_array: false
+          is_businesskey: false
+      fullPath: "$cache{event_test_biz_code}"
+      is_datakey: "false"
+      is_array: true
+      is_businesskey: false
+    autoGenerateFlag: true
+    modelId: "$cache{event_test_biz_code}"
+    isCustomDir: false
+    serviceCode: "DPBAS"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: request
+      jsonpath: $.eventId
+      name: event_test_event_id
+
+
+
+# 新增事件模型
+event_testing_add_model_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/event/eventAddOrUpdate
+  method: POST
+  detail: 新增事件模型
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    authorization: $cache{token}
+    locale: zh_CN
+  requestType: JSON
+  is_run: true
+  data:
+    eventName: "事件功能测试_新增模型${{get_time()}}"
+    customCode: "autotest_${{random_id()}}"
+    eventType: "custom"
+    dataStruct: "all"
+    addSourceType: "object_perspective"
+    adpTenantId: "athenadeveloperTest"
+    lang:
+      eventName:
+        zh_CN: "事件功能测试_新增模型${{get_time()}}"
+        zh_TW: "事件功能測試_新增模型${{get_time()}}"
+        en_US: "EventFuncTest_AddModel${{get_time()}}"
+    bizCode: "$cache{event_test_business_code}"
+    modelId: "$cache{event_test_biz_code}"
+    serviceCode: "DPBAS"
+    application: "${{app2_code()}}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: request
+      jsonpath: $.customCode
+      name: event_test_custom_code
+
+
+
+# 查询事件列表
+event_testing_query_list_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/getBusinessDirTree
+  method: GET
+  detail: 查询事件列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    authorization: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: false
+  data:
+    application: "${{app2_code()}}"
+    type: "event"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $..businessDirTree[?(@.businessSubName=='$cache{event_test_biz_code}')]..businessSubCode
+      name: event_test_id
+
+# 发布事件模型
+event_testing_publish_model_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modulePublish/modelSingle/publish
+  method: POST
+  detail: 发布事件模型
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    authorization: $cache{token}
+    locale: zh_CN
+  requestType: JSON
+  is_run: false
+  data:
+    pkValue: "$cache{event_test_id}"
+    module: "event"
+    application: "${{app2_code()}}"
+    tenantUsers:
+      - tenantId: "athenadeveloperTest"
+        tenantSid: 847600433497088
+        tenantName: "配置测试器"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 删除事件模型
+event_testing_delete_event_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/event/eventDelete
+  method: POST
+  detail: 删除事件模型
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    authorization: $cache{token}
+    locale: zh_CN
+  requestType: JSON
+  is_run: false
+  data:
+    id: "$cache{event_test_id}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
