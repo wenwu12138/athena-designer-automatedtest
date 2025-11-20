@@ -1,0 +1,828 @@
+# 公共参数
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 2.0应用详情
+  allureStory: 行动
+
+
+
+# 查询Actions列表（无分页）
+action_FindActionsNoPaging_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/action/findActionsNoPagingV2
+  method: GET
+  detail: 查询Actions列表（无分页）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    labelType: ""
+    condition: ""
+    appCode: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询应用信息
+action_GetApplication_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/get
+  method: GET
+  detail: 查询应用信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    condition: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询项目列表
+action_GetProjectList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/project/projectList/${{app2_code()}}
+  method: GET
+  detail: 查询项目列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 获取JSON请求导入数据
+action_JsonReqImportGet_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/action/JsonReqImport/Get
+  method: POST
+  detail: 获取JSON请求导入数据
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    storageput:
+      - balance: 5
+        storageput_id: 1
+        isgood: true
+        manage_status: "N"
+        complete_state: "0"
+        eoc_company_id: ""
+        eoc_site_id: ""
+        eoc_region_id: ""
+        owner_dept_id: ""
+        owner_dept_name: ""
+        owner_emp_id: ""
+        owner_emp_name: ""
+        hardware_name: "123"
+        hardware_type: ""
+        maintenance_record: ""
+        maintenance_personnel: ""
+        staff_id: "123"
+        tenantsid: 847600433497088
+        tenant_id: "athenadeveloperTest"
+        create_by: "wenwu@digiwin.com"
+        create_date: "2025-02-26 16:53:19"
+        modified_by: "wenwu@digiwin.com"
+        modified_date: "2025-02-27 15:58:09"
+        creator_name: "闻武"
+        modifier_name: "闻武"
+        __DATA_KEY: "1;"
+        uibot_data_status: "not-changed"
+        edit_type: 1
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 保存Action
+action_SaveAction_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/action/saveAction
+  method: POST
+  detail: 保存Action
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    actionId: "auto_action_${{random_id()}}"
+    label: "Action"
+    actionName: "自动化验证_action_${{get_time()}}"
+    application: ${{app2_code()}}
+    target: null
+    expression: null
+    type: null
+    request_parameters: []
+    response_object:
+      data_type: "object"
+      data_name: "storageput"
+      is_array: true
+      is_businesskey: false
+      is_datakey: false
+      required: false
+      description:
+        zh_CN: ""
+        zh_TW: ""
+        en_US: ""
+      fullPath: "storageput"
+      field:
+        - data_type: "double"
+          data_name: "balance"
+          is_array: false
+          is_businesskey: false
+          is_datakey: false
+          required: false
+          description:
+            zh_CN: "5"
+            zh_TW: "5"
+            en_US: "5"
+          fullPath: "storageput.balance"
+          uniqueId: "1763607369958_0"
+          _prefix: "storageput"
+          _hasInsert: true
+          level: 1
+        - data_type: "double"
+          data_name: "storageput_id"
+          is_array: false
+          is_businesskey: false
+          is_datakey: false
+          required: false
+          description:
+            zh_CN: "1"
+            zh_TW: "1"
+            en_US: "1"
+          fullPath: "storageput.storageput_id"
+          uniqueId: "1763607369958_1"
+          _prefix: "storageput"
+          _hasInsert: true
+          level: 1
+      uniqueId: "1763607369958_0"
+      _hasInsert: true
+      children: []
+    actionFieldRelations: []
+    lang:
+      actionName:
+        zh_CN: "自动化验证_action_${{get_time()}}"
+        zh_TW: "自動化驗證_action_${{get_time()}}"
+        en_US: "自动化验证_action_${{get_time()}}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.actionId
+      name: action_id
+
+# 根据Action ID查询Action详情
+action_FindActionByActionId_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/action/findActionByActionId
+  method: GET
+  detail: 根据Action ID查询Action详情
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    label: "Action"
+    actionId: $cache{action_id}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 更新Action
+action_UpdateAction_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/action/updateAction
+  method: POST
+  detail: 更新Action
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    actionId: $cache{action_id}
+    label: "Action"
+    actionName: "更新自动化验证_action_${{get_time()}}"
+    application: ${{app2_code()}}
+    target: null
+    expression: null
+    type: null
+    request_parameters: []
+    response_object:
+      data_name: "storageput"
+      data_type: "object"
+      required: false
+      description:
+        zh_CN: ""
+        zh_TW: ""
+        en_US: ""
+      field:
+        - data_name: "balance"
+          data_type: "double"
+          required: false
+          description:
+            zh_CN: "5"
+            zh_TW: "5"
+            en_US: "5"
+          fullPath: "storageput.balance"
+          is_datakey: false
+          is_array: false
+          is_businesskey: false
+          uniqueId: "1763607392446_0"
+          _prefix: "storageput"
+          _hasInsert: true
+          level: 1
+        - data_name: "storageput_id"
+          data_type: "double"
+          required: false
+          description:
+            zh_CN: "1"
+            zh_TW: "1"
+            en_US: "1"
+          fullPath: "storageput.storageput_id"
+          is_datakey: false
+          is_array: false
+          is_businesskey: false
+          uniqueId: "1763607392446_1"
+          _prefix: "storageput"
+          _hasInsert: true
+          level: 1
+      fullPath: "storageput"
+      is_datakey: false
+      is_array: true
+      is_businesskey: false
+      uniqueId: "1763607392446_0"
+      _hasInsert: true
+      children: []
+    actionFieldRelations: []
+    lang:
+      actionName:
+        zh_CN: "更新自动化验证_action_${{get_time()}}"
+        zh_TW: "更新自動化驗證_action_${{get_time()}}"
+        en_US: "更新自动化验证_action_${{get_time()}}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 发布行动
+modulePublish_Publish_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modulePublish/publish
+  method: POST
+  detail: 发布行动
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    pkValue: $cache{action_id}
+    module: "action"
+    application: ${{app2_code()}}
+    tenantUsers:
+      - tenantId: "athenadeveloperTest"
+        tenantSid: 847600433497088
+        tenantName: "配置测试器"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询行动操作记录
+operationRecord_Get_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/operationRecord/get
+  method: GET
+  detail: 查询行动操作记录
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    code: $cache{action_id}
+    collection: "actionMetadata"
+    appCode: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 根据Action ID删除Action
+action_DeleteActionByActionId_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/action/deleteActionByActionId
+  method: GET
+  detail: 根据Action ID删除Action
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    actionId: $cache{action_id}
+    label: "Action"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# -------------athena action-------------
+# 保存Athena Action
+action_SaveAthenaAction_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/action/saveAction
+  method: POST
+  detail: 保存Athena Action
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    actionId: "auto_athenaaction_${{random_id()}}"
+    label: "AthenaAction"
+    actionName: "athenaaction_${{get_time()}}"
+    application: ${{app2_code()}}
+    url: null
+    method: null
+    module: null
+    type: "ATHENA"
+    request_parameters: []
+    actionFieldRelations: []
+    lang:
+      actionName:
+        zh_CN: "athenaaction_${{get_time()}}"
+        zh_TW: "athenaaction_${{get_time()}}"
+        en_US: "athenaaction_${{get_time()}}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.actionId
+      name: athena_action_id
+
+# 更新Athena Action
+action_UpdateAthenaAction_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/action/updateAction
+  method: POST
+  detail: 更新Athena Action
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    actionId: $cache{athena_action_id}
+    label: "AthenaAction"
+    actionName: "更新athenaaction_${{get_time()}}"
+    application: ${{app2_code()}}
+    url: null
+    method: null
+    module: null
+    type: "ATHENA"
+    request_parameters: []
+    actionFieldRelations: []
+    lang:
+      actionName:
+        zh_CN: "更新athenaaction_${{get_time()}}"
+        zh_TW: "更新athenaaction_${{get_time()}}"
+        en_US: "更新athenaaction_${{get_time()}}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 删除Athena Action
+action_DeleteAthenaAction_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/action/deleteActionByActionId
+  method: GET
+  detail: 删除Athena Action
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    actionId: $cache{athena_action_id}
+    label: "AthenaAction"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# ----------DataPullingAction ---------
+
+
+# 保存DataPulling Action
+action_SaveDataPullingAction_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/action/saveAction
+  method: POST
+  detail: 保存DataPulling Action
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    actionId: "DataPullingAction_auto_${{random_id()}}"
+    label: "DataPullingAction"
+    actionName: "datapullingaction_${{get_time()}}"
+    application: ${{app2_code()}}
+    split: null
+    type: "DATA_PULLING"
+    request_parameters: []
+    actionFieldRelations: []
+    lang:
+      actionName:
+        zh_CN: "datapullingaction_${{get_time()}}"
+        zh_TW: "datapullingaction_${{get_time()}}"
+        en_US: "datapullingaction_${{get_time()}}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.actionId
+      name: datapulling_action_id
+
+# 更新DataPulling Action
+action_UpdateDataPullingAction_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/action/updateAction
+  method: POST
+  detail: 更新DataPulling Action
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    actionId: $cache{datapulling_action_id}
+    label: "DataPullingAction"
+    actionName: "更新datapullingaction_${{get_time()}}"
+    application: ${{app2_code()}}
+    split: null
+    type: "DATA_PULLING"
+    request_parameters: []
+    actionFieldRelations: []
+    lang:
+      actionName:
+        zh_CN: "更新datapullingaction_${{get_time()}}"
+        zh_TW: "更新datapullingaction_${{get_time()}}"
+        en_US: "更新datapullingaction_${{get_time()}}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 删除DataPulling Action
+action_DeleteDataPullingAction_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/action/deleteActionByActionId
+  method: GET
+  detail: 删除DataPulling Action
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    actionId: $cache{datapulling_action_id}
+    label: "DataPullingAction"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+#--------------------------  Eoc Action-----------------
+
+
+# 保存Eoc Action
+action_SaveEocAction_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/action/saveAction
+  method: POST
+  detail: 保存Eoc Action
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    actionId: "eoc_action_auto_${{random_id()}}"
+    label: "EocAction"
+    actionName: "Eoc_action_${{get_time()}}"
+    application: ${{app2_code()}}
+    url: null
+    method: null
+    allocateType: null
+    type: "EOC"
+    request_parameters: []
+    actionFieldRelations: []
+    lang:
+      actionName:
+        zh_CN: "Eoc_action_${{get_time()}}"
+        zh_TW: "Eoc_action_${{get_time()}}"
+        en_US: "Eoc_action_${{get_time()}}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.actionId
+      name: eoc_action_id
+
+# 更新Eoc Action
+action_UpdateEocAction_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/action/updateAction
+  method: POST
+  detail: 更新Eoc Action
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    actionId: $cache{eoc_action_id}
+    label: "EocAction"
+    actionName: "更新Eoc_action_${{get_time()}}"
+    application: ${{app2_code()}}
+    url: null
+    method: null
+    allocateType: null
+    type: "EOC"
+    request_parameters: []
+    actionFieldRelations: []
+    lang:
+      actionName:
+        zh_CN: "更新Eoc_action_${{get_time()}}"
+        zh_TW: "更新Eoc_action_${{get_time()}}"
+        en_US: "更新Eoc_action_${{get_time()}}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 删除Eoc Action
+action_DeleteEocAction_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/action/deleteActionByActionId
+  method: GET
+  detail: 删除Eoc Action
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    actionId: $cache{eoc_action_id}
+    label: "EocAction"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+#  -----------IAM_ACTION------
+
+# 保存Iam Action
+action_SaveIamAction_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/action/saveAction
+  method: POST
+  detail: 保存Iam Action
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    actionId: "IAM_ACTION_AUTO_${{random_id()}}"
+    label: "IamAction"
+    actionName: "IAM_ACTION_${{get_time()}}"
+    application: ${{app2_code()}}
+    allocateType: null
+    method: null
+    relativeUrl: null
+    type: null
+    request_parameters: []
+    actionFieldRelations: []
+    lang:
+      actionName:
+        zh_CN: "IAM_ACTION_${{get_time()}}"
+        zh_TW: "IAM_ACTION_${{get_time()}}"
+        en_US: "IAM_ACTION_${{get_time()}}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.actionId
+      name: iam_action_id
+
+# 更新Iam Action
+action_UpdateIamAction_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/action/updateAction
+  method: POST
+  detail: 更新Iam Action
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    actionId: $cache{iam_action_id}
+    label: "IamAction"
+    actionName: "更新IAM_ACTION_${{get_time()}}"
+    application: ${{app2_code()}}
+    allocateType: null
+    method: null
+    relativeUrl: null
+    type: null
+    request_parameters: []
+    actionFieldRelations: []
+    lang:
+      actionName:
+        zh_CN: "更新IAM_ACTION_${{get_time()}}"
+        zh_TW: "更新IAM_ACTION_${{get_time()}}"
+        en_US: "更新IAM_ACTION_${{get_time()}}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 删除Iam Action
+action_DeleteIamAction_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/action/deleteActionByActionId
+  method: GET
+  detail: 删除Iam Action
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    actionId: $cache{iam_action_id}
+    label: "IamAction"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
