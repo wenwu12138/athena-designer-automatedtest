@@ -3,3 +3,480 @@ case_common:
   allureEpic: 开发平台接口
   allureFeature: 2.0应用详情
   allureStory: 参数设定
+
+
+# --目前仅做了基础参数
+
+# 获取应用所有参数配置
+param_GetAllParam_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/applicationParam/getAllParam
+  method: POST
+  detail: 获取应用的所有基础参数配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    appCode: "${{app2_code()}}"
+    paramCatg: "BASE"
+    sceneCatg: "APPLICATION"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 获取参数配置模板
+param_GetParamConfig_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/applicationParam/getParamConfig
+  method: POST
+  detail: 获取基础参数配置模板
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    paramCatg: "BASE"
+    sceneCatg: "APPLICATION"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+
+# 翻译接口 - 简体转繁体和简体
+translate_TranslateContent_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/translate/translate
+  method: POST
+  detail: 翻译
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    content: "是否"
+    convertTypes: ["zh2Hant", "zh2Hans"]
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 保存参数配置
+param_SaveCompleteParam_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/applicationParam/saveParam
+  method: POST
+  detail: 保存完整的参数配置到应用
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    appCode: "${{app2_code()}}"
+    paramCatg: "BASE"
+    sceneCatg: "APPLICATION"
+    value:
+      - lang:
+          name:
+            zh_CN: "名称"
+            zh_TW: "名稱"
+            en_US: "name"
+          tip:
+            zh_CN: "在交付设计器显示的参数名称"
+            zh_TW: "在交付設計器顯示的參數名稱"
+            en_US: "在交付設計器顯示的參數名稱"
+          value:
+            zh_CN: "价格计算${{get_time()}}"
+            zh_TW: "價格計算${{get_time()}}"
+            en_US: "价格计算${{get_time()}}"
+        code: "name"
+        name: "名称"
+        displayType: "INPUT"
+        required: true
+        readOnly: false
+        sequence: 100
+        tip: "在交付设计器显示的参数名称"
+        defaultValue: ""
+        needLang: true
+        value: "价格计算${{get_time()}}"
+        options: []
+      - lang:
+          name:
+            zh_CN: "描述"
+            zh_TW: "描述"
+            en_US: "description"
+          tip:
+            zh_CN: "在交付设计器显示的参数描述"
+            zh_TW: "在交付設計器顯示的參數描述"
+            en_US: "在交付設計器顯示的參數描述"
+          value:
+            zh_CN: "价格计算参数描述${{get_time()}}"
+            zh_TW: "價格計算參數描述${{get_time()}}"
+            en_US: "价格计算参数描述${{get_time()}}"
+        code: "description"
+        name: "描述"
+        displayType: "TEXTAREA"
+        required: true
+        readOnly: false
+        sequence: 200
+        tip: "在交付设计器显示的参数描述"
+        defaultValue: ""
+        needLang: true
+        value: "价格计算参数描述${{get_time()}}"
+        options: []
+        breakWord: true
+      - lang:
+          name:
+            zh_CN: "编码"
+            zh_TW: "編碼"
+            en_US: "key"
+          tip:
+            zh_CN: "编码"
+            zh_TW: "編碼"
+            en_US: "key"
+        code: "key"
+        name: "编码"
+        displayType: "INPUT"
+        required: true
+        readOnly: false
+        sequence: 300
+        tip: "参数编码"
+        defaultValue: ""
+        needLang: false
+        value: "price_calculation_${{random_id()}}"
+        options: []
+      - lang:
+          name:
+            zh_CN: "顺序"
+            zh_TW: "順序"
+            en_US: "sequence"
+          tip:
+            zh_CN: "在交付设计器显示的参数顺序"
+            zh_TW: "在交付設計器顯示的參數順序"
+            en_US: "在交付設計器顯示的參數順序"
+        code: "sequence"
+        name: "顺序"
+        displayType: "NUM_INPUT"
+        required: true
+        readOnly: false
+        sequence: 400
+        tip: "在交付设计器显示的参数顺序"
+        defaultValue: ""
+        needLang: false
+        value: 1
+        options: []
+      - lang:
+          name:
+            zh_CN: "是否必填"
+            zh_TW: "是否必填"
+            en_US: "required"
+          tip:
+            zh_CN: "在交付设计器中该参数是否必填"
+            zh_TW: "在交付設計器中該參數是否必填"
+            en_US: "在交付設計器中該參數是否必填"
+        code: "required"
+        name: "是否必填"
+        displayType: "SWITCH"
+        required: true
+        readOnly: false
+        sequence: 500
+        tip: "在交付设计器中该参数是否必填"
+        defaultValue: true
+        needLang: false
+        value: true
+        options: []
+      - lang:
+          name:
+            zh_CN: "是否只读"
+            zh_TW: "是否只讀"
+            en_US: "readOnly"
+          tip:
+            zh_CN: "在交付设计器中该参数是否只读"
+            zh_TW: "在交付設計器中該參數是否只讀"
+            en_US: "在交付設計器中該參數是否只讀"
+        code: "readOnly"
+        name: "是否只读"
+        displayType: "SWITCH"
+        required: true
+        readOnly: false
+        sequence: 600
+        tip: "在交付设计器中该参数是否只读"
+        defaultValue: false
+        needLang: false
+        value: false
+        options: []
+      - lang:
+          name:
+            zh_CN: "参数控件类型"
+            zh_TW: "參數組件類型"
+            en_US: "displayType"
+          tip:
+            zh_CN: "交付设计器中该参数的控件类型"
+            zh_TW: "交付設計器中該參數的組件類型"
+            en_US: "displayType"
+        code: "displayType"
+        name: "参数控件类型"
+        displayType: "SELECT"
+        required: true
+        readOnly: false
+        sequence: 800
+        tip: "交付设计器中该参数的控件类型"
+        defaultValue: "STRING"
+        needLang: false
+        optionsMap:
+          PERIOD:
+            - label: "PERIODIC"
+              value: "PERIODIC"
+            - label: "PERIODIC_MULTIPLE"
+              value: "PERIODIC_MULTIPLE"
+            - label: "MONTH_PERIODIC"
+              value: "MONTH_PERIODIC"
+          BASE:
+            - label: "STRING"
+              value: "STRING"
+            - label: "NUMBER"
+              value: "NUMBER"
+            - label: "NATURAL_NUMBER"
+              value: "NATURAL_NUMBER"
+            - label: "PERCENT"
+              value: "PERCENT"
+            - label: "TEXT"
+              value: "TEXT"
+            - label: "RADIO"
+              value: "RADIO"
+            - label: "SELECT"
+              value: "SELECT"
+            - label: "SELECT_MULTIPLE"
+              value: "SELECT_MULTIPLE"
+            - label: "DATE"
+              value: "DATE"
+            - label: "DATETIME"
+              value: "DATETIME"
+            - label: "SWITCH"
+              value: "SWITCH"
+            - label: "CHECKBOX"
+              value: "CHECKBOX"
+            - label: "CHECKBOX_EXPRESSION"
+              value: "CHECKBOX_EXPRESSION"
+            - label: "CHARGE_PERSON"
+              value: "CHARGE_PERSON"
+            - label: "EXPECTEDDURATION"
+              value: "EXPECTEDDURATION"
+            - label: "SINGLE_USER"
+              value: "SINGLE_USER"
+            - label: "人员多选"
+              value: "MULTIPLE_USER"
+            - label: "职能单选"
+              value: "SINGLE_DUTY"
+            - label: "职能多选"
+              value: "MULTIPLE_DUTY"
+            - label: "定时参数"
+              value: "FREQUENCY"
+        displayControl:
+          SWITCH:
+            - "valueDisplay"
+            - "isSingleOperation"
+          SELECT:
+            - "options"
+            - "isSingleOperation"
+          SELECT_MULTIPLE:
+            - "options"
+            - "isSingleOperation"
+          DATE:
+            - "displayFormat"
+            - "isSingleOperation"
+          CHECKBOX:
+            - "options"
+            - "isSingleOperation"
+          CHECKBOX_EXPRESSION:
+            - "options"
+            - "isSingleOperation"
+          RADIO:
+            - "options"
+            - "isSingleOperation"
+          STRING:
+            - "isSingleOperation"
+          NUMBER:
+            - "isSingleOperation"
+          NATURAL_NUMBER:
+            - "isSingleOperation"
+          PERCENT:
+            - "isSingleOperation"
+          TEXT:
+            - "isSingleOperation"
+          DATETIME:
+            - "isSingleOperation"
+          CHARGE_PERSON:
+            - "isSingleOperation"
+          EXPECTEDDURATION:
+            - "isSingleOperation"
+          SINGLE_USER:
+            - "isSingleOperation"
+          MULTIPLE_USER:
+            - "isSingleOperation"
+          SINGLE_DUTY:
+            - "isSingleOperation"
+          MULTIPLE_DUTY:
+            - "isSingleOperation"
+          FREQUENCY:
+            - "isSingleOperation"
+        disableAndClear: {}
+        value: "STRING"
+        options:
+          - label: "STRING"
+            value: "STRING"
+          - label: "NUMBER"
+            value: "NUMBER"
+          - label: "NATURAL_NUMBER"
+            value: "NATURAL_NUMBER"
+          - label: "PERCENT"
+            value: "PERCENT"
+          - label: "TEXT"
+            value: "TEXT"
+          - label: "RADIO"
+            value: "RADIO"
+          - label: "SELECT"
+            value: "SELECT"
+          - label: "SELECT_MULTIPLE"
+            value: "SELECT_MULTIPLE"
+          - label: "DATE"
+            value: "DATE"
+          - label: "DATETIME"
+            value: "DATETIME"
+          - label: "SWITCH"
+            value: "SWITCH"
+          - label: "CHECKBOX"
+            value: "CHECKBOX"
+          - label: "CHECKBOX_EXPRESSION"
+            value: "CHECKBOX_EXPRESSION"
+          - label: "CHARGE_PERSON"
+            value: "CHARGE_PERSON"
+          - label: "EXPECTEDDURATION"
+            value: "EXPECTEDDURATION"
+          - label: "SINGLE_USER"
+            value: "SINGLE_USER"
+          - label: "人员多选"
+            value: "MULTIPLE_USER"
+          - label: "职能单选"
+            value: "SINGLE_DUTY"
+          - label: "职能多选"
+            value: "MULTIPLE_DUTY"
+          - label: "定时参数"
+            value: "FREQUENCY"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: request
+      jsonpath: $.value[2].value
+      name: saved_param_key
+
+# 根据参数编码获取应用下所有参数和type
+param_GetApplicationParamByCodes_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/applicationParam/getApplicationParamByCodes
+  method: POST
+  detail: 根据参数编码获取参数类型类型和code
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    paramCodes: ["$cache{saved_param_key}"]
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 根据参数编码获取单个参数详情
+param_GetParamByCode_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/applicationParam/getParamByCode
+  method: POST
+  detail: 根据参数编码获取单个参数详情
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    appCode: "${{app2_code()}}"
+    paramCatg: "BASE"
+    sceneCatg: "APPLICATION"
+    paramCode: "$cache{saved_param_key}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 删除参数配置
+param_DeleteParam_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/applicationParam/deleteParam
+  method: POST
+  detail: 删除应用${{app2_code()}}中的参数$cache{saved_param_key}
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    appCode: "${{app2_code()}}"
+    sceneCatg: "APPLICATION"
+    paramCatg: "BASE"
+    paramCode: "$cache{saved_param_key}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:

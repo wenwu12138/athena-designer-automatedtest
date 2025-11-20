@@ -7,8 +7,12 @@
 3.如果存在新增/更新数据接口中存在name，descrition 等名称描述字段 尽量贴合用例描述 言简意赅 并且 拼接后缀${{get_time()}}。。接口数据都在data或headers下
 4.在明确结构的前提上，学会使用 current_request_set_cache 添加缓存已经缓存使用方法 当多个curl之间存在关联关系能自动将存在关联的接口使用缓存串联起来
 5. 根据域名生成不同的host
-6.用例不存在依赖 dependence_case 为false  因为目前用例依赖逻辑是a依赖b  再在运行a的时候前置运行一下b  我直接用已有的逻辑
+6.如果存在多个curl，去重部分url并且调整生成顺序并且使用缓存保证存在业务依赖用例正确运行，不使用用例中的依赖配置dependence_case 为false  因为目前用例依赖逻辑是a依赖b  再在运行a的时候前置运行一下b  我直接用已有的逻辑
 7.尽量保证结构一致
+8.生成用例第一行存在备注 描述和备注结合入参和url生成
+9.如果有用例数据 data 中存在id或code等唯一键  那么期望可以参照类似生成随机 Id actionId: "auto_action_${{random_id()}}"
+10.用例detail里面不用存在变量
+11.assert 暂时使用简略的code断言
 
 
 
