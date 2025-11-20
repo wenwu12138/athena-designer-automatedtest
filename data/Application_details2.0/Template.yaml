@@ -1,0 +1,511 @@
+# 公共参数
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 2.0应用详情
+  allureStory: 服务编排
+
+# 新建服务编排
+template_CreateServiceOrchestration_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/template
+  method: POST
+  detail: 创建服务编排模板
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    name: 新建服务编排${{get_time()}}
+    lang:
+      name:
+        zh_CN: 新建服务编排${{get_time()}}
+        zh_TW: 新建服務編排${{get_time()}}
+        en_US: 新建服务编排${{get_time()}}
+    links: []
+    tasks:
+      - id: "Task85601119"
+        name: "node-脚本${{get_time()}}"
+        description: "接口自动化固定验证脚本${{get_time()}}"
+        type: "JS"
+        inputParameters:
+          script: 'return{"describe":"接口自动化固定验证脚本"}'
+        graphData:
+          position:
+            x: -45.5
+            y: -53.5
+          size:
+            width: 68
+            height: 40
+          attrs:
+            body:
+              rx: 6
+              ry: 6
+              stroke: "#2113D9"
+              fill: "#DAE8FF"
+              strokeWidth: 1
+              magnet: false
+            label:
+              text: "脚本"
+              fontSize: 12
+              textWrap:
+                width: 68
+                ellipsis: true
+            circle:
+              width: 17
+              height: 17
+              refX: 56
+              refY: -7
+              rx: 9
+              ry: 9
+              fill: "#2113D9"
+              strokeWidth: 0
+            image:
+              width: 14
+              height: 14
+              refX: 58
+              refY: -6
+              xlink:href: ""
+          visible: true
+          shape: "rect"
+          id: "840356b3-b724-4340-8b57-0d1cd471f560"
+          nodeType: "js"
+          markup:
+            - tagName: "rect"
+              selector: "body"
+            - tagName: "text"
+              selector: "label"
+            - tagName: "rect"
+              selector: "circle"
+            - tagName: "image"
+          ports:
+            groups:
+              top:
+                position: "top"
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#5F95FF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: "hidden"
+              right:
+                position: "right"
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#5F95FF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: "hidden"
+              bottom:
+                position: "bottom"
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#5F95FF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: "hidden"
+              left:
+                position: "left"
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#5F95FF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: "hidden"
+            items:
+              - group: "top"
+                id: "9d8fd270-edbe-4832-a99f-e9a5edace53c"
+              - group: "right"
+                id: "ac6eb0b2-5fed-4419-9fcd-b8bea08b2d89"
+              - group: "bottom"
+                id: "f82a7a07-1b48-4a55-a9d7-b9ca8be16973"
+              - group: "left"
+                id: "4989b121-2ff7-4db4-83ad-313fa47408ec"
+          zIndex: 1
+    applicationCode: ${{app2_code()}}
+    addSourceType: "auto_perspective"
+  dependence_case: false
+  dependence_case_data: ""
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.objectId
+      name: service_template_objectId
+    - type: response
+      jsonpath: $.data.id
+      name: service_template_id
+    - type: response
+      jsonpath: $.data.businessCode
+      name: service_template_businessCode
+    - type: response
+      jsonpath: $.data.applicationCode
+      name: service_template_appCode
+
+# 获取服务编排列表
+template_GetAllTemplates_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/template/all
+  method: GET
+  detail: 获取服务编排列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    applicationCode: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data: ""
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 编辑服务编排模板
+template_UpdateServiceOrchestration_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/template
+  method: POST
+  detail: 编辑服务编排模板
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    objectId: $cache{service_template_objectId}
+    id: $cache{service_template_id}
+    name: 编辑服务编排模板${{get_time()}}
+    lang:
+      name:
+        zh_CN: 编辑服务编排模板${{get_time()}}
+        zh_TW: 編輯服務編排模板${{get_time()}}
+        en_US: Edit Service Orchestration Template${{get_time()}}
+    links: []
+    tasks:
+      - id: "Task85604228"
+        name: "node-脚本${{get_time()}}"
+        description: ""
+        type: "JS"
+        inputParameters:
+          script: ""
+        graphData:
+          position:
+            x: -45.5
+            y: -53.5
+          size:
+            width: 68
+            height: 40
+          attrs:
+            body:
+              rx: 6
+              ry: 6
+              stroke: "#2113D9"
+              fill: "#DAE8FF"
+              strokeWidth: 1
+              magnet: false
+            label:
+              text: "脚本"
+              fontSize: 12
+              textWrap:
+                width: 68
+                ellipsis: true
+            circle:
+              width: 17
+              height: 17
+              refX: 56
+              refY: -7
+              rx: 9
+              ry: 9
+              fill: "#2113D9"
+              strokeWidth: 0
+            image:
+              width: 14
+              height: 14
+              refX: 58
+              refY: -6
+              xlink:href: ""
+          visible: true
+          shape: "rect"
+          id: "386f20a2-4b91-4dff-89df-be025d85ee7d"
+          nodeType: "js"
+          markup:
+            - tagName: "rect"
+              selector: "body"
+            - tagName: "text"
+              selector: "label"
+            - tagName: "rect"
+              selector: "circle"
+            - tagName: "image"
+          ports:
+            groups:
+              top:
+                position: "top"
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#5F95FF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: "hidden"
+              right:
+                position: "right"
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#5F95FF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: "hidden"
+              bottom:
+                position: "bottom"
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#5F95FF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: "hidden"
+              left:
+                position: "left"
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#5F95FF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: "hidden"
+            items:
+              - group: "top"
+                id: "77b05b95-de7d-4355-b28f-e4896ad03375"
+              - group: "right"
+                id: "230ddd95-e177-4d10-a816-22dc103f5a7f"
+              - group: "bottom"
+                id: "a203a094-6320-45b8-9231-8628e2c8f650"
+              - group: "left"
+                id: "3fd7dbc0-5086-4136-9cfc-f68ca70f5b75"
+          zIndex: 1
+    tenantId: "SYSTEM"
+    businessCode: $cache{service_template_businessCode}
+    applicationCode: $cache{service_template_appCode}
+    addSourceType: "auto_perspective"
+  dependence_case: false
+  dependence_case_data: ""
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 服务编排模板发布
+template_PublishServiceOrchestration_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modulePublish/publish
+  method: POST
+  detail: 发布服务编排模板到固定租户
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    pkValue: $cache{service_template_id}
+    module: "adTemplate"
+    application: $cache{service_template_appCode}
+    tenantUsers:
+      - tenantId: "athenadeveloperTest"
+        tenantSid: 847600433497088
+        tenantName: "配置测试器"
+  dependence_case: false
+  dependence_case_data: ""
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 根据对象ID查询模板详情
+template_GetTemplateByObjectId_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/template/getByObjId
+  method: GET
+  detail: 根据对象ID查询模板详情
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    objectId: $cache{service_template_objectId}
+  dependence_case: false
+  dependence_case_data: ""
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 删除服务编排
+template_DeleteTemplate_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/template/id/$cache{service_template_objectId}
+  method: DELETE
+  detail: 删除服务编排模板
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: json
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data: ""
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+#----------------------------服务编排参数------------------------------
+
+# 查询服务编排参数列表
+template_FindSvcParamList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/template/findSvcParamListByType/1
+  method: GET
+  detail: 查询服务编排参数列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: json
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data: ""
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 创建服务编排参数
+template_SaveSvcParam_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/template/saveSvcParam
+  method: POST
+  detail: 创建服务编排参数
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    desc: 服务编排参数验证描述${{get_time()}}
+    value: name${{get_time()}}
+    name: 服务编排参数验证${{get_time()}}
+    type: 1
+  dependence_case: false
+  dependence_case_data: ""
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.objectId
+      name: svc_param_id
+
+# 编辑服务编排参数
+template_UpdateSvcParam_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/template/saveSvcParam
+  method: POST
+  detail: 编辑服务编排参数
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    desc: 服务编排参数验证服务编排参数验证${{get_time()}}
+    value: name${{get_time()}}
+    name: 服务编排参数验证${{get_time()}}
+    objectId: $cache{svc_param_id}
+    type: 1
+  dependence_case: false
+  dependence_case_data: ""
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 删除服务编排参数
+template_DeleteSvcParam_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/template/deleteSvcParamById/$cache{svc_param_id}
+  method: DELETE
+  detail: 删除服务编排参数
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: json
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data: ""
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
