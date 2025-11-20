@@ -1,0 +1,299 @@
+# 公共参数
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 2.0应用详情
+  allureStory: 业务搭建-扩展信息
+
+
+
+
+# 获取扩展配置编译文档路径 - 查询扩展配置的编译文件路径信息
+extendConfig_GetCompiledPath_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/extendConfig/getExtendConfigCompiledDocumentPath
+  method: GET
+  detail: 获取扩展配置编译后的文档路径信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 创建已有表新数据扩展配置
+extendConfig_CreateMongoDataMap_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/extendConfig/save
+  method: POST
+  detail: 创建已有表新数据扩展配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    name: "已有表新数据_自动化验证_${{get_time()}}"
+    compiledDocmentPath: "mongo/datamap/task"
+    primaryField: ""
+    sceneCode: "extendDocument"
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 新增已有数据新字段扩展配置
+extendConfig_CreateMongoFieldMap_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/extendConfig/save
+  method: POST
+  detail: 新增已有数据新字段扩展配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    name: "已有数据新字段_${{get_time()}}"
+    compiledDocmentPath: "mongo/datamap/task"
+    primaryField: ""
+    sceneCode: "extendField"
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 查询扩展配置列表
+extendConfig_QueryAllConfigs_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/extendConfig/allConfigs
+  method: GET
+  detail: 查询扩展配置列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    appCode: ${{app2_code()}}
+    condition: ""
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data[0].code
+      name: extendConfig_code
+    - type: response
+      jsonpath: $.data[1].code
+      name: extendConfig_code2
+
+
+# 保存扩展字段信息 - 为扩展配置添加扩展字段数据
+extendConfig_SaveExtendField_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/extendConfig/saveEtField
+  method: POST
+  detail: 为扩展配置添加扩展字段信息，字段名称为扩展信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    name: "扩展信息_${{get_time()}}"
+    value: "{\"a\":\"b\"}"
+    sceneCode: "extendDocument"
+    application: ${{app2_code()}}
+    configCode: $cache{extendConfig_code}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.code
+      name: extend_field_code
+
+
+  # 查询扩展配置的所有扩展数据列表 - 使用列表查询缓存的配置code
+  extendConfig_QueryAllExtendData_001:
+    host: ${{athena_designer_host()}}
+    url: /athena-designer/extendConfig/allExtendData/$cache{extendConfig_code}
+    method: GET
+    detail: 查询扩展配置的所有扩展数据列表s
+    headers:
+      digi-middleware-auth-user: $cache{token}
+      token: $cache{token}
+      locale: zh_CN
+    requestType: PARAMS
+    is_run: true
+    data:
+    dependence_case: false
+    dependence_case_data:
+    assert:
+      code:
+        jsonpath: $.code
+        type: ==
+        value: 0
+        AssertType:
+    current_request_set_cache:
+      - type: response
+        jsonpath: $.data[0].code
+        name: extend_data_list_code
+
+  # 查询扩展数据的详细信息 - 使用扩展字段保存缓存的字段code
+  extendConfig_QueryExtendDataDetail_001:
+    host: ${{athena_designer_host()}}
+    url: /athena-designer/extendConfig/extendData/$cache{extend_field_code}
+    method: GET
+    detail: 查询扩展数据的详细信息
+    headers:
+      digi-middleware-auth-user: $cache{token}
+      token: $cache{token}
+      locale: zh_CN
+    requestType: PARAMS
+    is_run: true
+    data:
+    dependence_case: false
+    dependence_case_data:
+    assert:
+      code:
+        jsonpath: $.code
+        type: ==
+        value: 0
+        AssertType:
+
+
+# 编辑扩展字段信息 - 更新已存在的扩展字段数据
+extendConfig_UpdateExtendField_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/extendConfig/saveEtField
+  method: POST
+  detail: 编辑扩展字段信息，更新字段名称和值
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    name: "更新扩展信息_${{get_time()}}"
+    value: "{\"a\":\"b_updated\"}"
+    sceneCode: "extendDocument"
+    application: ${{app2_code()}}
+    configCode: $cache{extendConfig_code}
+    code: $cache{extend_field_code}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 删除扩展字段信息 - 清理测试创建的扩展字段数据
+extendConfig_DeleteExtendField_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/extendField/deleteExtendField
+  method: GET
+  detail: 删除扩展字段信息，清理测试数据
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    code: $cache{extend_field_code}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 删除扩展配置 - 清理已有表新数据配置（第一个配置）
+extendConfig_DeleteTableDataConfig_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/extendConfig/$cache{extendConfig_code}
+  method: DELETE
+  detail: 删除已有表新数据扩展配置，清理测试数据
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 删除扩展配置 - 清理已有数据新字段配置（第二个配置）
+extendConfig_DeleteFieldConfig_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/extendConfig/$cache{extendConfig_code2}
+  method: DELETE
+  detail: 删除已有数据新字段扩展配置，清理测试数据
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
