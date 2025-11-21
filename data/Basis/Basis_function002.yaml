@@ -150,6 +150,10 @@ basis_PublishTest_002:
       type: ==
       value: 0
       AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data
+      name: deployNo
 
 
 #2.0切版测试区
@@ -216,6 +220,10 @@ basis_SwitchPlanTest_002:
       type: ==
       value: 0
       AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.id
+      name: switchNo
 
 #2.0发版华为正式
 basis_PublishHuaweiProd_002:

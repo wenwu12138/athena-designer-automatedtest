@@ -15,7 +15,7 @@ query_DeployProcess_001:
     digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
     token: $cache{token}
   requestType: PARAMS
-  is_run: False
+  is_run: true
   data:
     deployNo: $cache{deployNo}
     application: ${{app2_code()}}
@@ -36,7 +36,7 @@ query_DeployProcess_001:
       AssertType:
 
 
-#查询发版/切版详情
+#查询发版详情
 query_DeployDetail_001:
   host: ${{athena_deployer_host()}}
   url: /athenadeployer/deploy/v3/queryDeployDetailByApplication
@@ -46,7 +46,7 @@ query_DeployDetail_001:
     digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
     token: $cache{token}
   requestType: PARAMS
-  is_run: False
+  is_run: true
   data:
     deployNo: $cache{deployNo}
     application: ${{app2_code()}}
@@ -59,6 +59,32 @@ query_DeployDetail_001:
         - dependent_type: response
           jsonpath: $.data
           set_cache: deployNo
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+#查询切版详情
+query_SwithDetail_001:
+  host: ${{athena_deployer_host()}}
+  url: /athenadeployer/deploy/v3/queryDeployDetailByApplication
+  method: GET
+  detail: 查询切版详情
+  headers:
+    digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
+    token: $cache{token}
+  requestType: PARAMS
+  is_run: true
+  data:
+    deployNo: $cache{switchNo}
+    application: ${{app2_code()}}
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: False
+  # 依赖的数据
+  dependence_case_data:
   assert:
     code:
       jsonpath: $.code
@@ -77,9 +103,9 @@ query_SwitchProcess_001:
     digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
     token: $cache{token}
   requestType: PARAMS
-  is_run: False
+  is_run: true
   data:
-    deployNo: a1db6768be984179bf3852aba7d52e49
+    deployNo: $cache{switchNo}
     application: A20240311173157-lcdp
   # 是否有依赖业务，为空或者false则表示没有
   dependence_case: False
