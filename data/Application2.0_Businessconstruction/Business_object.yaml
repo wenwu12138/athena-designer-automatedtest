@@ -938,6 +938,39 @@ businessDir_cleanup_param_001:
       value: 0
       AssertType:
 
+
+# 查询API模型信息
+modelDriver_queryApiModelByCode_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modelDriver/queryModelByCode
+  method: GET
+  detail: 查询API模型信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: PARAMS
+  is_run: true
+  data:
+    code: "$cache{api_model_code}"
+    serviceCode: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.objectId
+      name: api_object_id
+    - type: response
+      jsonpath: $.data.relateBusinessCode
+      name: api_business_code
+    - type: response
+      jsonpath: $.data.id
+      name: api_data_id
+
 # 检查API模型绑定关系
 api_checkModelBindRelation_001:
   host: ${{athena_designer_host()}}
@@ -963,6 +996,10 @@ api_checkModelBindRelation_001:
       value: 0
       AssertType:
 
+
+
+
+
 # 清理API模型
 api_cleanup_model_001:
   host: ${{athena_designer_host()}}
@@ -976,7 +1013,7 @@ api_cleanup_model_001:
   is_run: true
   data:
     type: "businessConstructor"
-    businessCode: "$cache{api_model_code}"
+    businessCode: "$cache{api_business_code}"
   dependence_case: false
   dependence_case_data:
   assert:
