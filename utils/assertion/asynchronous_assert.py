@@ -63,7 +63,7 @@ class AsynchronousAssert:
                                          "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n")
                         return result
                         break
-                    elif json.loads(deployprocess_res.response_data)["data"] == -1:
+                    elif json.loads(deployprocess_res.response_data)["data"] == -1 or json.loads(deploydetail_res.response_data)["data"][-1]["result"] == "fail":
                         result = False
                         INFO.logger.info("\n"
                                          "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n"
@@ -130,11 +130,11 @@ class AsynchronousAssert:
                                          "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n")
                         return result
                         break
-                    elif json.loads(switchprocess_res.response_data)["data"] == -1:
+                    elif json.loads(switchprocess_res.response_data)["data"] == -1 or json.loads(switchdetail_res.response_data)["data"][-1]["result"] == "fail":
                         result = False
                         INFO.logger.info("\n"
                                          "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n"
-                                         "切板成功\n"
+                                         "切板失败\n"
                                          "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n")
                         return result
                         break

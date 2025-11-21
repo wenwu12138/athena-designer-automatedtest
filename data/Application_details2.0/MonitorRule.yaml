@@ -57,12 +57,12 @@ process_FindProcessPagination_001:
       value: 0
       AssertType:
 
-# 新增API类型定时侦测规则
+# 更新集成自动化信息
 monitorRule_AddAPITimingMonitor_001:
   host: ${{athena_designer_host()}}
   url: /athena-designer/businessDir/updateIntegrationAutomationInfo
   method: POST
-  detail: 新增API类型定时侦测规则
+  detail: 更新集成自动化信息
   headers:
     digi-middleware-auth-user: $cache{token}
     token: $cache{token}
@@ -306,38 +306,39 @@ process_FindProcessList_001:
       value: 0
       AssertType:
 
-# 2. 保存/创建侦测规则
-monitorRule_SaveMonitorRule_001:
+
+# 保存定时侦测规则配置（使用已有侦测规则编码）
+monitor_SaveMonitorRule_001:
   host: ${{athena_designer_host()}}
   url: /athena-designer/task/monitorRule/saveMonitorRule
   method: POST
-  detail: 保存侦测规则配置
+  detail: 保存定时侦测规则配置
   headers:
     digi-middleware-auth-user: $cache{token}
-    token: $cache{token}
+    authorization: $cache{token}
     locale: zh_CN
     content-type: application/json
   requestType: json
   is_run: true
   data:
-    code: $cache{monitorRule_code}
+    code: "$cache{monitorRule_code}"
     triggerAction: null
     product:
       - code: ${{app2_code()}}
         rule:
-          monitorRuleId: $cache{monitorRule_code}
+          monitorRuleId: "$cache{monitorRule_code}"
           productName: ${{app2_code()}}
           isPollingIds: false
-    name: "测试侦测${{get_time()}}"
+    name: "定时侦测规则${{get_time()}}"
     tenantId: null
     lang:
       name:
-        zh_CN: "测试侦测${{get_time()}}"
-        zh_TW: "測試偵測${{get_time()}}"
-        en_US: "Test Monitor${{get_time()}}"
+        zh_CN: "定时侦测规则${{get_time()}}"
+        zh_TW: "定時偵測規則${{get_time()}}"
+        en_US: "Monitor Rule${{get_time()}}"
     type: "CUSTOM"
     standardPollingRule:
-      start_time: "2025-11-19 00:00:00"
+      start_time: "2025-11-21 00:00:00"
       monthly: 1
       bymonthday: 1
     monitorActionId: null
@@ -352,7 +353,6 @@ monitorRule_SaveMonitorRule_001:
     category: "API"
     application: ${{app2_code()}}
     addSourceType: "auto_perspective"
-    # 完整的参数配置（36个参数）
     params:
       - lang:
           name:
@@ -364,9 +364,9 @@ monitorRule_SaveMonitorRule_001:
             zh_TW: "在交付設計器顯示的參數名稱"
             en_US: "在交付設計器顯示的參數名稱"
           value:
-            zh_CN: "测试侦测${{get_time()}}"
-            zh_TW: "測試偵測${{get_time()}}"
-            en_US: "Test Monitor${{get_time()}}"
+            zh_CN: "定时侦测参数${{get_time()}}"
+            zh_TW: "定時偵測參數${{get_time()}}"
+            en_US: "Monitor Parameter${{get_time()}}"
         code: "name"
         name: "名称"
         displayType: "INPUT"
@@ -376,12 +376,104 @@ monitorRule_SaveMonitorRule_001:
         tip: "在交付设计器显示的参数名称"
         defaultValue: ""
         needLang: true
-        value: "测试侦测${{get_time()}}"
+        value: "定时侦测参数${{get_time()}}"
         options: []
         width: "140px"
         attrIndex: 0
-      # ... 这里需要包含完整的36个参数配置
-      # 参照您提供的正常请求体中的完整参数列表
+      - lang:
+          name:
+            zh_CN: "参数项描述"
+            zh_TW: "參數項描述"
+            en_US: "Parameter item description"
+          tip:
+            zh_CN: "描述同步至交付设计器上的参数描述区域"
+            zh_TW: "描述同步至交付設計器上的參數描述區域"
+            en_US: "Description synchronized to the parameter description area on the delivery designer"
+          value:
+            zh_CN: "自动化测试参数描述${{get_time()}}"
+            zh_TW: "自動化測試參數描述${{get_time()}}"
+            en_US: "Auto test parameter description${{get_time()}}"
+        code: "description"
+        name: "参数项描述"
+        displayType: "TEXTAREA"
+        required: true
+        readOnly: false
+        sequence: 200
+        tip: "在交付设计器显示的参数描述"
+        defaultValue: ""
+        needLang: true
+        value: "自动化测试参数描述${{get_time()}}"
+        options: []
+        breakWord: true
+        width: "140px"
+        placeholder: "定时侦测参数"
+        attrIndex: 1
+      - lang:
+          name:
+            zh_CN: "编码"
+            zh_TW: "編碼"
+            en_US: "key"
+          tip:
+            zh_CN: "编码"
+            zh_TW: "編碼"
+            en_US: "key"
+        code: "key"
+        name: "编码"
+        displayType: "INPUT"
+        required: true
+        readOnly: false
+        sequence: 300
+        tip: "参数编码"
+        defaultValue: ""
+        needLang: false
+        value: "$cache{monitorRule_code}"
+        options: []
+        width: "140px"
+        attrIndex: 2
+      - lang:
+          name:
+            zh_CN: "页面顺序"
+            zh_TW: "頁面順序"
+            en_US: "Page order"
+          tip:
+            zh_CN: "在交付设计器上的排序顺序，默认999，可在参数设定中拖动更改排序，同时更新于此字段"
+            zh_TW: "在交付設計器上的排序順序，默認999，可在參數設定中拖動更改排序，同時更新於此字段"
+            en_US: "The sorting order on the delivery designer is set to 999 by default. It can be changed by dragging in the parameter settings and will be updated in this field."
+        code: "sequence"
+        name: "页面顺序"
+        displayType: "NUM_INPUT"
+        required: true
+        readOnly: false
+        sequence: 400
+        tip: "在交付设计器显示的参数顺序"
+        defaultValue: ""
+        needLang: false
+        value: "999"
+        options: []
+        width: "300px"
+        attrIndex: 3
+      - lang:
+          name:
+            zh_CN: "扩展数据"
+            zh_TW: "擴展數據"
+            en_US: "extendData"
+          tip:
+            zh_CN: "参数的扩展数据，侦测时需要设定规则id"
+            zh_TW: "參數的擴展數據，偵測時需要設定規則id"
+            en_US: "参数的扩展数据，侦测时需要设定规则id"
+        code: "extendData"
+        name: "扩展数据"
+        displayType: "INPUT"
+        required: true
+        readOnly: false
+        sequence: 1900
+        tip: "参数的扩展数据，侦测时需要设定规则id"
+        defaultValue: ""
+        needLang: false
+        value: "$cache{monitorRule_code}"
+        options: []
+        width: "140px"
+        attrIndex: 17
   dependence_case: false
   dependence_case_data:
   assert:
@@ -390,6 +482,7 @@ monitorRule_SaveMonitorRule_001:
       type: ==
       value: 0
       AssertType:
+
 
 # 3. 获取侦测规则详情
 monitorRule_GetMonitorRule_001:
@@ -413,7 +506,7 @@ monitorRule_GetMonitorRule_001:
       value: 0
       AssertType:
 
-# 更新侦测规则配置
+# 更新定时侦测规则配置
 monitorRule_UpdateMonitorRule_001:
   host: ${{athena_designer_host()}}
   url: /athena-designer/task/monitorRule/updateMonitorRule
@@ -421,30 +514,30 @@ monitorRule_UpdateMonitorRule_001:
   detail: 更新侦测规则配置
   headers:
     digi-middleware-auth-user: $cache{token}
-    token: $cache{token}
+    authorization: $cache{token}
     locale: zh_CN
     content-type: application/json
   requestType: json
   is_run: true
   data:
-    code: $cache{monitorRule_code}
+    code: "$cache{monitorRule_code}"
     triggerAction: null
     product:
       - code: ${{app2_code()}}
         rule:
-          monitorRuleId: $cache{monitorRule_code}
+          monitorRuleId: "$cache{monitorRule_code}"
           productName: ${{app2_code()}}
           isPollingIds: false
-    name: "测试侦测${{get_time()}}"
+    name: "更新侦测规则${{get_time()}}"
     tenantId: "SYSTEM"
     lang:
       name:
-        zh_CN: "测试侦测${{get_time()}}"
-        zh_TW: "測試偵測${{get_time()}}"
-        en_US: "Test Monitor${{get_time()}}"
+        zh_CN: "更新侦测规则${{get_time()}}"
+        zh_TW: "更新偵測規則${{get_time()}}"
+        en_US: "Update Monitor Rule${{get_time()}}"
     type: "CUSTOM"
     standardPollingRule:
-      start_time: "2025-11-19 00:00:00"
+      start_time: "2025-11-21 00:00:00"
       monthly: 1
       bymonthday: 1
     monitorActionId: null
@@ -459,7 +552,6 @@ monitorRule_UpdateMonitorRule_001:
     category: "API"
     application: ${{app2_code()}}
     addSourceType: "auto_perspective"
-    # 完整的36个参数配置（需要完整复制您提供的参数列表）
     params:
       - lang:
           name:
@@ -471,9 +563,9 @@ monitorRule_UpdateMonitorRule_001:
             zh_TW: "在交付設計器顯示的參數名稱"
             en_US: "在交付設計器顯示的參數名稱"
           value:
-            zh_CN: "测试侦测${{get_time()}}"
-            zh_TW: "測試偵測${{get_time()}}"
-            en_US: "Test Monitor${{get_time()}}"
+            zh_CN: "更新侦测参数${{get_time()}}"
+            zh_TW: "更新偵測參數${{get_time()}}"
+            en_US: "Update Monitor Parameter${{get_time()}}"
         code: "name"
         name: "名称"
         displayType: "INPUT"
@@ -483,12 +575,222 @@ monitorRule_UpdateMonitorRule_001:
         tip: "在交付设计器显示的参数名称"
         defaultValue: ""
         needLang: true
-        value: "测试侦测${{get_time()}}"
+        value: "更新侦测参数${{get_time()}}"
         options: []
         width: "140px"
         attrIndex: 0
-      # ... 这里需要包含完整的36个参数配置
-      # 参照您提供的成功请求体中的完整参数列表
+      - lang:
+          name:
+            zh_CN: "参数项描述"
+            zh_TW: "參數項描述"
+            en_US: "Parameter item description"
+          tip:
+            zh_CN: "描述同步至交付设计器上的参数描述区域"
+            zh_TW: "描述同步至交付設計器上的參數描述區域"
+            en_US: "Description synchronized to the parameter description area on the delivery designer"
+          value:
+            zh_CN: "更新测试参数描述${{get_time()}}"
+            zh_TW: "更新測試參數描述${{get_time()}}"
+            en_US: "Update test parameter description${{get_time()}}"
+        code: "description"
+        name: "参数项描述"
+        displayType: "TEXTAREA"
+        required: true
+        readOnly: false
+        sequence: 200
+        tip: "在交付设计器显示的参数描述"
+        defaultValue: ""
+        needLang: true
+        value: "更新测试参数描述${{get_time()}}"
+        options: []
+        breakWord: true
+        width: "140px"
+        placeholder: "更新侦测参数"
+        attrIndex: 1
+      - lang:
+          name:
+            zh_CN: "编码"
+            zh_TW: "編碼"
+            en_US: "key"
+          tip:
+            zh_CN: "编码"
+            zh_TW: "編碼"
+            en_US: "key"
+        code: "key"
+        name: "编码"
+        displayType: "INPUT"
+        required: true
+        readOnly: false
+        sequence: 300
+        tip: "参数编码"
+        defaultValue: ""
+        needLang: false
+        value: "$cache{monitorRule_code}"
+        options: []
+        width: "140px"
+        attrIndex: 2
+      - lang:
+          name:
+            zh_CN: "页面顺序"
+            zh_TW: "頁面順序"
+            en_US: "Page order"
+          tip:
+            zh_CN: "在交付设计器上的排序顺序，默认999，可在参数设定中拖动更改排序，同时更新于此字段"
+            zh_TW: "在交付設計器上的排序順序，默認999，可在參數設定中拖動更改排序，同時更新於此字段"
+            en_US: "The sorting order on the delivery designer is set to 999 by default. It can be changed by dragging in the parameter settings and will be updated in this field."
+        code: "sequence"
+        name: "页面顺序"
+        displayType: "NUM_INPUT"
+        required: true
+        readOnly: false
+        sequence: 400
+        tip: "在交付设计器显示的参数顺序"
+        defaultValue: ""
+        needLang: false
+        value: "999"
+        options: []
+        width: "300px"
+        attrIndex: 3
+      - lang:
+          name:
+            zh_CN: "是否必填"
+            zh_TW: "是否必填"
+            en_US: "required"
+          tip:
+            zh_CN: "勾选后，侦测控件全部项全部置灰不可操作，防止用户操作后在交付设计器上报错等（如设置了开启侦测手动执行，执行按钮不置灰，且可手动点击执行）"
+            zh_TW: "勾選後，偵測控件全部項全部置灰不可操作，防止用戶操作後在交付設計器上報錯等（如設置了開啟偵測手動執行，執行按鈕不置灰，且可手動點擊執行）"
+            en_US: "After checking, all detection control items are grayed out and not operable to prevent user errors in the delivery designer (if manual detection execution is enabled, the execute button will not be grayed out and can be manually clicked to execute)"
+        code: "required"
+        name: "是否必填"
+        displayType: "SWITCH"
+        required: true
+        readOnly: false
+        sequence: 500
+        tip: "在交付设计器中该参数是否必填"
+        defaultValue: true
+        needLang: false
+        value: true
+        options: []
+        width: "140px"
+        attrIndex: 4
+      - lang:
+          name:
+            zh_CN: "是否只读"
+            zh_TW: "是否只讀"
+            en_US: "readOnly"
+          tip:
+            zh_CN: "在交付设计器中该参数是否只读"
+            zh_TW: "在交付設計器中該參數是否只讀"
+            en_US: "在交付設計器中該參數是否只讀"
+        code: "readOnly"
+        name: "是否只读"
+        displayType: "SELECT"
+        required: true
+        readOnly: false
+        sequence: 600
+        tip: "在交付设计器中该参数是否只读"
+        defaultValue: false
+        needLang: false
+        value: false
+        options:
+          - lang:
+              label:
+                zh_CN: "是"
+                zh_TW: "是"
+                en_US: "true"
+            label: "是"
+            value: true
+          - lang:
+              label:
+                zh_CN: "否"
+                zh_TW: "否"
+                en_US: "false"
+            label: "否"
+            value: false
+        width: "300px"
+        attrIndex: 5
+        clear: true
+      - lang:
+          name:
+            zh_CN: "参数控件类型"
+            zh_TW: "參數組件類型"
+            en_US: "displayType"
+          tip:
+            zh_CN: "交付设计器中该参数的控件类型"
+            zh_TW: "交付設計器中該參數的組件類型"
+            en_US: "displayType"
+        code: "displayType"
+        name: "参数控件类型"
+        displayType: "SELECT"
+        required: true
+        readOnly: false
+        sequence: 800
+        tip: "交付设计器中该参数的控件类型"
+        defaultValue: "STRING"
+        needLang: false
+        value: "PERIODIC"
+        options:
+          - lang:
+              label:
+                zh_CN: "单条频次"
+                zh_TW: "單條頻次"
+                en_US: "Single frequency"
+            label: "单条频次"
+            value: "PERIODIC"
+          - lang:
+              label:
+                zh_CN: "多条频次"
+                zh_TW: "多條頻次"
+                en_US: "Multiple frequency"
+            label: "多条频次"
+            value: "PERIODIC_MULTIPLE"
+        width: "140px"
+        attrIndex: 6
+        clear: true
+      - lang:
+          name:
+            zh_CN: "扩展数据"
+            zh_TW: "擴展數據"
+            en_US: "extendData"
+          tip:
+            zh_CN: "参数的扩展数据，侦测时需要设定规则id"
+            zh_TW: "參數的擴展數據，偵測時需要設定規則id"
+            en_US: "参数的扩展数据，侦测时需要设定规则id"
+        code: "extendData"
+        name: "扩展数据"
+        displayType: "INPUT"
+        required: true
+        readOnly: false
+        sequence: 1900
+        tip: "参数的扩展数据，侦测时需要设定规则id"
+        defaultValue: ""
+        needLang: false
+        value: "$cache{monitorRule_code}"
+        options: []
+        width: "140px"
+        attrIndex: 17
+      - lang:
+          name:
+            zh_CN: "前后端数据传输格式"
+            zh_TW: "前後端數據傳輸格式"
+            en_US: "format"
+          tip:
+            zh_CN: "前端传给后端的时候数据的保存格式,例如：\"rule;yyyyMMdd HH:mm;switch\""
+            zh_TW: "前端傳給後端的時候數據的保存格式,例如：\"rule;yyyyMMdd HH:mm;switch\""
+            en_US: "e.g. \"rule;yyyyMMdd HH:mm;switch\""
+        code: "format"
+        name: "前后端数据传输格式"
+        displayType: "INPUT"
+        required: true
+        readOnly: false
+        sequence: 1800
+        tip: "前端传给后端的时候数据的保存格式,例如：\"rule;yyyyMMdd HH:mm;switch\""
+        defaultValue: ""
+        needLang: false
+        value: "rule;yyyyMMdd HH:mm;switch"
+        options: []
+        width: "140px"
+        attrIndex: 16
   dependence_case: false
   dependence_case_data:
   assert:
@@ -561,7 +863,7 @@ monitorRule_DeleteMonitorRule_001:
   host: ${{athena_designer_host()}}
   url: /athena-designer/task/monitorRule/deleteMonitorRule/$cache{monitorRule_code}
   method: GET
-  detail: 删除指定的侦测规则
+  detail: 删除定时的侦测规则
   headers:
     digi-middleware-auth-user: $cache{token}
     token: $cache{token}
@@ -569,672 +871,6 @@ monitorRule_DeleteMonitorRule_001:
   requestType: PARAMS
   is_run: true
   data:
-  dependence_case: false
-  dependence_case_data:
-  assert:
-    code:
-      jsonpath: $.code
-      type: ==
-      value: 0
-      AssertType:
-
-
-# 创建主动上报类型侦测规则
-businessDir_UpdateReportMonitor_001:
-  host: ${{athena_designer_host()}}
-  url: /athena-designer/businessDir/updateIntegrationAutomationInfo
-  method: POST
-  detail: 创建主动上报类型侦测规则
-  headers:
-    digi-middleware-auth-user: $cache{token}
-    token: $cache{token}
-    locale: zh_CN
-    content-type: application/json
-  requestType: json
-  is_run: true
-  data:
-    application: ${{app2_code()}}
-    type: process
-    jsonObject:
-      name:
-        zh_CN: "主动上报侦测${{get_time()}}"
-        zh_TW: "主動上報偵測${{get_time()}}"
-        en_US: "Report Monitor${{get_time()}}"
-      monitorType: REPORT
-  dependence_case: false
-  dependence_case_data:
-  assert:
-    code:
-      jsonpath: $.code
-      type: ==
-      value: 0
-      AssertType:
-
-
-
-# 查询集成自动化信息
-businessDir_QueryReportMonitorInfo_001:
-  host: ${{athena_designer_host()}}
-  url: /athena-designer/businessDir/queryIntegrationAutomationInfo
-  method: POST
-  detail: 查询主动上报侦测集成自动化信息
-  headers:
-    digi-middleware-auth-user: $cache{token}
-    token: $cache{token}
-    locale: zh_CN
-    content-type: application/json
-  requestType: json
-  is_run: true
-  data:
-    application: ${{app2_code()}}
-    type: process
-  dependence_case: false
-  dependence_case_data:
-  assert:
-    code:
-      jsonpath: $.code
-      type: ==
-      value: 0
-      AssertType:
-
-# 获取侦测规则树结构
-monitorRule_GetReportMonitorTree_001:
-  host: ${{athena_designer_host()}}
-  url: /athena-designer/task/monitorRule/getMonitorRuleTree
-  method: GET
-  detail: 获取主动上报侦测规则树结构
-  headers:
-    digi-middleware-auth-user: $cache{token}
-    token: $cache{token}
-    locale: zh_CN
-  requestType: PARAMS
-  is_run: true
-  data:
-    appCode: ${{app2_code()}}
-  dependence_case: false
-  dependence_case_data:
-  assert:
-    code:
-      jsonpath: $.code
-      type: ==
-      value: 0
-      AssertType:
-
-# 获取所有产品列表
-monitorRule_GetAllProducts_002:
-  host: ${{athena_designer_host()}}
-  url: /athena-designer/task/monitorRule/getAllProducts
-  method: GET
-  detail: 获取主动上报侦测相关产品列表
-  headers:
-    digi-middleware-auth-user: $cache{token}
-    token: $cache{token}
-    locale: zh_CN
-  requestType: PARAMS
-  is_run: true
-  data:
-    appCode: ${{app2_code()}}
-  dependence_case: false
-  dependence_case_data:
-  assert:
-    code:
-      jsonpath: $.code
-      type: ==
-      value: 0
-      AssertType:
-
-# 获取应用根项目列表
-project_GetRootProjects_002:
-  host: ${{athena_designer_host()}}
-  url: /athena-designer/project/getRootProjects/${{app2_code()}}
-  method: GET
-  detail: 获取主动上报侦测应用根项目列表
-  headers:
-    digi-middleware-auth-user: $cache{token}
-    token: $cache{token}
-    locale: zh_CN
-  requestType: PARAMS
-  is_run: true
-  data:
-  dependence_case: false
-  dependence_case_data:
-  assert:
-    code:
-      jsonpath: $.code
-      type: ==
-      value: 0
-      AssertType:
-
-# 生成主动上报侦测规则编码
-code_GenerateReportMonitorCode_001:
-  host: ${{athena_designer_host()}}
-  url: /athena-designer/code/generate/standard
-  method: POST
-  detail: 生成主动上报侦测规则编码
-  headers:
-    digi-middleware-auth-user: $cache{token}
-    token: $cache{token}
-    locale: zh_CN
-    content-type: application/json
-  requestType: json
-  is_run: true
-  data:
-    typeCode: default
-    paramMap:
-      abbreviationCode: DT
-      application: ${{app2_code()}}
-  dependence_case: false
-  dependence_case_data:
-  assert:
-    code:
-      jsonpath: $.code
-      type: ==
-      value: 0
-      AssertType:
-  current_request_set_cache:
-    - type: response
-      jsonpath: $.data
-      name: report_monitor_code
-
-# 获取应用所有模板
-template_All_002:
-  host: ${{athena_designer_host()}}
-  url: /athena-designer/template/all
-  method: GET
-  detail: 获取主动上报侦测应用模板列表
-  headers:
-    digi-middleware-auth-user: $cache{token}
-    token: $cache{token}
-    locale: zh_CN
-  requestType: PARAMS
-  is_run: true
-  data:
-    applicationCode: ${{app2_code()}}
-  dependence_case: false
-  dependence_case_data:
-  assert:
-    code:
-      jsonpath: $.code
-      type: ==
-      value: 0
-      AssertType:
-
-# 获取应用周期参数配置
-applicationParam_GetReportParamConfig_001:
-  host: ${{athena_designer_host()}}
-  url: /athena-designer/applicationParam/getParamConfig
-  method: POST
-  detail: 获取主动上报侦测周期参数配置
-  headers:
-    digi-middleware-auth-user: $cache{token}
-    token: $cache{token}
-    locale: zh_CN
-    content-type: application/json
-  requestType: json
-  is_run: true
-  data:
-    paramCatg: PERIOD
-    sceneCatg: APPLICATION
-  dependence_case: false
-  dependence_case_data:
-  assert:
-    code:
-      jsonpath: $.code
-      type: ==
-      value: 0
-      AssertType:
-
-# 查询应用流程列表
-process_FindProcessList_002:
-  host: ${{athena_designer_host()}}
-  url: /athena-designer/process/findProcessList
-  method: GET
-  detail: 查询主动上报侦测相关流程列表
-  headers:
-    digi-middleware-auth-user: $cache{token}
-    token: $cache{token}
-    locale: zh_CN
-  requestType: PARAMS
-  is_run: true
-  data:
-    application: ${{app2_code()}}
-  dependence_case: false
-  dependence_case_data:
-  assert:
-    code:
-      jsonpath: $.code
-      type: ==
-      value: 0
-      AssertType:
-
-# 保存主动上报类型侦测规则
-monitorRule_SaveReportMonitor_001:
-  host: ${{athena_designer_host()}}
-  url: /athena-designer/task/monitorRule/saveMonitorRule
-  method: POST
-  detail: 保存主动上报类型侦测规则配置
-  headers:
-    digi-middleware-auth-user: $cache{token}
-    token: $cache{token}
-    locale: zh_CN
-    content-type: application/json
-  requestType: json
-  is_run: true
-  data:
-    code: $cache{report_monitor_code}
-    triggerAction: null
-    name: "主动上报侦测${{get_time()}}"
-    tenantId: null
-    lang:
-      name:
-        zh_CN: "主动上报侦测${{get_time()}}"
-        zh_TW: "主動上報偵測${{get_time()}}"
-        en_US: "Report Monitor${{get_time()}}"
-    type: "REPORT"
-    product:
-      - code: ${{app2_code()}}
-        rule:
-          monitorRuleId: $cache{report_monitor_code}
-          productName: ${{app2_code()}}
-    autoRun: false
-    isDesignerSet: true
-    actionType: null
-    actionCommonId: null
-    category: "REPORT"
-    application: ${{app2_code()}}
-    addSourceType: "auto_perspective"
-    params:
-      - lang:
-          name:
-            zh_CN: "名称"
-            zh_TW: "名稱"
-            en_US: "name"
-          tip:
-            zh_CN: "在交付设计器显示的参数名称"
-            zh_TW: "在交付設計器顯示的參數名稱"
-            en_US: "在交付設計器顯示的參數名稱"
-          value:
-            zh_CN: "主动上报侦测${{get_time()}}"
-            zh_TW: "主動上報偵測${{get_time()}}"
-            en_US: "Report Monitor${{get_time()}}"
-        code: "name"
-        name: "名称"
-        displayType: "INPUT"
-        required: true
-        readOnly: false
-        sequence: 100
-        tip: "在交付设计器显示的参数名称"
-        defaultValue: ""
-        needLang: true
-        value: "主动上报侦测${{get_time()}}"
-        options: []
-        width: "140px"
-        attrIndex: 0
-      - lang:
-          name:
-            zh_CN: "参数项描述"
-            zh_TW: "參數項描述"
-            en_US: "Parameter item description"
-          tip:
-            zh_CN: "描述同步至交付设计器上的参数描述区域"
-            zh_TW: "描述同步至交付設計器上的參數描述區域"
-            en_US: "Description synchronized to the parameter description area on the delivery designer"
-          value:
-            zh_CN: "主动上报类型侦测测试${{get_time()}}"
-            zh_TW: "主動上報類型偵測測試${{get_time()}}"
-            en_US: "Report type monitor test${{get_time()}}"
-        code: "description"
-        name: "参数项描述"
-        displayType: "TEXTAREA"
-        required: true
-        readOnly: false
-        sequence: 200
-        tip: "在交付设计器显示的参数描述"
-        defaultValue: ""
-        needLang: true
-        value: "主动上报类型侦测测试${{get_time()}}"
-        options: []
-        breakWord: true
-        width: "140px"
-        placeholder: "主动上报侦测${{get_time()}}"
-        attrIndex: 1
-      # ... 其他参数配置（可根据需要添加完整参数列表）
-  dependence_case: false
-  dependence_case_data:
-  assert:
-    code:
-      jsonpath: $.code
-      type: ==
-      value: 0
-      AssertType:
-
-# 查询主动上报侦测规则详情
-monitorRule_GetReportMonitor_001:
-  host: ${{athena_designer_host()}}
-  url: /athena-designer/task/monitorRule/getMonitorRule/$cache{report_monitor_code}
-  method: GET
-  detail: 查询主动上报类型侦测规则详情
-  headers:
-    digi-middleware-auth-user: $cache{token}
-    token: $cache{token}
-    locale: zh_CN
-  requestType: PARAMS
-  is_run: true
-  data:
-  dependence_case: false
-  dependence_case_data:
-  assert:
-    code:
-      jsonpath: $.code
-      type: ==
-      value: 0
-      AssertType:
-
-# 生成侦测规则编码
-code_GenerateMonitorCode_001:
-  host: ${{athena_designer_host()}}
-  url: /athena-designer/code/generate/standard
-  method: POST
-  detail: 生成定时侦测规则编码
-  headers:
-    digi-middleware-auth-user: $cache{token}
-    token: $cache{token}
-    locale: zh_CN
-    content-type: application/json
-  requestType: json
-  is_run: true
-  data:
-    typeCode: "default"
-    paramMap:
-      abbreviationCode: "DT"
-      application: ${{app2_code()}}
-  dependence_case: false
-  dependence_case_data:
-  assert:
-    code:
-      jsonpath: $.code
-      type: ==
-      value: 0
-      AssertType:
-  current_request_set_cache:
-    - type: response
-      jsonpath: $.data
-      name: monitor_rule_code
-
-# 创建定时侦测规则
-monitor_CreateScheduleMonitor_001:
-  host: ${{athena_designer_host()}}
-  url: /athena-designer/task/monitorRule/saveMonitorRule
-  method: POST
-  detail: 创建定时侦测规则
-  headers:
-    digi-middleware-auth-user: $cache{token}
-    token: $cache{token}
-    locale: zh_CN
-    content-type: application/json
-  requestType: json
-  is_run: true
-  data:
-    code: $cache{monitor_rule_code}
-    triggerAction: null
-    product:
-      - code: ${{app2_code()}}
-        rule:
-          monitorRuleId: $cache{monitor_rule_code}
-          productName: ${{app2_code()}}
-    name: "定时侦测${{get_time()}}"
-    tenantId: null
-    lang:
-      name:
-        zh_CN: "定时侦测${{get_time()}}"
-        zh_TW: "定時偵測${{get_time()}}"
-        en_US: "Schedule Monitor${{get_time()}}"
-    standardPollingRule:
-      start_time: "2025-11-19 00:00:00"
-      monthly: 1
-      bymonthday: 1
-    autoRun: false
-    executeOnStartup: false
-    isDesignerSet: true
-    actionType: null
-    actionCommonId: null
-    category: "SCHEDULE"
-    application: ${{app2_code()}}
-    addSourceType: "auto_perspective"
-    params:
-      - lang:
-          name:
-            zh_CN: "名称"
-            zh_TW: "名稱"
-            en_US: "name"
-          tip:
-            zh_CN: "在交付设计器显示的参数名称"
-            zh_TW: "在交付設計器顯示的參數名稱"
-            en_US: "Parameter name displayed in delivery designer"
-          value:
-            zh_CN: "定时侦测${{get_time()}}"
-            zh_TW: "定時偵測${{get_time()}}"
-            en_US: "Schedule Monitor${{get_time()}}"
-        code: "name"
-        name: "名称"
-        displayType: "INPUT"
-        required: true
-        readOnly: false
-        sequence: 100
-        tip: "在交付设计器显示的参数名称"
-        defaultValue: ""
-        needLang: true
-        value: "定时侦测${{get_time()}}"
-        options: []
-        width: "140px"
-        attrIndex: 0
-      - lang:
-          name:
-            zh_CN: "参数项描述"
-            zh_TW: "參數項描述"
-            en_US: "Parameter item description"
-          tip:
-            zh_CN: "描述同步至交付设计器上的参数描述区域"
-            zh_TW: "描述同步至交付設計器上的參數描述區域"
-            en_US: "Description synchronized to the parameter description area on the delivery designer"
-          value:
-            zh_CN: "定时侦测描述${{get_time()}}"
-            zh_TW: "定時偵測描述${{get_time()}}"
-            en_US: "Schedule monitor description${{get_time()}}"
-        code: "description"
-        name: "参数项描述"
-        displayType: "TEXTAREA"
-        required: true
-        readOnly: false
-        sequence: 200
-        tip: "在交付设计器显示的参数描述"
-        defaultValue: ""
-        needLang: true
-        value: "定时侦测描述${{get_time()}}"
-        options: []
-        breakWord: true
-        width: "140px"
-        placeholder: "定时侦测${{get_time()}}"
-        attrIndex: 1
-      - lang:
-          name:
-            zh_CN: "编码"
-            zh_TW: "編碼"
-            en_US: "key"
-          tip:
-            zh_CN: "编码"
-            zh_TW: "編碼"
-            en_US: "key"
-        code: "key"
-        name: "编码"
-        displayType: "INPUT"
-        required: true
-        readOnly: false
-        sequence: 300
-        tip: "参数编码"
-        defaultValue: ""
-        needLang: false
-        value: $cache{monitor_rule_code}
-        options: []
-        width: "140px"
-        attrIndex: 2
-  dependence_case: false
-  dependence_case_data:
-  assert:
-    code:
-      jsonpath: $.code
-      type: ==
-      value: 0
-      AssertType:
-  current_request_set_cache:
-    - type: response
-      jsonpath: $.data
-      name: monitor_rule_id
-
-# 查询定时侦测规则详情
-monitor_GetScheduleMonitor_001:
-  host: ${{athena_designer_host()}}
-  url: /athena-designer/task/monitorRule/getMonitorRule/$cache{monitor_rule_code}
-  method: GET
-  detail: 查询定时侦测规则详情
-  headers:
-    digi-middleware-auth-user: $cache{token}
-    token: $cache{token}
-    locale: zh_CN
-  requestType: PARAMS
-  is_run: true
-  data:
-  dependence_case: false
-  dependence_case_data:
-  assert:
-    code:
-      jsonpath: $.code
-      type: ==
-      value: 0
-      AssertType:
-    data:
-      jsonpath: $.data.code
-      type: ==
-      value: $cache{monitor_rule_code}
-      AssertType:
-
-# 更新定时侦测规则
-monitor_UpdateScheduleMonitor_001:
-  host: ${{athena_designer_host()}}
-  url: /athena-designer/task/monitorRule/updateMonitorRule
-  method: POST
-  detail: 更新定时侦测规则
-  headers:
-    digi-middleware-auth-user: $cache{token}
-    token: $cache{token}
-    locale: zh_CN
-    content-type: application/json
-  requestType: json
-  is_run: true
-  data:
-    code: $cache{monitor_rule_code}
-    triggerAction: null
-    product:
-      - code: ${{app2_code()}}
-        rule:
-          monitorRuleId: $cache{monitor_rule_code}
-          productName: ${{app2_code()}}
-    name: "更新定时侦测${{get_time()}}"
-    tenantId: "SYSTEM"
-    lang:
-      name:
-        zh_CN: "更新定时侦测${{get_time()}}"
-        zh_TW: "更新定時偵測${{get_time()}}"
-        en_US: "Updated Schedule Monitor${{get_time()}}"
-    standardPollingRule:
-      start_time: "2025-11-19 00:00:00"
-      monthly: 1
-      bymonthday: 1
-    autoRun: false
-    executeOnStartup: false
-    isDesignerSet: true
-    actionType: null
-    actionCommonId: null
-    category: "SCHEDULE"
-    application: ${{app2_code()}}
-    addSourceType: "auto_perspective"
-    params:
-      - lang:
-          name:
-            zh_CN: "名称"
-            zh_TW: "名稱"
-            en_US: "name"
-          tip:
-            zh_CN: "在交付设计器显示的参数名称"
-            zh_TW: "在交付設計器顯示的參數名稱"
-            en_US: "Parameter name displayed in delivery designer"
-          value:
-            zh_CN: "更新定时侦测${{get_time()}}"
-            zh_TW: "更新定時偵測${{get_time()}}"
-            en_US: "Updated Schedule Monitor${{get_time()}}"
-        code: "name"
-        name: "名称"
-        displayType: "INPUT"
-        required: true
-        readOnly: false
-        sequence: 100
-        tip: "在交付设计器显示的参数名称"
-        defaultValue: ""
-        needLang: true
-        value: "更新定时侦测${{get_time()}}"
-        options: []
-        width: "140px"
-        attrIndex: 0
-      - lang:
-          name:
-            zh_CN: "参数项描述"
-            zh_TW: "參數項描述"
-            en_US: "Parameter item description"
-          tip:
-            zh_CN: "描述同步至交付设计器上的参数描述区域"
-            zh_TW: "描述同步至交付設計器上的參數描述區域"
-            en_US: "Description synchronized to the parameter description area on the delivery designer"
-          value:
-            zh_CN: "更新定时侦测描述${{get_time()}}"
-            zh_TW: "更新定時偵測描述${{get_time()}}"
-            en_US: "Updated schedule monitor description${{get_time()}}"
-        code: "description"
-        name: "参数项描述"
-        displayType: "TEXTAREA"
-        required: true
-        readOnly: false
-        sequence: 200
-        tip: "在交付设计器显示的参数描述"
-        defaultValue: ""
-        needLang: true
-        value: "更新定时侦测描述${{get_time()}}"
-        options: []
-        breakWord: true
-        width: "140px"
-        placeholder: "更新定时侦测${{get_time()}}"
-        attrIndex: 1
-      - lang:
-          name:
-            zh_CN: "编码"
-            zh_TW: "編碼"
-            en_US: "key"
-          tip:
-            zh_CN: "编码"
-            zh_TW: "編碼"
-            en_US: "key"
-        code: "key"
-        name: "编码"
-        displayType: "INPUT"
-        required: true
-        readOnly: false
-        sequence: 300
-        tip: "参数编码"
-        defaultValue: ""
-        needLang: false
-        value: $cache{monitor_rule_code}
-        options: []
-        width: "140px"
-        attrIndex: 2
   dependence_case: false
   dependence_case_data:
   assert:

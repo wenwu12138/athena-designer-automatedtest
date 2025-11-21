@@ -24,9 +24,9 @@ basis_AddBranch_001:
         zh_TW: c001
         en_US: c001
       description:
-        zh_CN: "2025728"
-        zh_TW: "2025728"
-        en_US: "2025728"
+        zh_CN: ${{get_time()}}
+        zh_TW: ${{get_time()}}
+        en_US: ${{get_time()}}
     application: ${{app1_code()}}
   # 是否有依赖业务，为空或者false则表示没有
   dependence_case: False
@@ -59,7 +59,7 @@ basis_Compile_001:
   is_run: true
   data:
     application: ${{app1_code()}}
-    description: 20250801171145-備份分支(20250626)編譯
+    description: ${{get_time()}}-備份分支(20250626)編譯
     branch: bak
     versionNum:
       - "1"
@@ -67,7 +67,7 @@ basis_Compile_001:
       - "0"
       - "2508011711"
     versionLetter: alpha
-    version: 1.0.0.2508011711_alpha
+    version: 1.0.0.${{get_time()}}_alpha
   # 是否有依赖业务，为空或者false则表示没有
   dependence_case: False
   # 依赖的数据

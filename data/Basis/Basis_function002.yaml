@@ -58,15 +58,15 @@ basis_Compile_002:
   is_run: true
   data:
     application: ${{app2_code()}}
-    description: 20250821162729-備份分支(備份分支2)編譯
+    description: ${{get_time()}}-備份分支(備份分支2)編譯
     branch: bak
     versionNum:
       - "1"
       - "0"
       - "0"
-      - "2508211627"
+      - "${{get_time()}}"
     versionLetter: alpha
-    version: 1.0.0.2508211627_alpha
+    version: 1.0.0.${{get_time()}}_alpha
   # 是否有依赖业务，为空或者false则表示没有
   dependence_case: False
   # 依赖的数据

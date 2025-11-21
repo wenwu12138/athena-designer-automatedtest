@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time   : 2025-11-20 15:22:46
+# @Time   : 2025-11-21 11:14:54
 
 
 import allure
@@ -16,7 +16,7 @@ import datetime
 import json
 
 
-case_id = ['process_FindProcessCountByTriggerType_001', 'process_FindProcessPagination_001', 'monitorRule_AddAPITimingMonitor_001', 'monitorRule_GetMonitorRuleTree_001', 'businessDir_QueryIntegrationAutomationInfo_001', 'monitorRule_GetAllProducts_001', 'project_GetRootProjects_001', 'code_GenerateStandard_001', 'template_All_001', 'applicationParam_GetParamConfig_001', 'guide_IsSkip_001', 'process_FindProcessList_001', 'monitorRule_SaveMonitorRule_001', 'monitorRule_GetMonitorRule_001', 'monitorRule_UpdateMonitorRule_001', 'operationRecord_GetMonitorRuleHistory_001', 'modulePublish_PublishMonitorRule_001', 'monitorRule_DeleteMonitorRule_001', 'businessDir_UpdateReportMonitor_001', 'businessDir_QueryReportMonitorInfo_001', 'monitorRule_GetReportMonitorTree_001', 'monitorRule_GetAllProducts_002', 'project_GetRootProjects_002', 'code_GenerateReportMonitorCode_001', 'template_All_002', 'applicationParam_GetReportParamConfig_001', 'process_FindProcessList_002', 'monitorRule_SaveReportMonitor_001', 'monitorRule_GetReportMonitor_001', 'code_GenerateMonitorCode_001', 'monitor_CreateScheduleMonitor_001', 'monitor_GetScheduleMonitor_001', 'monitor_UpdateScheduleMonitor_001']
+case_id = ['process_FindProcessCountByTriggerType_001', 'process_FindProcessPagination_001', 'monitorRule_AddAPITimingMonitor_001', 'monitorRule_GetMonitorRuleTree_001', 'businessDir_QueryIntegrationAutomationInfo_001', 'monitorRule_GetAllProducts_001', 'project_GetRootProjects_001', 'code_GenerateStandard_001', 'template_All_001', 'applicationParam_GetParamConfig_001', 'guide_IsSkip_001', 'process_FindProcessList_001', 'monitor_SaveMonitorRule_001', 'monitorRule_GetMonitorRule_001', 'monitorRule_UpdateMonitorRule_001', 'operationRecord_GetMonitorRuleHistory_001', 'modulePublish_PublishMonitorRule_001', 'monitorRule_DeleteMonitorRule_001']
 TestData = GetTestCase.case_data(case_id)
 re_data = regular(str(TestData))
 
