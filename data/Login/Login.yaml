@@ -1,0 +1,560 @@
+# 公共参数
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 登录
+  allureStory: 登录
+
+
+
+# 获取设备ID（登录前置步骤）
+iam_GetDeviceId_001:
+  host: ${{iam_host()}}
+  url: /api/iam/v2/device/id
+  method: GET
+  detail: 获取设备ID用于登录流程
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    digi-middleware-auth-app: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImF0aGVuYS1sY2RwIiwiaW5zaWRlIjpmYWxzZSwic2lkIjo0NzEzMTUyMTExMzM1MDR9.pT0WT9qO8j9IVxBBO8HkUFRMd9bSfeQOyw0Oh4xL34U
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data
+      name: device_id
+
+# 获取用户盐值（密码加密前置步骤）
+iam_GetUserSalt_001:
+  host: ${{iam_host()}}
+  url: /api/iam/v2/user/salt
+  method: POST
+  detail: 获取用户盐值用于密码加密
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    digi-middleware-auth-app: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImF0aGVuYS1sY2RwIiwiaW5zaWRlIjpmYWxzZSwic2lkIjo0NzEzMTUyMTExMzM1MDR9.pT0WT9qO8j9IVxBBO8HkUFRMd9bSfeQOyw0Oh4xL34U
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    id: wenwu@digiwin.com
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.salt
+      name: user_salt
+
+# 获取RSA公钥（加密前置步骤）
+iam_GetPublicKey_001:
+  host: ${{iam_host()}}
+  url: /api/iam/v2/identity/publickey
+  method: GET
+  detail: 获取RSA公钥用于数据加密
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    digi-middleware-auth-app: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImF0aGVuYS1sY2RwIiwiaW5zaWRlIjpmYWxzZSwic2lkIjo0NzEzMTUyMTExMzM1MDR9.pT0WT9qO8j9IVxBBO8HkUFRMd9bSfeQOyw0Oh4xL34U
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.publicKey
+      name: rsa_public_key
+
+# 获取AES密钥（加密前置步骤）
+iam_GetAesKey_001:
+  host: ${{iam_host()}}
+  url: /api/iam/v2/identity/aeskey
+  method: POST
+  detail: 获取AES加密密钥
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    digi-middleware-auth-app: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImF0aGVuYS1sY2RwIiwiaW5zaWRlIjpmYWxzZSwic2lkIjo0NzEzMTUyMTExMzM1MDR9.pT0WT9qO8j9IVxBBO8HkUFRMd9bSfeQOyw0Oh4xL34U
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    clientEncryptPublicKey: SST+tZq7aR9M4WBlmyzABUHyCCeUwMyc4L7NdkUtPeErd3Y/gyyzr7Ti5VzZhJeoPx+UYeKd51Vxn+nNwtgK+MCczZ2dYDQWAJb2lAWdWUF1Dmw5Smzy0Rr8SA7f8gQ4uagknjnWm8V3dI9I2ekD6jaDDk6qw2ILflFsPqfGznXqXjc1sOsx9o0OzUj2C0F4Y/YIkRSEpSRJy5HYTz2DVKF9pI2UxEktaVAd8BgnDIjGnSJAFuOJOieXoAXcxLPhu9aNqI9TSEjFi0RM6LImcy8OR4GeSTNwnDa3ZLYgotqdkn4zgVWSgYyeap1evfdUtQsitThTAiVo4O9LD/pe1Q==
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.encryptAesKey
+      name: encrypt_aes_key
+
+# 用户登录（核心登录接口）
+auth_UserLogin_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/user/v2/login
+  method: POST
+  detail: 用户登录认证
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+    branch: develop
+  requestType: json
+  is_run: true
+  data:
+    name: wenwu@digiwin.com
+    deviceId: $cache{device_id}
+    identityType: query
+    passwordHash: +4BBRj9DCreOh4iwDs4TAg==
+    clientEncryptPublicKey: SST+tZq7aR9M4WBlmyzABUHyCCeUwMyc4L7NdkUtPeErd3Y/gyyzr7Ti5VzZhJeoPx+UYeKd51Vxn+nNwtgK+MCczZ2dYDQWAJb2lAWdWUF1Dmw5Smzy0Rr8SA7f8gQ4uagknjnWm8V3dI9I2ekD6jaDDk6qw2ILflFsPqfGznXqXjc1sOsx9o0OzUj2C0F4Y/YIkRSEpSRJy5HYTz2DVKF9pI2UxEktaVAd8BgnDIjGnSJAFuOJOieXoAXcxLPhu9aNqI9TSEjFi0RM6LImcy8OR4GeSTNwnDa3ZLYgotqdkn4zgVWSgYyeap1evfdUtQsitThTAiVo4O9LD/pe1Q==
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.token
+      name: token
+    - type: response
+      jsonpath: $.data.userId
+      name: user_id
+    - type: response
+      jsonpath: $.data.iamToken
+      name: iam_token
+    - type: response
+      jsonpath: $.data.defaultTenantId
+      name: default_tenant_id
+
+# 查询用户租户列表
+tenant_QueryUserTenants_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/tenant/queryUserTenants
+  method: GET
+  detail: 查询用户所属租户列表
+  headers:
+    digi-middleware-auth-user: $cache{iam_token}
+    token: $cache{token}
+    locale: zh_CN
+    authorization: $cache{token}
+    branch: develop
+    routerkey: $cache{default_tenant_id}
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data[0].id
+      name: current_tenant_id
+    - type: response
+      jsonpath: $.data[0].sid
+      name: tenant_sid
+    - type: response
+      jsonpath: $.data[0].name
+      name: current_tenant_name
+
+# 查询个人案例用户租户
+tenant_QueryIndividualCaseUserTenants_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/tenant/queryIndividualCaseUserTenants
+  method: GET
+  detail: 查询个人案例用户租户信息
+  headers:
+    digi-middleware-auth-user: $cache{iam_token}
+    token: $cache{token}
+    locale: zh_CN
+    authorization: $cache{token}
+    branch: develop
+    routerkey: $cache{default_tenant_id}
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# ------------------------------------登录------------
+
+
+#------------------------------------选择租户----------
+
+# 切换租户（注意：切换租户后token会更新）
+tenant_ChangeTenant_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/user/changeTenantId
+  method: POST
+  detail: 切换用户当前租户
+  headers:
+    digi-middleware-auth-user: $cache{iam_token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: json
+  is_run: true
+  data:
+    name: 配置测试器
+    tenantId: $cache{default_tenant_id}
+    testTenant: true
+    experience: false
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.token
+      name: token
+
+# 查询权限策略
+auth_QueryAuthPolicy_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/auth/queryAuthPolicy
+  method: POST
+  detail: 查询用户权限策略
+  headers:
+    digi-middleware-auth-user: $cache{iam_token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: json
+  is_run: true
+  data:
+    resourceType: tenant
+    userId: $cache{user_id}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+
+# 查询资源角色用户
+auth_QueryResourceRoleUser_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/auth/queryResourceRoleUser
+  method: GET
+  detail: 查询租户资源角色用户
+  headers:
+    digi-middleware-auth-user: $cache{iam_token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    resourceType: tenant
+    userId: $cache{user_id}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+
+# 查询数据标准权限
+dataStandard_QueryAuth_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/dataStandard/auth/query
+  method: POST
+  detail: 查询数据标准权限
+  headers:
+    digi-middleware-auth-user: $cache{iam_token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: json
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+
+# 查询用户权限（IAM服务）
+iam_QueryUserPermission_001:
+  host: ${{iam_host()}}
+  url: /api/iam/v2/permission/user
+  method: POST
+  detail: 查询用户系统权限
+  headers:
+    digi-middleware-auth-user: $cache{iam_token}
+    token: $cache{iam_token}
+    locale: zh_CN
+    digi-middleware-auth-app: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImF0aGVuYS1sY2RwIiwiaW5zaWRlIjpmYWxzZSwic2lkIjo0NzEzMTUyMTExMzM1MDR9.pT0WT9qO8j9IVxBBO8HkUFRMd9bSfeQOyw0Oh4xL34U
+  requestType: json
+  is_run: true
+  data:
+    userId: $cache{user_id}
+    sysId: athena-lcdp
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+
+# 查询消息主题
+message_QueryTopic_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/messageNotification/queryTopic
+  method: GET
+  detail: 查询消息通知主题
+  headers:
+    digi-middleware-auth-user: $cache{iam_token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+
+# 查询解决方案设计器
+application_QuerySolutionDesigner_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/querySolutionDesigner
+  method: GET
+  detail: 查询解决方案设计器
+  headers:
+    digi-middleware-auth-user: $cache{iam_token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+
+# 查询个人案例权限
+individualCase_QueryAuth_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/individualCaseApp/individualCaseAuth
+  method: GET
+  detail: 查询个人案例应用权限
+  headers:
+    digi-middleware-auth-user: $cache{iam_token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+
+# 获取预设数据
+presetData_GetPresetData_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/presetData/getPresetDataObject
+  method: GET
+  detail: 获取预设数据对象
+  headers:
+    digi-middleware-auth-user: $cache{iam_token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    key: isPrivatization
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+
+# 查询解决方案卡片
+application_QuerySolutionCards_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/querySolutionCards
+  method: GET
+  detail: 查询解决方案卡片
+  headers:
+    digi-middleware-auth-user: $cache{iam_token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+
+# 查询有效消息
+message_QueryValid_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/messageNotification/queryValid
+  method: GET
+  detail: 查询有效消息通知
+  headers:
+    digi-middleware-auth-user: $cache{iam_token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+
+# 查询租户资源角色用户（无资源ID）
+auth_QueryResourceRoleUserNull_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/auth/queryResourceRoleUser
+  method: GET
+  detail: 查询租户资源角色用户（无资源ID）
+  headers:
+    digi-middleware-auth-user: $cache{iam_token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    resourceType: tenant
+    resourceId: null
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+
+# 查询用户租户列表
+tenant_QueryUserTenants_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/tenant/queryUserTenants
+  method: GET
+  detail: 查询用户所属租户列表
+  headers:
+    digi-middleware-auth-user: $cache{iam_token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+
+# 查询租户发布流水线
+deployer_QueryTenantPipeline_001:
+  host: ${{athena_deployer_host()}}
+  url: /athenadeployer/releasePipeline/queryTenantPipeline4IndexPage
+  method: GET
+  detail: 查询租户发布流水线
+  headers:
+    digi-middleware-auth-user: $cache{iam_token}
+    token: $cache{iam_token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+
+# 查询热门解决方案卡片
+application_QueryPopularSolutionCards_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/querySolutionCards
+  method: GET
+  detail: 查询热门解决方案卡片
+  headers:
+    digi-middleware-auth-user: $cache{iam_token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    popular: 0
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+
+# 查询所有消息
+message_QueryAll_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/messageNotification/queryAll
+  method: GET
+  detail: 查询所有消息通知
+  headers:
+    digi-middleware-auth-user: $cache{iam_token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+
+# 查询解决方案授权超时提醒
+application_QueryAuthTimeout_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/querySolutionAuthorizeTimeoutReminder
+  method: GET
+  detail: 查询解决方案授权超时提醒
+  headers:
+    digi-middleware-auth-user: $cache{iam_token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
+
+# 查询最近访问
+application_QueryRecentVisit_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/queryRecentVisit
+  method: GET
+  detail: 查询最近访问的应用
+  headers:
+    digi-middleware-auth-user: $cache{iam_token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    searchAppAuth: ""
+    appType: ""
+    condition: ""
+    num: 20
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    status_code: 200
