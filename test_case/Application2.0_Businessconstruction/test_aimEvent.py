@@ -16,18 +16,18 @@ import datetime
 import json
 
 
-case_id = ['template_CreateServiceOrchestration_001', 'template_GetAllTemplates_001', 'template_UpdateServiceOrchestration_001', 'template_PublishServiceOrchestration_001', 'template_GetTemplateByObjectId_001', 'template_DeleteTemplate_001', 'template_FindSvcParamList_001', 'template_SaveSvcParam_001', 'template_UpdateSvcParam_001', 'template_DeleteSvcParam_001']
+case_id = ['aimEvent_QueryList_001', 'aimEvent_QueryPlatformList_001', 'aimEvent_CreateEvent_001', 'aimEvent_GetDetail_001', 'aimScene_QueryByCondition_001', 'aimEvent_EditEvent_001', 'aimEvent_GetDetail_002', 'aimEvent_DeleteEvent_001', 'aimScene_QueryPlatformByCondition_001', 'aimScene_QueryApplicationByCondition_001', 'aimScene_CreateScene_001', 'aimScene_QueryApplicationByCondition_002', 'aimScene_GetDetail_001', 'aimScene_QueryChannels_001', 'eoc_GetUserList_001', 'eoc_GetDutyList_001', 'aimEvent_QueryPlatformAndAppEvents_001', 'aimScene_UpdateScene_001', 'aimScene_DeleteScene_001', 'aimScene_QueryApplicationByCondition_003']
 TestData = GetTestCase.case_data(case_id)
 re_data = regular(str(TestData))
 
 
 @allure.epic("开发平台接口")
-@allure.feature("2.0应用详情")
-class TestTemplate:
+@allure.feature("业务搭建")
+class TestAimevent:
 
-    @allure.story("服务编排")
+    @allure.story("消息管理")
     @pytest.mark.parametrize('in_data', eval(re_data), ids=[i['detail'] for i in TestData])
-    def test_Template(self, in_data, case_skip):
+    def test_aimEvent(self, in_data, case_skip):
         """
         :param :
         :return:
@@ -50,4 +50,4 @@ class TestTemplate:
 
 
 if __name__ == '__main__':
-    pytest.main(['test_test_Template.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])
+    pytest.main(['test_test_aimEvent.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])

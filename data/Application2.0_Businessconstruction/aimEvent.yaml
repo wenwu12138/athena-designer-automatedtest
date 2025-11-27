@@ -1,0 +1,559 @@
+# 公共参数
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 业务搭建
+  allureStory: 消息管理
+
+
+
+# 应用级消息事件核心流程测试 - 包含事件查询、创建、详情查看、场景查询、编辑等完整操作
+aimEvent_QueryList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/aimEvent/queryList
+  method: POST
+  detail: 查询应用消息事件列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    pageNum: 1
+    pageSize: 10
+    searchValue: ""
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+aimEvent_QueryPlatformList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/aimEvent/queryListOfPlatForm
+  method: GET
+  detail: 查询平台级消息事件列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+aimEvent_CreateEvent_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/aimEvent/insert
+  method: POST
+  detail: 创建自定义消息事件
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    eventId: "/${{app2_code()}}/custom/auto_event_${{random_id()}}"
+    eventName: "自动化验证事件${{get_time()}}"
+    eventType: "custom"
+    lang:
+      eventName:
+        zh_CN: "自动化验证事件"
+        zh_TW: "自動化驗證事件"
+        en_US: "Auto Test Event"
+    application: ${{app2_code()}}
+    adpApplication: ${{app2_code()}}
+    adpTenantId: "athenadeveloperTest"
+    eventBodyExplain: []
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: request
+      jsonpath: $.eventId
+      name: created_event_id
+
+aimEvent_GetDetail_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/aimEvent/detail
+  method: GET
+  detail: 查看消息事件详情
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    eventId: $cache{created_event_id}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+aimScene_QueryByCondition_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/aimScene/queryByCondition
+  method: POST
+  detail: 根据事件ID查询相关场景
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    eventId: $cache{created_event_id}
+    searchValue: ""
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+aimEvent_EditEvent_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/aimEvent/edit
+  method: POST
+  detail: 编辑更新消息事件信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    eventName: "更新后自动化事件${{get_time()}}"
+    eventId: $cache{created_event_id}
+    eventType: "custom"
+    eventBodyExplain: []
+    lang:
+      eventName:
+        zh_CN: "更新后自动化事件"
+        zh_TW: "更新後自動化事件"
+        en_US: "Updated Auto Event"
+    application: ${{app2_code()}}
+    adpApplication: ${{app2_code()}}
+    adpTenantId: "athenadeveloperTest"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+aimEvent_GetDetail_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/aimEvent/detail
+  method: GET
+  detail: 验证事件更新后详情
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    eventId: $cache{created_event_id}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+aimEvent_DeleteEvent_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/aimEvent/delete
+  method: GET
+  detail: 删除已创建的消息事件
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    eventId: $cache{created_event_id}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+#----------------⬇️  消息推送相关
+
+
+# 消息推送场景全流程测试 - 包含场景查询、创建、详情查看、渠道查询、用户查询、更新、删除等完整操作
+aimScene_QueryPlatformByCondition_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/aimScene/platform/queryByCondition
+  method: GET
+  detail: 查询平台级消息推送场景列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    condition: ""
+    pageNum: 1
+    pageSize: 10
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+aimScene_QueryApplicationByCondition_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/aimScene/application/queryByCondition
+  method: GET
+  detail: 查询应用级消息推送场景列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    condition: ""
+    pageNum: 1
+    pageSize: 10
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+aimScene_CreateScene_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/aimScene/insert
+  method: POST
+  detail: 创建消息推送场景
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    type:
+      name: "自动化测试消息推送${{get_time()}}"
+      eventLevel: 2
+      description: "自动化测试描述"
+      lang:
+        name:
+          zh_CN: "自动化测试消息推送"
+          zh_TW: "自動化測試消息推送"
+          en_US: "Auto Test Message Push"
+        description:
+          zh_CN: "描述"
+          zh_TW: "描述"
+          en_US: "Description"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.type.sid
+      name: created_scene_id
+
+aimScene_QueryApplicationByCondition_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/aimScene/application/queryByCondition
+  method: GET
+  detail: 验证场景创建后查询应用级场景列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    condition: ""
+    pageNum: 1
+    pageSize: 10
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+aimScene_GetDetail_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/aimScene/detail/$cache{created_scene_id}
+  method: GET
+  detail: 查看消息推送场景详情
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    eventLevel: 2
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+aimScene_QueryChannels_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/aimScene/queryChannels
+  method: GET
+  detail: 查询消息推送渠道列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+eoc_GetUserList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/eoc/getUserList
+  method: GET
+  detail: 获取用户列表用于消息推送配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+eoc_GetDutyList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/eoc/getDutyList
+  method: GET
+  detail: 获取职务列表用于消息推送配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+aimEvent_QueryPlatformAndAppEvents_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/aimEvent/queryEventOfPlatFormAndApp
+  method: GET
+  detail: 查询平台和应用级事件列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+aimScene_UpdateScene_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/aimScene/update
+  method: POST
+  detail: 更新消息推送场景配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    createBy: "wenwu@digiwin.com"
+    application: ${{app2_code()}}
+    triggerTimingIsEdit: true
+    type:
+      eventLevel: 2
+      athenaMessageId: "SC_$cache{created_scene_id}"
+      name: "自动化测试消息推送${{get_time()}}"
+      description: "更新后描述"
+      replaceSource: false
+      disabled: false
+      id: "SC_$cache{created_scene_id}"
+      lang:
+        name:
+          zh_TW: "自動化測試消息推送"
+          en_US: "Auto Test Message Push"
+          zh_CN: "自动化测试消息推送"
+        description:
+          zh_TW: "描述"
+          en_US: "Description"
+          zh_CN: "描述"
+      sid: $cache{created_scene_id}
+      triggerId: "/ATHENA/TASK/CREATE/EVENT"
+      triggerLevel: 1
+      triggerCondition: null
+      queryConditions: null
+    editBy: "wenwu@digiwin.com"
+    editDate: 1764228510348
+    objectId: "auto_object_${{random_id()}}"
+    createDate: 1764228510348
+    settings:
+      - type: "web"
+        msgType: "notice"
+        settingId: "auto_setting_${{random_id()}}"
+        pushConfig:
+          - type: "contacts"
+            receivers:
+              - classification: "personnel"
+                personnel:
+                  - empId: "wwwwwwwwwwee"
+                    empName: "闻武"
+                    userId: "wenwu@digiwin.com"
+        templates:
+          - subject: "自动化推送验证"
+            content: "自动化推送验证"
+            language: "zh-CN"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+aimScene_DeleteScene_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/aimScene/delete/$cache{created_scene_id}
+  method: GET
+  detail: 删除已创建的消息推送场景
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+aimScene_QueryApplicationByCondition_003:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/aimScene/application/queryByCondition
+  method: GET
+  detail: 验证场景删除后查询应用级场景列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    condition: ""
+    pageNum: 1
+    pageSize: 10
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
