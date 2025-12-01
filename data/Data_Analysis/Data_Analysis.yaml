@@ -1,0 +1,795 @@
+# 公共参数
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 数据分析
+  allureStory: 报表
+
+# 报表活动配置全流程测试：从查询、创建、配置到发布完整流程
+report_GetActivityListByPattern_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/activityConfigs/getActivityListByPatternAndApplication
+  method: GET
+  detail: 查询STATEMENT模式下的报表活动列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    authorization: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    pattern: STATEMENT
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+
+report_AddActivityByPattern_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/activityConfigs/addByPattern
+  method: POST
+  detail: 创建STATEMENT模式的ABI报表活动
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    authorization: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    name: "数据分析abi${{get_time()}}"
+    category: "ABI-STATEMENT"
+    type: "ESP"
+    pattern: "STATEMENT"
+    dependOnGroundEnd: false
+    authorityPrefix: ""
+    lang:
+      name:
+        zh_CN: "数据分析abi${{get_time()}}"
+        zh_TW: "數據分析abi${{get_time()}}"
+        en_US: "数据分析abi${{get_time()}}"
+    disablePrintFlag: false
+    disableExportFlag: false
+    application: ${{app2_code()}}
+    categoryAbi: "prpttpl"
+    pageFlag: "N"
+    subReport: false
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.code
+      name: report_activity_code
+
+report_GetActivityDetail_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/activityConfigs/$cache{report_activity_code}
+  method: GET
+  detail: 获取报表活动详情信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    authorization: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+report_GetResidByCode_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/activityConfigs/getResidByCodeAndLocale
+  method: GET
+  detail: 根据活动编码和语言获取资源ID
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    authorization: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    code: $cache{report_activity_code}
+    locale: zh_CN
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+button_QueryReportButtons_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/button/queryButtonsByKey/REPORT
+  method: GET
+  detail: 查询报表相关按钮配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    authorization: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    modelCode: ""
+    serviceCode: ""
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+customConfig_GetControlList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/customConfig/getCustomControlList
+  method: GET
+  detail: 获取自定义控件列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    authorization: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+task_GetPageViewList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/task/pageView/pageViewList
+  method: GET
+  detail: 获取报表页面视图列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    authorization: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    applicationCode: ${{app2_code()}}
+    code: $cache{report_activity_code}
+    type: Statement
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+report_UpsertActivityConfig_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/activityConfigs/upsertActivityConfigs
+  method: POST
+  detail: 更新ABI报表活动配置信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    authorization: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    activityConfig:
+      createBy: "wenwu@digiwin.com"
+      createDate: "2025-11-27 16:21:30"
+      editBy: "wenwu@digiwin.com"
+      editDate: "2025-11-27 16:21:30"
+      id: "69280a0a5c3b5702c8c15324"
+      code: $cache{report_activity_code}
+      pages:
+        condition-detail:
+          extendedFields:
+            STATEMENT__resid_zh_CN: "EANA$2$17$1$e5a7dacf1ced431480451fb4afb93ac3$af78e735b08545dfb16d11d66943bf7a"
+          submitActions:
+            - sequence: "0"
+              defaultAction: true
+              actionParams: []
+              attachActions: []
+              title: "查询"
+              type: "ESP"
+              lang:
+                title:
+                  zh_TW: "查詢"
+                  en_US: "Search"
+                  zh_CN: "查询"
+              extendParas: {}
+          submitType:
+            isBatch: false
+          layout: []
+          operations: []
+      name: "数据分析abi${{get_time()}}"
+      authorityPrefix: ""
+      dependOnGroundEnd: false
+      pageFlag: "N"
+      application: ${{app2_code()}}
+      masterFromDataSourceName: false
+    fieldConfig: {}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+tenant_QueryCustomerTenants_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/tenant/queryCustomerTenants
+  method: GET
+  detail: 查询客户租户列表用于发布
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    authorization: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+module_PublishActivity_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modulePublish/publish
+  method: POST
+  detail: 发布报表活动到租户环境
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    authorization: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    pkValue: $cache{report_activity_code}
+    module: Statement
+    application: ${{app2_code()}}
+    tenantUsers:
+      - tenantId: "athenadeveloperTest"
+        tenantSid: 847600433497088
+        tenantName: "配置测试器"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+
+operation_GetRecord_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/operationRecord/get
+  method: GET
+  detail: 获取报表活动操作记录
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    authorization: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    code: $cache{report_activity_code}
+    collection: activityConfigs
+    appCode: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 删除ABI报表活动配置
+report_DeleteActivityByCode_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/activityConfigs/deleteByCode
+  method: DELETE
+  detail: 根据活动编码删除ABI报表配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    authorization: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    pattern: STATEMENT
+    code: $cache{report_activity_code}
+    resCode: undefined
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# ---------------------- ⬇️数据查询报表
+# 数据查询明细表活动配置完整测试流程 - 涵盖创建、配置、查询、发布全流程
+# 创建数据查询明细表活动配置用例 - 建立明细表基础配置
+statement_CreateDetailTable_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/activityConfigs/addByPattern
+  method: POST
+  detail: 创建数据查询明细表活动配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    name: "数据查询明细表_${{get_time()}}"
+    category: "ABI-STATEMENT"
+    type: "ESP"
+    pattern: "STATEMENT"
+    dependOnGroundEnd: false
+    authorityPrefix: ""
+    lang:
+      name:
+        zh_CN: "数据查询明细表_${{get_time()}}"
+        zh_TW: "數據查詢明細表_${{get_time()}}"
+        en_US: "Data Query Detail Table_${{get_time()}}"
+    disablePrintFlag: false
+    disableExportFlag: false
+    application: "${{app2_code()}}"
+    categoryAbi: "ebibase"
+    pageFlag: "N"
+    subReport: false
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.code
+      name: detail_table_code
+
+# 查询数据查询明细表列表用例 - 验证明细表活动配置查询功能
+statement_QueryTableList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/activityConfigs/getActivityListByPatternAndApplication
+  method: GET
+  detail: 查询数据查询明细表配置列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    pattern: "STATEMENT"
+    application: "${{app2_code()}}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询数据查询明细表多语言资源用例 - 获取明细表多语言显示配置
+statement_GetLangResource_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/activityConfigs/getResidByCodeAndLocale
+  method: GET
+  detail: 查询数据查询明细表多语言资源ID
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: "${{app2_code()}}"
+    code: $cache{detail_table_code}
+    locale: zh_CN
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询明细表操作按钮用例 - 获取数据查询明细表相关功能按钮配置
+statement_QueryActionButtons_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/button/queryButtonsByKey/REPORT
+  method: GET
+  detail: 查询数据查询明细表操作按钮配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    modelCode: ""
+    serviceCode: ""
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询数据查询明细表详情用例 - 获取明细表完整配置信息
+statement_GetTableDetail_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/activityConfigs/$cache{detail_table_code}
+  method: GET
+  detail: 查询数据查询明细表配置详情
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询明细表控件配置用例 - 获取明细表关联的自定义控件
+statement_GetCustomControls_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/customConfig/getCustomControlList
+  method: GET
+  detail: 查询数据查询明细表自定义控件列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: "${{app2_code()}}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询明细表页面视图用例 - 获取明细表页面布局配置
+statement_GetPageViews_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/task/pageView/pageViewList
+  method: GET
+  detail: 查询数据查询明细表页面视图配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    applicationCode: "${{app2_code()}}"
+    code: $cache{detail_table_code}
+    type: Statement
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 更新数据查询明细表配置用例 - 修改明细表查询条件和显示设置
+statement_UpdateTableConfig_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/activityConfigs/upsertActivityConfigs
+  method: POST
+  detail: 更新数据查询明细表配置信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    activityConfig:
+      createBy: "testuser@digiwin.com"
+      createDate: "2025-11-28 10:07:23"
+      editBy: "testuser@digiwin.com"
+      editDate: "2025-11-28 10:07:23"
+      id: "auto_detail_table_${{random_id()}}"
+      code: $cache{detail_table_code}
+      pages:
+        condition-detail:
+          extendedFields:
+            STATEMENT__resid_zh_CN: "EANA$2$2$1$e5a7dacf1ced431480451fb4afb93ac3$bb934b9636124aeeac50ad885f303775"
+          submitActions:
+            - sequence: "0"
+              defaultAction: true
+              actionParams: []
+              attachActions: []
+              title: "数据查询"
+              type: "ESP"
+              lang:
+                title:
+                  zh_TW: "數據查詢"
+                  en_US: "Data Query"
+                  zh_CN: "数据查询"
+              extendParas: {}
+          submitType:
+            isBatch: false
+          layout: []
+          operations: []
+      name: "更新数据查询明细表_${{get_time()}}"
+      authorityPrefix: ""
+      dependOnGroundEnd: false
+      pageFlag: "N"
+      application: "${{app2_code()}}"
+      masterFromDataSourceName: false
+    fieldConfig: {}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询明细表发布租户用例 - 为数据查询明细表发布准备租户数据
+statement_QueryPublishTenants_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/tenant/queryCustomerTenants
+  method: GET
+  detail: 查询可发布数据查询明细表的租户列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 发布数据查询明细表用例 - 将配置好的明细表发布到目标租户
+statement_PublishDetailTable_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modulePublish/publish
+  method: POST
+  detail: 发布数据查询明细表到目标租户
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    pkValue: $cache{detail_table_code}
+    module: Statement
+    application: "${{app2_code()}}"
+    tenantUsers:
+      - tenantId: "athenadeveloperTest"
+        tenantSid: 847600433497088
+        tenantName: "配置测试器"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 删除数据查询明细表用例 - 清理测试数据
+statement_DeleteDetailTable_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/activityConfigs/deleteByCode
+  method: DELETE
+  detail: 删除数据查询明细表配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    pattern: STATEMENT
+    code: $cache{detail_table_code}
+    resCode: undefined
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# TBB
+
+
+# TBB数据分析表配置流程测试 - 涵盖创建、查询、发布核心流程
+# 创建TBB数据分析表用例 - 建立TBB风格的数据分析表配置
+tbb_CreateDataAnalysisTable_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/activityConfigs/addByPattern
+  method: POST
+  detail: 创建TBB数据分析表配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    name: "TBB数据分析表_${{get_time()}}"
+    category: "STATEMENT"
+    type: "ESP"
+    pattern: "STATEMENT"
+    dependOnGroundEnd: false
+    authorityPrefix: ""
+    lang:
+      name:
+        zh_CN: "TBB数据分析表_${{get_time()}}"
+        zh_TW: "TBB數據分析表_${{get_time()}}"
+        en_US: "TBB Data Analysis Table_${{get_time()}}"
+    disablePrintFlag: false
+    disableExportFlag: false
+    application: "${{app2_code()}}"
+    subReport: false
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.resCode
+      name: tbb_table_code
+
+# 查询TBB数据分析表列表用例 - 获取TBB风格数据表配置列表
+tbb_QueryAnalysisTables_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/activityConfigs/getActivityListByPatternAndApplication
+  method: GET
+  detail: 查询TBB数据分析表配置列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    pattern: STATEMENT
+    application: "${{app2_code()}}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 发布TBB数据分析表用例 - 将TBB数据表发布到目标环境
+tbb_PublishAnalysisTable_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modulePublish/publish
+  method: POST
+  detail: 发布TBB数据分析表到租户环境
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    pkValue: $cache{tbb_table_code}
+    module: Statement
+    application: "${{app2_code()}}"
+    tenantUsers:
+      - tenantId: "athenadeveloperTest"
+        tenantSid: 847600433497088
+        tenantName: "配置测试器"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 删除TBB数据分析表用例 - 清理TBB测试数据
+tbb_DeleteAnalysisTable_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/activityConfigs/deleteByCode
+  method: DELETE
+  detail: 删除TBB数据分析表配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    pattern: STATEMENT
+    code: $cache{tbb_table_code}
+    resCode: $cache{tbb_table_code}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:

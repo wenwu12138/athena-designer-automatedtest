@@ -16,18 +16,18 @@ import datetime
 import json
 
 
-case_id = ['aimEvent_QueryList_001', 'aimEvent_QueryPlatformList_001', 'aimEvent_CreateEvent_001', 'aimEvent_GetDetail_001', 'aimScene_QueryByCondition_001', 'aimEvent_EditEvent_001', 'aimEvent_GetDetail_002', 'aimEvent_DeleteEvent_001', 'aimScene_QueryPlatformByCondition_001', 'aimScene_QueryApplicationByCondition_001', 'aimScene_CreateScene_001', 'aimScene_QueryApplicationByCondition_002', 'aimScene_GetDetail_001', 'aimScene_QueryChannels_001', 'eoc_GetUserList_001', 'eoc_GetDutyList_001', 'aimEvent_QueryPlatformAndAppEvents_001', 'aimScene_UpdateScene_001', 'aimScene_DeleteScene_001', 'aimScene_QueryApplicationByCondition_003']
+case_id = ['report_GetActivityListByPattern_001', 'report_AddActivityByPattern_001', 'report_GetActivityDetail_001', 'report_GetResidByCode_001', 'button_QueryReportButtons_001', 'customConfig_GetControlList_001', 'task_GetPageViewList_001', 'report_UpsertActivityConfig_001', 'tenant_QueryCustomerTenants_001', 'module_PublishActivity_001', 'operation_GetRecord_001', 'report_DeleteActivityByCode_001', 'statement_CreateDetailTable_001', 'statement_QueryTableList_001', 'statement_GetLangResource_001', 'statement_QueryActionButtons_001', 'statement_GetTableDetail_001', 'statement_GetCustomControls_001', 'statement_GetPageViews_001', 'statement_UpdateTableConfig_001', 'statement_QueryPublishTenants_001', 'statement_PublishDetailTable_001', 'statement_DeleteDetailTable_001', 'tbb_CreateDataAnalysisTable_001', 'tbb_QueryAnalysisTables_001', 'tbb_PublishAnalysisTable_001', 'tbb_DeleteAnalysisTable_001']
 TestData = GetTestCase.case_data(case_id)
 re_data = regular(str(TestData))
 
 
 @allure.epic("开发平台接口")
-@allure.feature("业务搭建")
-class TestAimevent:
+@allure.feature("数据分析")
+class TestDataAnalysis:
 
-    @allure.story("消息管理")
+    @allure.story("报表")
     @pytest.mark.parametrize('in_data', eval(re_data), ids=[i['detail'] for i in TestData])
-    def test_aimEvent(self, in_data, case_skip):
+    def test_Data_Analysis(self, in_data, case_skip):
         """
         :param :
         :return:
@@ -50,4 +50,4 @@ class TestAimevent:
 
 
 if __name__ == '__main__':
-    pytest.main(['test_test_aimEvent.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])
+    pytest.main(['test_test_Data_Analysis.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])

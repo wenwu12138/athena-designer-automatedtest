@@ -1,0 +1,5 @@
+# 公共参数
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 业务搭建
+  allureStory: 业务流
