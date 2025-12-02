@@ -196,7 +196,6 @@ businessDir_queryList_002:
   detail: 查询应用下的业务对象列表
   headers:
     digi-middleware-auth-user: $cache{token}
-    authorization: $cache{token}
     locale: zh_CN
     content-type: application/json
   requestType: json
@@ -225,7 +224,6 @@ pageDesign_updatePageConfig_001:
   detail: 更新页面设计配置
   headers:
     digi-middleware-auth-user: $cache{token}
-    authorization: $cache{token}
     locale: zh_CN
     content-type: application/json
   requestType: json
@@ -343,7 +341,6 @@ pageDesign_batchUpdateSubpage_001:
   detail: 批量更新子页面
   headers:
     digi-middleware-auth-user: $cache{token}
-    authorization: $cache{token}
     locale: zh_CN
     content-type: application/json
   requestType: json
@@ -367,7 +364,6 @@ pageDesign_getOperationRecord_001:
   detail: 查询页面设计操作记录
   headers:
     digi-middleware-auth-user: $cache{token}
-    authorization: $cache{token}
     locale: zh_CN
   requestType: PARAMS
   is_run: true
@@ -392,7 +388,6 @@ modulePublish_publish_001:
   detail: 发布页面设计模块到租户
   headers:
     digi-middleware-auth-user: $cache{token}
-    authorization: $cache{token}
     locale: zh_CN
     content-type: application/json
   requestType: json

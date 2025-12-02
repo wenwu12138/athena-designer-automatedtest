@@ -138,7 +138,6 @@ basis_VerifyPermission_001:
   method: GET
   detail: 2.0应用基础功能验证_验证解决方案权限
   headers:
-    authorization: $cache{token}
     digi-middleware-auth-user: $cache{token}
   requestType: json
   is_run: true
@@ -159,7 +158,6 @@ basis_GetServiceCode_001:
   method: GET
   detail: 2.0应用基础功能验证_获取服务代码列表
   headers:
-    authorization: $cache{token}
     digi-middleware-auth-user: $cache{token}
   requestType: json
   is_run: true
@@ -180,7 +178,6 @@ basis_Translate_001:
   method: POST
   detail: 应用基础功能验证_翻译服务
   headers:
-    authorization: $cache{token}
     digi-middleware-auth-user: $cache{token}
   requestType: json
   is_run: true
@@ -203,7 +200,6 @@ basis_CreateApp_001:
   method: POST
   detail: 2.0应用基础功能验证_创建新应用
   headers:
-    authorization: $cache{token}
     digi-middleware-auth-user: $cache{token}
   requestType: json
   is_run: true
@@ -252,7 +248,6 @@ basis_AppAuthUser_001:
   method: POST
   detail: 2.0应用基础功能验证_应用授权用户
   headers:
-    authorization: $cache{token}
     digi-middleware-auth-user: $cache{token}
   requestType: json
   is_run: true
@@ -275,7 +270,6 @@ basis_DeleteApp_001:
   method: GET
   detail: 1.0应用基础功能验证_删除应用
   headers:
-    authorization: $cache{token}
     digi-middleware-auth-user: $cache{token}
   requestType: json
   is_run: true
@@ -296,7 +290,6 @@ basis_QueryDeleteLog_001:
   method: POST
   detail: 2.0应用基础功能验证_查询删除日志详情
   headers:
-    authorization: $cache{token}
     digi-middleware-auth-user: $cache{token}
   requestType: json
   is_run: true
@@ -319,7 +312,6 @@ basis_QueryDeleteProgress_001:
   method: POST
   detail: 2.0应用基础功能验证_查询删除进度
   headers:
-    authorization: $cache{token}
     digi-middleware-auth-user: $cache{token}
   requestType: json
   is_run: true

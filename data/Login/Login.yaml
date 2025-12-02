@@ -133,9 +133,6 @@ auth_UserLogin_001:
       AssertType:
   current_request_set_cache:
     - type: response
-      jsonpath: $.data.token
-      name: token
-    - type: response
       jsonpath: $.data.userId
       name: user_id
     - type: response
@@ -155,7 +152,6 @@ tenant_QueryUserTenants_001:
     digi-middleware-auth-user: $cache{iam_token}
     token: $cache{token}
     locale: zh_CN
-    authorization: $cache{token}
     branch: develop
     routerkey: $cache{default_tenant_id}
   requestType: PARAMS
@@ -191,7 +187,6 @@ tenant_QueryIndividualCaseUserTenants_001:
     digi-middleware-auth-user: $cache{iam_token}
     token: $cache{token}
     locale: zh_CN
-    authorization: $cache{token}
     branch: develop
     routerkey: $cache{default_tenant_id}
   requestType: PARAMS
@@ -233,10 +228,7 @@ tenant_ChangeTenant_001:
   dependence_case_data:
   assert:
     status_code: 200
-  current_request_set_cache:
-    - type: response
-      jsonpath: $.data.token
-      name: token
+
 
 # 查询权限策略
 auth_QueryAuthPolicy_001:

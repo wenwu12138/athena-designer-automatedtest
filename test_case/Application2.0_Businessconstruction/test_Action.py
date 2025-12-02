@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time   : 2025-11-28 10:44:16
+# @Time   : 2025-12-02 11:40:02
 
 
 import allure
@@ -38,7 +38,6 @@ class TestAction:
                         判断用例是否为发版切板用例
                         如果是的话循环调用查询接口，设定超时次数为100次 100次以内没满足条件抛异常
         """
-        # 如果是编译接口那么就存储存储编译包信息给后面用
         TearDownHandler(res).teardown_handle()
         Assert(assert_data=in_data['assert_data'],
                sql_data=res.sql_data,

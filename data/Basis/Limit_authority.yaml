@@ -67,7 +67,6 @@ basis_CreateAuthTestApp_001:
   method: POST
   detail: 创建权限测试应用（权限管理功能前置数据准备）
   headers:
-    authorization: $cache{token}
     digi-middleware-auth-user: $cache{token}
   requestType: json
   is_run: true
@@ -178,7 +177,6 @@ basis_DeleteAuthTestApp_001:
   method: GET
   detail: 清理权限测试应用（权限管理功能后置数据清理）
   headers:
-    authorization: $cache{token}
     digi-middleware-auth-user: $cache{token}
   requestType: json
   is_run: true

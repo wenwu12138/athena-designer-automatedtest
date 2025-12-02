@@ -3,3 +3,1638 @@ case_common:
   allureEpic: 开发平台接口
   allureFeature: 业务搭建
   allureStory: 业务流
+
+
+# 创建业务流测试业务对象
+businessFlow_CreateProcess_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/add
+  method: POST
+  detail: 创建业务流测试业务对象
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    code: "business_flow_test_${{random_id()}}"
+    name: "业务流测试${{get_time()}}"
+    description: "业务流测试${{get_time()}}"
+    serviceCode: "DPBAS"
+    needCreateApi: true
+    customProperties: {}
+    modelType: "transaction"
+    lang:
+      name:
+        zh_CN: "业务流测试${{get_time()}}"
+        zh_TW: "業務流測試${{get_time()}}"
+        en_US: "BusinessFlowTest${{get_time()}}"
+      description:
+        zh_CN: "业务流测试${{get_time()}}"
+        zh_TW: "業務流測試${{get_time()}}"
+        en_US: "BusinessFlowTest${{get_time()}}"
+    tenantId: "SYSTEM"
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: request
+      jsonpath: $.code
+      name: FlowtestModelcode
+
+# 查询业务流测试流程信息
+businessFlow_QueryProcess_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modelDriver/queryModelByCode
+  method: GET
+  detail: 查询业务流测试流程详情
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: params
+  is_run: true
+  data:
+    code: "$cache{FlowtestModelcode}"
+    serviceCode: "DPBAS"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.relateBusinessCode
+      name: business_flow_test_business_code
+    - type: response
+      jsonpath: $.data.objectId
+      name: model_test_object_id
+
+
+
+
+
+
+
+# 查询业务目录列表
+businessDir_QueryList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/queryList
+  method: POST
+  detail: 查询业务目录列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 按模式和应用查询活动配置列表
+activityConfigs_GetActivityListByPatternAndApplication_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/activityConfigs/getActivityListByPatternAndApplication
+  method: GET
+  detail: 按模式和应用查询活动配置列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    pattern: DATA_ENTRY
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+
+
+
+# 创建通用触发流程（基于业务流测试）
+process_UpsertGeneralTriggerVerify_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/process/upsertProcess
+  method: POST
+  detail: 创建通用触发验证流程（基于业务流测试）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+    adpversion: 202566666666666
+    adpstatus: effect
+  requestType: json
+  is_run: true
+  data:
+    businessCode: "$cache{business_flow_test_business_code}"
+    addSourceType: "object_perspective"
+    processName: "通用触发验证${{get_time()}}"
+    triggerType: "page"
+    triggerConfig:
+      businessCode: null
+      eventId: null
+    engine: "coze"
+    flowGraph:
+      nodes:
+        - position:
+            x: 690
+            y: 202
+          size:
+            width: 160
+            height: 38
+          attrs:
+            body:
+              strokeWidth: 1
+              stroke: "#E9E9E9"
+              fill: "#FFFFFF"
+              rx: 19
+              ry: 19
+              cursor: move
+              filter:
+                name: dropShadow
+                args:
+                  color: "#4943a3"
+                  dx: 0
+                  dy: 0
+                  blur: 4
+                  opacity: 0.4
+            label:
+              text: 通用触发
+              fontSize: 13
+              fill: "#333"
+              textWrap:
+                width: 104
+                ellipsis: true
+              x: -34
+              textAnchor: start
+              cursor: move
+            icon:
+              xlink:href: data:image/svg+xml;base64,PHN2ZyB0PSIxNzE5OTczNzU5NjQ1IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjIwMjE2IiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiPjxwYXRoIGQ9Ik0wIDBtNTEyIDBsMCAwcTUxMiAwIDUxMiA1MTJsMCAwcTAgNTEyLTUxMiA1MTJsMCAwcS01MTIgMC01MTItNTEybDAgMHEwLTUxMiA1MTItNTEyWiIgZmlsbD0iI0E2QUZCQyIgcC1pZD0iMjAyMTciPjwvcGF0aD48cGF0aCBkPSJNNDc5Ljk4OTc2IDI1NmEyMC42ODQ4IDIwLjY4NDggMCAwIDEgMTYuOTM2OTYgOC44MDY0bDU0LjYwNDggNzcuOTAwOGgxODYuMzM3MjhjMjQuNzI5NiAwIDQ0Ljg0MDk2IDE5LjY5NjY0IDQ1LjQ3NTg0IDQ0LjIzMTY4bDAuMDE1MzYgMS4xODc4NHYzMzQuNDUzNzZjMCAyNS4wODgtMjAuMzY3MzYgNDUuNDE5NTItNDUuNDkxMiA0NS40MTk1MmgtNDQ2LjYxNzZjLTI1LjEyMzg0IDAtNDUuNDkxMi0yMC4zMzY2NC00NS40OTEyLTQ1LjQxOTUyVjMwMS40MTk1MmMwLTI1LjA4OCAyMC4zNjczNi00NS40MTk1MiA0NS40OTEyLTQ1LjQxOTUyeiBtLTEwLjc3MjQ4IDQxLjI5MjhoLTE3Ny45NzEyYTQuMTMxODQgNC4xMzE4NCAwIDAgMC00LjEzMTg0IDQuMTI2NzJ2NDIxLjE2MDk2YzAgMi4yNzg0IDEuODUzNDQgNC4xMjY3MiA0LjEzNjk2IDQuMTI2NzJoNDQ2LjYxNzZhNC4xMzE4NCA0LjEzMTg0IDAgMCAwIDQuMTM2OTYtNC4xMjY3MlYzODguMTI2NzJhNC4xMzE4NCA0LjEzMTg0IDAgMCAwLTQuMTM2OTYtNC4xMjY3MmgtMTk3LjEwNDY0YTIwLjY4NDggMjAuNjg0OCAwIDAgMS0xNi45MzY5Ni04LjgwNjRMNDY5LjIxNzI4IDI5Ny4yOTI4ek01NTUuOTYwMzIgNDE5Ljg0YzEzLjcyMTYgMCAyNC44MzcxMiAxMS4wNDM4NCAyNC44MzcxMiAyNC42NjgxNnY5MC40NTUwNGg1My44MjE0NGMxOC4zMTkzNiAwIDI3LjQ3OTA0IDIxLjc5NTg0IDE1LjAwMTYgMzQuNzI4OTZsLTAuNjI0NjQgMC42MTQ0LTEyMC4wNTg4OCAxMTUuMTIzMmEyMC44MDI1NiAyMC44MDI1NiAwIDAgMS0yOC43NTM5MiAwbC0xMjAuMDY0LTExNS4xMTgwOGMtMTMuMzg4OC0xMi44NDYwOC00LjIzNDI0LTM1LjM0ODQ4IDE0LjM4MjA4LTM1LjM0ODQ4bDUzLjgyMTQ0LTAuMDA1MTJWNDQ0LjUwODE2YzAtMTMuMzEyIDEwLjYxODg4LTI0LjE2NjQgMjMuOTEwNC0yNC42NTI4bDAuOTI2NzItMC4wMTUzNnogbS0xNi41NTgwOCA0MS4xMTM2aC00OS42ODQ0OHY5NC41NjY0YzAgMTEuMDQ4OTYtOC43ODA4IDIwLjA3MDQtMTkuNzk5MDQgMjAuNTMxMmwtMC44OTYgMC4wMjA0OGgtMjMuMjkwODhsNjguODI4MTYgNjUuOTkxNjggNjguODEyOC02NS45ODY1NmgtMjMuMjc1NTJjLTExLjEzMDg4IDAtMjAuMjA4NjQtOC43MjQ0OC0yMC42Nzk2OC0xOS42NjA4bC0wLjAxNTM2LTAuODk2VjQ2MC45NTM2eiIgZmlsbD0iI0ZGRkZGRiIgcC1pZD0iMjAyMTgiPjwvcGF0aD48L3N2Zz4=
+              width: 26
+              height: 26
+              x: 10
+              y: 6
+              cursor: move
+            tag:
+              display: none
+              xlink:href: data:image/svg+xml;base64,PHN2ZyB0PSIxNjk5OTQ5NjIxODI2IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDE0NDEgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjEyNzA2IiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PHBhdGggZD0iTTAgMGg4NDYuMzkyODg5TDE0NDEuMTg1MTg1IDQyNi42NjY2NjdWMTAyNHoiIGZpbGw9IiNDRkNGRjYiIHAtaWQ9IjEyNzA3Ij48L3BhdGg+PHBhdGggZD0iTTY4MS45NDYwNzQgNDguODQ4NTkzbC04LjgzNjc0MSAxMi4xMzYyOTYtMjAuNTkzNzc3LTE0Ljk4MDc0MS0xMy4xMjIzNzEgMTguMDUyNzQxIDIwLjYzMTcwNCAxNC45ODA3NDEtNy4yMDU5MjYgOS45MzY1OTIgMTguMDE0ODE1IDEzLjEyMjM3MSA3LjIwNTkyNi05LjkzNjU5MyAyMC44MjEzMzMgMTUuMDk0NTE5LTkuMjUzOTI2IDEyLjcwNTE4NSAxOC4wNTI3NDEgMTMuMTIyMzcgOS4yNTM5MjYtMTIuNzA1MTg1IDE4LjIwNDQ0NCAxMy4yMzYxNDggMTMuMTIyMzcxLTE4LjA1Mjc0MS0xOC4yMDQ0NDUtMTMuMjM2MTQ4IDguOTEyNTkzLTEyLjMyNTkyNi0xOC4wMTQ4MTUtMTMuMTIyMzctOC45ODg0NDUgMTIuMzI1OTI2LTIwLjc4MzQwNy0xNS4wOTQ1MTkgOC44MzY3NDEtMTIuMTM2Mjk2LTE4LjA1Mjc0MS0xMy4xMjIzN3pNNjAxLjg4NDQ0NCAxMzUuNzc0ODE1bC0zMS40NDA1OTIgNDMuMjM1NTU1IDQ4LjQzMTQwNyAzNS4xOTUyNiA0MC45MjIwNzQtNTYuMzItMzguODM2MTQ4LTI4LjIxNjg4OWM1LjQ5OTI1OS0yLjE5OTcwNCAxMC45OTg1MTktNC43MDI4MTUgMTYuODM5MTExLTcuNzM2ODg5bDQyLjg5NDIyMyAzMS4xNzUxMTFjLTI4Ljk3NTQwNyAzOS4xMzk1NTYtNDYuMzgzNDA3IDYxLjkzMzAzNy01Mi4zMzc3NzggNjcuNzM1NzA0LTcuNTA5MzMzIDguMDQwMjk2LTE0LjcxNTI1OSA5Ljg2MDc0MS0yMC45NzMwMzcgNS4zMDk2MjlhMzQyLjYyMjgxNSAzNDIuNjIyODE1IDAgMCAxLTE4Ljg0OTE4NS0xNS4xMzI0NDRsLTguMDAyMzcxIDIwLjMyODI5NmM4LjA3ODIyMiA2LjcxMjg4OSAxMy44ODA4ODkgMTEuNDkxNTU2IDE3LjM3MDA3NCAxNC4wMzI1OTMgMTUuMjg0MTQ4IDExLjExMjI5NiAyOS4yNzg4MTUgMTAuMDUwMzcgNDEuNTY2ODE1LTIuOTk2MTQ4IDguNDk1NDA3LTguOTg4NDQ0IDI2LjYyNC0zMi4zODg3NDEgNTQuNDIzNzA0LTY5Ljg1OTU1NmwwLjk4NjA3NCAyMS44MDc0MDdhMTY4LjAxMTg1MiAxNjguMDExODUyIDAgMCAwIDE2LjYxMTU1NS03LjMxOTcwMyAzMTYuMDM2NzQxIDMxNi4wMzY3NDEgMCAwIDAtMTUuNTQ5NjI5IDUzLjA5NjI5NiAxMjMuMjU5MjU5IDEyMy4yNTkyNTkgMCAwIDEtNTguNTU3NjMgMTEuNzU3MDM3bC0xLjcwNjY2NyAyNC4zNDg0NDVjMTkuNDE4MDc0IDAgMzguMjI5MzMzLTMuNDEzMzMzIDU2LjY5OTI2LTEwLjI0LTEuNjY4NzQxIDE5LjMwNDI5Ni0wLjM0MTMzMyAzNi44MjYwNzQgNC40MzczMzMgNTIuNzE3MDM3bDIzLjU4OTkyNi04LjQ5NTQwOGMtNS40OTkyNTktMTYuMzg0LTcuMjQzODUyLTM0LjUxMjU5My01LjMwOTYzLTU0Ljk5MjU5MiAyNC44NDE0ODEtMTQuMDMyNTkzIDQ4LjE2NTkyNi0zNS4zNDY5NjMgNzAuNTQyMjIzLTY0LjEzMjc0MWw5Ljc0Njk2MyA3LjA5MjE0OCAxMy41MDE2MjktMTguNTgzNzA0LTQzLjI3MzQ4MS0zMS40Nzg1MThjNi44MjY2NjctNi4yNTc3NzggMTMuODgwODg5LTEzLjI3NDA3NCAyMS4xNjI2NjYtMjAuNTkzNzc4bC0xNi4xOTQzNy0xNi44MzkxMTFjLTI2LjI4MjY2NyAyOC40NDQ0NDQtNTEuMTI0MTQ4IDQ4LjM1NTU1Ni03NS4wOTMzMzMgNTkuNjU3NDgxbDE1LjkyODg4OS0yMS45MjExODUtNTMuMDIwNDQ1LTM4LjUzMjc0MWMxLjg5NjI5Ni0xLjEzNzc3OCAzLjY3ODgxNS0yLjM1MTQwNyA1Ljc2NDc0MS0zLjY3ODgxNGwtMTUuMjg0MTQ4LTE3LjI5NDIyM2MtMTguNTgzNzA0IDEyLjQwMTc3OC0zNS4yNzExMTEgMjAuMjUyNDQ0LTUwLjA2MjIyMyAyMy41NTJsMS42Njg3NDEgMjMuNzAzNzA0YzAuMjY1NDgxLTAuMzc5MjU5IDAuNzU4NTE5LTAuMjY1NDgxIDEuNDAzMjU5LTAuMzc5MjU5eiBtMTIuMzI1OTI2IDUwLjAyNDI5NmwtMTUuNDczNzc3LTExLjIyNjA3NCAxNy41MjE3NzctMjQuMTIwODg5IDE1LjQ3Mzc3OCAxMS4yMjYwNzQtMTcuNTIxNzc4IDI0LjEyMDg4OXogbTE1My45MDM0MDgtNy40MzM0ODFhMjQ0LjYyMjIyMiAyNDQuNjIyMjIyIDAgMCAxLTQ4LjAxNDIyMiA0cy41MjExODVjNC4zNjE0ODEtMTcuNjM1NTU2IDEwLjk5ODUxOS0zNi40NDY4MTUgMjAuMTc2NTkyLTU2LjgxMzAzN2w3LjM5NTU1Ni01LjU3NTExMSAyMC40OCAxNC44NjY5NjN6TTk0Ny4yIDI0MC40NTAzN2wtNy4zNTc2MyAxMC4xMjYyMjMtNDIuMzI1MzMzLTMwLjc1NzkyNi0xMS4yMjYwNzQgMTUuNDM1ODUyIDQyLjMyNTMzMyAzMC43OTU4NTEtNS42MTMwMzcgNy42OTg5NjMtMzQuNjI2MzctMjUuMTQ0ODg5LTEwLjk2MDU5MyAxNS4wOTQ1MTkgMzQuNjI2MzcxIDI1LjE0NDg4OS01Ljc2NDc0MSA3Ljk2NDQ0NC00Ny40ODMyNTktMzQuNTEyNTkyLTExLjUyOTQ4MiAxNS44MTUxMTEgMTE0LjE1NzAzNyA4Mi45MDYwNzQgMTEuNDkxNTU2LTE1LjgxNTExMS00OC4wNTIxNDgtMzQuODkxODUyIDUuNzY0NzQtNy45NjQ0NDUgMzcuMTY3NDA4IDI3LjA0MTE4NiAxMC45OTg1MTgtMTUuMDk0NTE5LTM3LjE2NzQwNy0yNy4wMDMyNTkgNS41NzUxMTEtNy43MzY4ODkgNDMuNjE0ODE1IDMxLjcwNjA3NCAxMS4yNjQtMTUuNDczNzc4LTQzLjYxNDgxNS0zMS43MDYwNzQgNy4zNTc2My0xMC4xMjYyMjItMTguNTgzNzA0LTEzLjUwMTYzeiBtLTEwMi44OTMwMzcgMTA2LjM4MjIyM2w1Mi42NzkxMTEgMzguMjY3MjU5LTYuNTYxMTg1IDguOTg4NDQ0LTUyLjY0MTE4NS0zOC4yMjkzMzMgNi41MjMyNTktOS4wMjYzN3ogbTYzLjEwODc0MSAyMy44OTMzMzNsLTUyLjY3OTExMS0zOC4yNjcyNTkgNi43MTI4ODgtOS4xNzgwNzQgNTIuNjQxMTg2IDM4LjIyOTMzMy02LjY3NDk2MyA5LjIxNnogbS04MC4yMTMzMzQtMC4zNDEzMzNsNTIuNjQxMTg2IDM4LjI2NzI1OS0zLjc1NDY2NyA1LjE1NzkyNmMtMi44MDY1MTkgMy44Njg0NDQtNS45MTY0NDQgNC42NjQ4ODktOS4yMTYgMi4yNzU1NTVsLTE0LjAzMjU5My0xMS4zMDE5MjYtNy41ODUxODUgMjAuMTAwNzQxIDE1LjMyMjA3NCAxMS4xMTIyOTZjMTEuOTQ2NjY3IDguNjg1MDM3IDIyLjQ1MjE0OCA3LjAxNjI5NiAzMC45ODU0ODItNC43Nzg2NjZsNTIuMTg2MDc0LTcxLjc5Mzc3OC04OS4xMjU5MjYtNjQuNzM5NTU2LTY1LjkxNTI1OSA5MC43NTY3NDEgMTguMDE0ODE0IDEzLjEyMjM3MSAyMC40OC0yOC4xNzg5NjN6IG00MS43MTg1MTktMTg0LjgxMzAzN2wtMjMuMDk2ODg5IDMuMTQ3ODUxYzYuMTQ0IDE5LjA3Njc0MSA5Ljc2MDc0MSAzNS4yNzExMTEgMTAuNjU3MTg1IDQ4LjgxMDY2N2wyMi45MDcyNTktMy42MDI5NjNhMjk4LjU1Mjg4OSAyOTguNTUyODg5IDAgMCAwLTEwLjQyOTYyOS00OC4zNTU1NTV6IG0tNjQuNjI1Nzc4IDM0LjAxOTU1NWwtMTMuMzg3ODUyIDE4LjM5NDA3NCAyNC41MDAxNDggMTcuODI1MTg1LTQ3LjIxNzc3NyA2NC45NjcxMTFhMTYuNTM1NzA0IDE2LjUzNTcwNCAwIDAgMS0xMi4yODggNi44MjY2NjdsLTUuMzg1NDgyIDIyLjUyOGMxOC40MzIgMC4xNTE3MDQgMzcuMTI5NDgxLTEuMTM3Nzc4IDU2LjA1NDUxOS00LjAyMDE0OGw5LjU1NzMzMy0yMy45NjkxODVjLTguMDc4MjIyIDEuNDQxMTg1LTE1Ljg1MzAzNyAyLjgwNjUxOS0yMy4zMjQ0NDQgMy44MzA1MThsNTQuNTc1NDA3LTc1LjA5MzMzMy00My4wODM4NTItMzEuMjg4ODg5ek0xMDQwLjgwMTE4NSAzMDkuODU0ODE1bC0xMy4zODc4NTIgMTguMzk0MDc0LTkuMzY3NzAzLTYuODI2NjY3LTEyLjk3MDY2NyAxNy44NjMxMTEgOS4zNjc3MDQgNi44MjY2NjctNTIuMjk5ODUyIDcxLjk4MzQwNy0xMS4zNzc3NzgtOC4zMDU3NzctMTMuMDA4NTkzIDE3Ljg2MzExMSA4OC41NTcwMzcgNjQuMzYwMjk2IDEyLjk3MDY2Ny0xNy44NjMxMTEtOS45MzY1OTItNy4yMDU5MjYgNTIuMjk5ODUxLTcyLjAyMTMzMyA5LjAyNjM3MSA2LjU2MTE4NSAxMi45NzA2NjYtMTcuODI1MTg1LTkuMDI2MzctNi41OTkxMTEgMTMuMTIyMzctMTguMDE0ODE1LTE4LjQzMi0xMy4zODc4NTItMTMuMDg0NDQ0IDE4LjA1Mjc0MS0zMC4zNzg2NjctMjIuMDcyODg5IDEzLjM0OTkyNi0xOC40MzItMTguMzk0MDc0LTEzLjM0OTkyNnogbS02MC4yMjYzNyAxMjEuNjI4NDQ0bDkuMjE2LTEyLjcwNTE4NSAzMC4zNDA3NDEgMjIuMDcyODg5LTkuMTc4MDc1IDEyLjcwNTE4NS0zMC4zNzg2NjYtMjIuMDcyODg5eiBtODIuNjc4NTE4LTQ5LjkxMDUxOGwtOS4zNjc3MDMgMTIuODk0ODE1LTMwLjM3ODY2Ny0yMi4xMTA4MTUgOS4zNjc3MDQtMTIuODk0ODE1IDMwLjM0MDc0IDIyLjExMDgxNXogbS02MS4yODgyOTYgMjAuNDQyMDc0bDkuMzY3NzA0LTEyLjcwNTE4NSAzMC4zNDA3NCAyMi4wNzI4ODktOS4zMjk3NzcgMTIuODk0ODE1LTMwLjM3ODY2Ny0yMi4wNzI4ODl6IG0tMi4yMzc2MyA3Mi4zNjI2NjZsLTIxLjczMTU1NS0xLjQ0MTE4NWMtMC4yNjU0ODEgMTYuNjg3NDA3LTEuMjUxNTU2IDMxLjEzNzE4NS0zLjI2MTYzIDQzLjE5NzYzbDE2LjY4NzQwOCAwLjMwMzQwNyA0LjU4OTAzNyAyMS44ODMyNmMyMy42Mjc4NTItNy4zMTk3MDQgNDUuNTQ5MDMctMjEuOTk3MDM3IDY1LjgzOTQwNy00NC4xNDU3NzhsMjkuNDY4NDQ1IDIxLjQyODE0OC0yMy4wMjEwMzggMzEuNjMwMjIyYy0zLjYwMjk2MyA1LjAwNjIyMi03LjMxOTcwNCA2LjIxOTg1Mi0xMC45OTg1MTggMy41NjUwMzdhMjc2LjIxNDUxOSAyNzYuMjE0NTE5IDAgMCAxLTE3LjU1OTcwNC0xNC4xODQyOTZsLTguNDk1NDA3IDIyLjUyOCAxOS4xNTI1OTIgMTMuOTE4ODE1YzEyLjUxNTU1NiA5LjEwMjIyMiAyMy4zMjQ0NDQgNy4zOTU1NTYgMzIuMTYxMTg2LTQuNzc4NjY3bDEwNS4xMzA2NjYtMTQ0LjY4NzQwNy02Ni44MjU0ODEtNDguNTQ1MTg2LTY0LjQ3NDA3NCA4OC43NDY2NjdjLTE2Ljc2MzI1OSAyMi42Nzk3MDQtMzUuODAyMDc0IDM4LjM4MTAzNy01Ny4xOTIyOTcgNDcuMzMxNTU2IDAuODcyMjk2LTEwLjA4ODI5NiAxLjAyNC0yMi4zMzgzNyAwLjUzMDk2My0zNi43ODgxNDh6IG0tNDEuOTg0LTI5LjY5NmExNTMuOTAzNDA3IDE1My45MDM0MDcgMCAwIDEtNDUuMDkzOTI2IDEzLjY1MzMzNGw3LjQzMzQ4MiAyMi4zMDA0NDRhMTg2LjIxNjI5NiAxODYuMjE2Mjk2IDAgMCAwIDQ3LjU5NzAzNy0xNy40NDU5MjZsLTkuOTM2NTkzLTE4LjUwNzg1MnogbTEzNy4xNzgwNzQgNi4yOTU3MDRsMjguMzY4NTkzIDIwLjU5Mzc3OC0xOS4yNjYzNyAyNi41NDgxNDgtMjguMzY4NTkzLTIwLjYzMTcwNCAxOS4yNjYzNy0yNi41MTAyMjJ6IG00MS4wNzM3NzggMy4xMDk5MjZsLTI4LjM2ODU5Mi0yMC41OTM3NzggMTkuMjY2MzctMjYuNTEwMjIyIDI4LjMzMDY2NyAyMC41OTM3NzgtMTkuMjI4NDQ1IDI2LjU0ODE0OHpNMTI0OC45MDA3NDEgNDU3LjM4NjY2N2MtMjAuMzI4Mjk2IDExLjM3Nzc3OC00My4zMTE0MDcgMTcuNDQ1OTI2LTY4Ljc5NzYzIDE4LjA5MDY2NmwtNy42OTg5NjMgMjIuNTI4YzM0LjUxMjU5My0wLjIyNzU1NiA2My40MTIxNDgtNy4wOTIxNDggODcuMzA1NDgyLTIwLjY2OTYyOWwtMTAuODA4ODg5LTE5Ljk0OTAzN3ogbS0yNC4yNzI1OTMgNDcuMzMxNTU1YTE3OC42MzExMTEgMTc4LjYzMTExMSAwIDAgMS03OS43OTYxNDggMjIuNzU1NTU2bC03LjU0NzI1OSAyMi4zNzYyOTZjOS44NjA3NDEtMC40MTcxODUgMTkuNzIxNDgxLTEuMTM3Nzc4IDI5LjI3ODgxNS0yLjM1MTQwN2wtNTIuNzE3MDM3IDcyLjUxNDM3IDE4LjYyMTYyOSAxMy41MDE2MyA2OC4wNzcwMzctOTMuNjc3MDM3YzEyLjQwMTc3OC0zLjk0NDI5NiAyNC4xMjA4ODktOS4yMTYgMzQuODkxODUyLTE1LjQ3Mzc3OGwtMTAuODA4ODg5LTE5LjY0NTYzeiBtOTIuMzQ5NjMgMy43OTI1OTNsLTEzLjEyMjM3MSAxOC4wNTI3NDEtMzguODM2MTQ4LTI4LjIxNjg4OS0xMi43MDUxODUgMTcuNDQ1OTI2IDM4LjgzNjE0OCAyOC4yNTQ4MTQtMTIuNzA1MTg1IDE3LjQ4Mzg1Mi00NS41MTExMTEtMzIuOTk1NTU1LTEyLjgxODk2MyAxNy42MzU1NTUgMTEwLjgxOTU1NiA4MC41MTY3NDEgMTIuODU2ODg4LTE3LjY3MzQ4MS00Ni43NjI2NjYtMzMuOTgxNjMgMTIuNzA1MTg1LTE3LjQ0NTkyNiAzOS4yMTU0MDcgMjguNDQ0NDQ0IDEyLjcwNTE4Ni0xNy40NDU5MjYtMzkuMjE1NDA4LTI4LjUyMDI5NiAxMy4xMjIzNy0xOC4wNTI3NDEtMTguNTgzNzAzLTEzLjUwMTYyOXogbS0xMDguNjE5ODUyIDU0Ljk5MjU5MmwtMTIuOTcwNjY3IDE3Ljg2MzExMiA2OS4yMTQ4MTUgNTAuMjg5Nzc3LTI3LjAwMzI1OSAzNy4xNjcyNDBzLTQuMjg1NjMgNS45MTY0NDQtOS4zMjk3NzggNy4wNTQyMjItMTQuODI5MDM3IDMuMDM0MDc0YTM0MC4wNDM4NTIgMzQwLjA0Mzg1MiAwIDAgMS0yMi45NDUxODUtMTguMzU2MTQ4bC04LjgzNjc0MSAyMS40MjgxNDggMjYuMTY4ODg5IDE4Ljk2Mjk2M2MxMy42MTU0MDcgOS45MzY1OTMgMjUuNzg5NjMgNy44MTI3NDEgMzYuMTA1NDgxLTYuMzMzNjNsMzAuNDkyNDQ1LTQxLjk4NCAxOS4zNDIyMjIgMTQuMDMyNTkzIDEyLjk3MDY2Ny0xNy44MjUxODUtMTkuMzQyMjIzLTE0LjAzMjU5MyA4LjQ1NzQ4Mi0xMS42NDMyNTktMTkuMTUyNTkzLTEzLjkxODgxNS04LjQxOTU1NSAxMS42MDUzMzMtNjkuMjUyNzQxLTUwLjI4OTc3OHogbTkuMjE2IDM5LjU5NDY2N2wtMjEuNzMxNTU2LTEuNDQxMTg1YzIuMTk5NzA0IDE3LjA2NjY2NyAzLjI2MTYzIDMxLjg5NTcwNCAyLjk1ODIyMyA0NC4zNzMzMzNsMjIuNTI4IDAuMzAzNDA4YTI0OC40MTQ4MTUgMjQ4LjQxNDgxNSAwIDAgMC0zLjc1NDY2Ny00My4yMzU1NTZ6IiBmaWxsPSIjNzE3N0ZDIiBwLWlkPSIxMjcwOCI+PC9wYXRoPjwvc3ZnPg==
+              width: 35
+              height: 35
+              x: 89
+              y: -5
+              cursor: move
+          visible: true
+          shape: rect
+          id: eca1a402e5cb92c18d6485f6de6eb0c3
+          markup:
+            - tagName: rect
+              selector: body
+            - tagName: text
+              selector: label
+            - tagName: image
+              selector: icon
+            - tagName: image
+              selector: tag
+          ports:
+            groups:
+              top:
+                position: top
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+              right:
+                position: right
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+              bottom:
+                position: bottom
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+              left:
+                position: left
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+            items:
+              - group: top
+                id: 3a75d213e6accb817ee74157b414fece
+                attrs:
+                  circle:
+                    style:
+                      visibility: hidden
+              - group: right
+                id: 56e3562055414c643435a5fac06e6f4a
+                attrs:
+                  circle:
+                    style:
+                      visibility: hidden
+              - group: bottom
+                id: 4fa07731a2fe846442b29a3ae6e3dc89
+                attrs:
+                  circle:
+                    style:
+                      visibility: hidden
+              - group: left
+                id: bd0214e3464c32984e8b3776671a605e
+                attrs:
+                  circle:
+                    style:
+                      visibility: hidden
+          data:
+            nodeId: eca1a402e5cb92c18d6485f6de6eb0c3
+            nodeType: StartManual
+            nodeName: 通用触发
+            iconCode: iconkaishi-graph
+            isOpen: true
+            isSelected: false
+            isVerificationPassed: true
+          zIndex: 1
+          tools:
+            items: []
+            name: null
+        - position:
+            x: 690
+            y: 320
+          size:
+            width: 160
+            height: 38
+          attrs:
+            body:
+              strokeWidth: 1
+              stroke: "#E9E9E9"
+              fill: "#FFFFFF"
+              rx: 19
+              ry: 19
+              cursor: move
+              filter:
+                name: dropShadow
+                args:
+                  color: "#4943a3"
+                  dx: 0
+                  dy: 0
+                  blur: 4
+                  opacity: 0.4
+            label:
+              text: 结束
+              fontSize: 13
+              fill: "#333"
+              textWrap:
+                width: 104
+                ellipsis: true
+              x: -34
+              textAnchor: start
+              cursor: move
+            icon:
+              xlink:href: data:image/svg+xml;base64,PHN2ZyB0PSIxNzAwMDIwMjE4NjA5IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjEzMzI2IiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PHBhdGggZD0iTTUxMiA1MTJtLTUxMiAwYTUxMiA1MTIgMCAxIDAgMTAyNCAwIDUxMiA1MTIgMCAxIDAtMTAyNCAwWiIgZmlsbD0iI0E2QUZCQyIgcC1pZD0iMTMzMjciPjwvcGF0aD48cGF0aCBkPSJNNjYwLjgzNDQ2MiAyNzUuMTAxNTM4YTI5OC41MzUzODUgMjk4LjUzNTM4NSAwIDAgMSA3NC40MzY5MjMgNjAuMjE5MDc3IDI5MS4yMDk4NDYgMjkxLjIwOTg0NiAwIDAgMSA3NC41NTUwNzcgMTk0Ljc1NjkyM2MwIDE2Mi41Nzk2OTItMTMzLjM5NTY5MiAyOTQuMjgxODQ2LTI5Ny44MjY0NjIgMjk0LjI4MTg0Ny0xNjQuNDMwNzY5IDAtMjk3Ljg2NTg0Ni0xMzEuNzAyMTU0LTI5Ny44NjU4NDYtMjk0LjI4MTg0NyAwLTcyLjc0MzM4NSAyNi44NjAzMDgtMTQxLjM5MDc2OSA3NC41OTQ0NjEtMTk0Ljc1NjkyM2EyOTguMTQxNTM4IDI5OC4xNDE1MzggMCAwIDEgNzQuNDM2OTIzLTYwLjIxOTA3NyAyMi4xMzQxNTQgMjIuMTM0MTU0IDAgMSAxIDIxLjk3NjYxNiAzOC40Nzg3NyAyNTQuMjY3MDc3IDI1NC4yNjcwNzcgMCAwIDAtNjMuNDA5MjMxIDUxLjIzOTM4NCAyNDYuOTAyMTU0IDI0Ni45MDIxNTQgMCAwIDAtNjMuMjkxMDc3IDE2NS4yNTc4NDZjMCAxMzguMDAzNjkyIDExMy40NjcwNzcgMjQ5Ljk3NDE1NCAyNTMuNTU4MTU0IDI0OS45NzQxNTRzMjUzLjUxODc2OS0xMTEuOTcwNDYyIDI1My41MTg3NjktMjQ5Ljk3NDE1NGEyNDYuOTAyMTU0IDI0Ni45MDIxNTQgMCAwIDAtNjMuMjUxNjkyLTE2NS4yNTc4NDYgMjUzLjgzMzg0NiAyNTMuODMzODQ2IDAgMCAwLTYzLjQwOTIzMS01MS4yIDIyLjE3MzUzOCAyMi4xNzM1MzggMCAwIDEgMjEuOTc2NjE2LTM4LjUxODE1NHpNNTEyIDIxNC4xMzQxNTRjMTIuMjA5MjMxIDAgMjIuMTM0MTU0IDkuOTI0OTIzIDIyLjEzNDE1NCAyMi4xNzM1Mzh2MjkwLjE4NTg0NmEyMi4xNzM1MzggMjIuMTczNTM4IDAgMCAxLTQ0LjMwNzY5MiAwVjIzNi4zMDc2OTJjMC0xMi4yMDkyMzEgOS45MjQ5MjMtMjIuMTczNTM4IDIyLjE3MzUzOC0yMi4xNzM1Mzh6IiBmaWxsPSIjRkZGRkZGIiBwLWlkPSIxMzMyOCI+PC9wYXRoPjwvc3ZnPg==
+              width: 26
+              height: 26
+              x: 10
+              y: 6
+              cursor: move
+            tag:
+              display: none
+              xlink:href: data:image/svg+xml;base64,PHN2ZyB0PSIxNjk5OTQ5NjIxODI2IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDE0NDEgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjEyNzA2IiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PHBhdGggZD0iTTAgMGg4NDYuMzkyODg5TDE0NDEuMTg1MTg1IDQyNi42NjY2NjdWMTAyNHoiIGZpbGw9IiNDRkNGRjYiIHAtaWQ9IjEyNzA3Ij48L3BhdGg+PHBhdGggZD0iTTY4MS45NDYwNzQgNDguODQ4NTkzbC04LjgzNjc0MSAxMi4xMzYyOTYtMjAuNTkzNzc3LTE0Ljk4MDc0MS0xMy4xMjIzNzEgMTguMDUyNzQxIDIwLjYzMTcwNCAxNC45ODA3NDEtNy4yMDU5MjYgOS45MzY1OTIgMTguMDE0ODE1IDEzLjEyMjM3MSA3LjIwNTkyNi05LjkzNjU5MyAyMC44MjEzMzMgMTUuMDk0NTE5LTkuMjUzOTI2IDEyLjcwNTE4NSAxOC4wNTI3NDEgMTMuMTIyMzcgOS4yNTM5MjYtMTIuNzA1MTg1IDE4LjIwNDQ0NCAxMy4yMzYxNDggMTMuMTIyMzcxLTE4LjA1Mjc0MS0xOC4yMDQ0NDUtMTMuMjM2MTQ4IDguOTEyNTkzLTEyLjMyNTkyNi0xOC4wMTQ4MTUtMTMuMTIyMzctOC45ODg0NDUgMTIuMzI1OTI2LTIwLjc4MzQwNy0xNS4wOTQ1MTkgOC44MzY3NDEtMTIuMTM2Mjk2LTE4LjA1Mjc0MS0xMy4xMjIzN3pNNjAxLjg4NDQ0NCAxMzUuNzc0ODE1bC0zMS40NDA1OTIgNDMuMjM1NTU1IDQ4LjQzMTQwNyAzNS4xOTUyNiA0MC45MjIwNzQtNTYuMzItMzguODM2MTQ4LTI4LjIxNjg4OWM1LjQ5OTI1OS0yLjE5OTcwNCAxMC45OTg1MTktNC43MDI4MTUgMTYuODM5MTExLTcuNzM2ODg5bDQyLjg5NDIyMyAzMS4xNzUxMTFjLTI4Ljk3NTQwNyAzOS4xMzk1NTYtNDYuMzgzNDA3IDYxLjkzMzAzNy01Mi4zMzc3NzggNjcuNzM1NzA0LTcuNTA5MzMzIDguMDQwMjk2LTE0LjcxNTI1OSA5Ljg2MDc0MS0yMC45NzMwMzcgNS4zMDk2MjlhMzQyLjYyMjgxNSAzNDIuNjIyODE1IDAgMCAxLTE4Ljg0OTE4NS0xNS4xMzI0NDRsLTguMDAyMzcxIDIwLjMyODI5NmM4LjA3ODIyMiA2LjcxMjg4OSAxMy44ODA4ODkgMTEuNDkxNTU2IDE3LjM3MDA3NCAxNC4wMzI1OTMgMTUuMjg0MTQ4IDExLjExMjI5NiAyOS4yNzg4MTUgMTAuMDUwMzcgNDEuNTY2ODE1LTIuOTk2MTQ4IDguNDk1NDA3LTguOTg4NDQ0IDI2LjYyNC0zMi4zODg3NDEgNTQuNDIzNzA0LTY5Ljg1OTU1NmwwLjk4NjA3NCAyMS44MDc0MDdhMTY4LjAxMTg1MiAxNjguMDExODUyIDAgMCAwIDE2LjYxMTU1NS03LjMxOTcwMyAzMTYuMDM2NzQxIDMxNi4wMzY3NDEgMCAwIDAtMTUuNTQ5NjI5IDUzLjA5NjI5NiAxMjMuMjU5MjU5IDEyMy4yNTkyNTkgMCAwIDEtNTguNTU3NjMgMTEuNzU3MDM3bC0xLjcwNjY2NyAyNC4zNDg0NDVjMTkuNDE4MDc0IDAgMzguMjI5MzMzLTMuNDEzMzMzIDU2LjY5OTI2LTEwLjI0LTEuNjY4NzQxIDE5LjMwNDI5Ni0wLjM0MTMzMyAzNi44MjYwNzQgNC40MzczMzMgNTIuNzE3MDM3bDIzLjU4OTkyNi04LjQ5NTQwOGMtNS40OTkyNTktMTYuMzg0LTcuMjQzODUyLTM0LjUxMjU5My01LjMwOTYzLTU0Ljk5MjU5MiAyNC44NDE0ODEtMTQuMDMyNTkzIDQ4LjE2NTkyNi0zNS4zNDY5NjMgNzAuNTQyMjIzLTY0LjEzMjc0MWw5Ljc0Njk2MyA3LjA5MjE0OCAxMy41MDE2MjktMTguNTgzNzA0LTQzLjI3zNTE5zMzguODM2MTQ4IDI4LjI1NDgxNC0xMi43MDUxODUgMTcuNDgzODUyLTQ1LjUxMTExMS0zMi45OTU1NTUtMTIuODE4OTYzIDE3LjYzNTU1NSAxMTAuODE5NTU2IDgwLjUxNjc0MSAxMi44NTY4ODgtMTcuNjczNDgxLTQ2Ljc2MjY2Ni0zMy45ODE2MyAxMi43MDUxODUtMTcuNDQ1OTI2IDM5LjIxNTQwNyAyOC40NDQ0NDQgMTIuNzA1MTg2LTE3LjQ0NTkyNi0zOS4yMTU0MDgtMjguNTIwMjk2IDEzLjEyMjM3LTE4LjA1Mjc0MS0xOC41ODM3MDMtMTMuNTAxNjI5eiBtLTEwOC42MTk4NTIgNTQuOTkyNTkybC0xMi45NzA2NjcgMTcuODYzMTEyIDY5LjIxNDgxNSA1MC4yODk3NzctMjcuMDAzMjU5IDM3LjE2NzQwOGMtNC4yODU2MyA1LjkxNjQ0NC05LjMyOTc3OCA3LjA1NDIyMi0xNC44MjkwMzcgMy4wMzQwNzRhMzQwLjA0Mzg1MiAzNDAuMDQzODUyIDAgMCAxLTIyLjk0NTE4NS0xOC4zNTYxNDhsLTguODM2NzQxIDIxLjQyODE0OCAyNi4xNjg4ODkgMTguOTYyOTYzYzEzLjYxNTQwNyA5LjkzNjU5MyAyNS43ODk2MyA3LjgxMjc0MSAzNi4xMDU0ODEtNi4zMzM2M2wzMC40OTI0NDUtNDEuOTg0IDE5LjM0MjIyMiAxNC4wMzI1OTMgMTIuOTcwNjY3LTE3LjgyNTE4NS0xOS4zNDIyMjMtMTQuMDMyNTkzIDguNDU3NDgyLTExLjY0MzI1OS0xOS4xNTI1OTMtMTMuOTE4ODE1LTguNDE5NTU1IDExLjYwNTMzMy02OS4yNTI3NDEtNTAuMjg5Nzc4eiBtOS4yMTYgMzkuNTk0NjY3bC0yMS43MzE1NTYtMS40NDExODVjMi4xOTk3MDQgMTcuMDY2NjY3IDMuMjYxNjMgMzEuODk1NzA0IDIuOTU4MjIzIDQ0LjM3MzMzM2wyMi41MjggMC4zMDM0MDhhMjQ4LjQxNDgxNSAyNDguNDE0ODE1IDAgMCAwLTMuNzU0NjY3LTQzLjIzNTU1NnoiIGZpbGw9IiM3MTc3RkMiIHAtaWQ9IjEyNzA4Ij48L3BhdGg+PC9zdmc+
+              width: 35
+              height: 35
+              x: 89
+              y: -5
+              cursor: move
+          visible: true
+          shape: rect
+          id: 56c57d7e90da436013a298942fafa9f9
+          markup:
+            - tagName: rect
+              selector: body
+            - tagName: text
+              selector: label
+            - tagName: image
+              selector: icon
+            - tagName: image
+              selector: tag
+          ports:
+            groups:
+              top:
+                position: top
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+              right:
+                position: right
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+              bottom:
+                position: bottom
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+              left:
+                position: left
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+            items:
+              - group: top
+                id: 726b56786c2d3820c1f42dfa911e14c2
+              - group: right
+                id: bff156779bee5f345a881e1bf761954a
+              - group: bottom
+                id: c0ad87e2e27fa19e154138db58f9d7ce
+              - group: left
+                id: 038f73f32d43b5767eb51ceeb779e4ab
+          data:
+            nodeId: 56c57d7e90da436013a298942fafa9f9
+            nodeType: EndFlow
+            nodeName: 结束
+            iconCode: iconjieshu-graph
+            isOpen: true
+            isSelected: false
+            isVerificationPassed: true
+          zIndex: 3
+      links:
+        - shape: edge
+          attrs:
+            line:
+              stroke: "#A2B1C3"
+              strokeWidth: 1
+              targetMarker:
+                name: block
+                width: 6
+                height: 10
+          id: a50fff555af3e65dcc41d5b5c08ff692
+          connector:
+            name: rounded
+            args:
+              type: gap
+          router:
+            name: orth
+          source:
+            cell: eca1a402e5cb92c18d6485f6de6eb0c3
+            port: 4fa07731a2fe846442b29a3ae6e3dc89
+          target:
+            cell: 56c57d7e90da436013a298942fafa9f9
+            port: 726b56786c2d3820c1f42dfa911e14c2
+          tools:
+            items:
+              - name: vertices
+          zIndex: 2
+    processConfig:
+      sourceName: 未命名
+      subjectRule: 未命名标题
+      projectName: 项目名称
+      nodes:
+        - id: StartNode_eca1a402e5cb92c18d6485f6de6eb0c3
+          type: StartNode
+          name: 通用触发
+          lang:
+            name:
+              zh_CN: 通用触发
+              zh_TW: 通用觸發
+              en_US: Universal triggering
+          _nodeId: eca1a402e5cb92c18d6485f6de6eb0c3
+          _nodeType: StartManual
+        - id: EndNode_56c57d7e90da436013a298942fafa9f9
+          type: EndNode
+          name: 结束
+          lang:
+            name:
+              zh_CN: 结束
+              zh_TW: 結束
+              en_US: end
+          _nodeId: 56c57d7e90da436013a298942fafa9f9
+          _nodeType: EndFlow
+          _isValidPassed:
+            base: true
+          _events:
+            - type: 0
+      links:
+        - id: a50fff555af3e65dcc41d5b5c08ff692
+          fromId: StartNode_eca1a402e5cb92c18d6485f6de6eb0c3
+          toId: EndNode_56c57d7e90da436013a298942fafa9f9
+    bindForm:
+      type: 0
+    lang:
+      sourceName:
+        zh_CN: 未命名
+        zh_TW: 未命名
+        en_US: Untitled
+      subjectRule:
+        zh_CN: 未命名标题
+        zh_TW: 未命名標題
+        en_US: Untitled title
+      processName:
+        zh_CN: 通用触发验证${{get_time()}}
+        zh_TW: 通用觸發驗證${{get_time()}}
+        en_US: 通用触发验证${{get_time()}}
+      projectName:
+        zh_CN: 项目名称
+        en_US: Project Name
+        zh_TW: 專案名稱
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.processId
+      name: process_verify_id
+    - type: response
+      jsonpath: $.data.objectId
+      name: process_objectId
+
+
+# 查询业务流程版本列表
+processVersion_QueryList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/processVersion/queryList
+  method: GET
+  detail: 查询业务流程版本列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    processId: "$cache{process_test_id}"
+    adpStatus: ""
+    timeType: ""
+    adpRemark: ""
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType: 
+
+# 根据ID查询业务流程详情
+process_FindProcessById_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/process/findProcessById
+  method: GET
+  detail: 根据ID查询业务流程详情
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    processId: "$cache{process_verify_id}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType: 
+
+# 刷新业务资源树（业务流程类型）
+resourceTree_QueryListOfSourceRefresh_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/resourceTree/queryListOfSourceRefresh
+  method: POST
+  detail: 刷新业务资源树（业务流程类型）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    type: "businessProcess"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType: 
+
+# 刷新业务目录部件（业务流程）
+businessDir_PartRefresh_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/part/refresh
+  method: POST
+  detail: 刷新业务目录部件（业务流程）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    businessCode: "$cache{business_flow_test_business_code}"
+    type: "businessProcess"
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType: 
+
+# 查询模型分配列表（用于业务流程测试）
+modelDriver_ModelAssignQueryList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modelDriver/modelAssign/queryList
+  method: GET
+  detail: 查询模型分配列表（用于业务流程测试）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    queryType: "list"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType: 
+
+
+# 查询当前应用下作业配置的活动列表
+activity_GetActivityList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/activityConfigs/getActivityListByPatternAndApplication
+  method: GET
+  detail: 查询当前应用下作业配置的活动列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    pattern: DATA_ENTRY
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询应用业务目录列表
+businessDir_QueryList_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/queryList
+  method: POST
+  detail: 查询应用业务目录列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 根据模型编码批量查询模型详情
+modelDriver_QueryModelByCodes_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modelDriver/queryModelByCodes
+  method: POST
+  detail: 根据模型编码批量查询模型详情
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    - modelCode: $cache{FlowtestModelcode}
+      serviceCode: DPBAS
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 更新通用触发业务流
+process_UpdateGeneralTriggerProcess_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/process/upsertProcess
+  method: POST
+  detail: 更新通用触发业务流（基于已创建的流程）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    createBy: wenwu@digiwin.com
+    createDate: "2025-12-01 15:36:01"
+    editBy: wenwu@digiwin.com
+    editDate: "2025-12-01 15:36:01"
+    lang:
+      sourceName:
+        zh_CN: 未命名
+        zh_TW: 未命名
+        en_US: Untitled
+      subjectRule:
+        zh_CN: 未命名标题
+        zh_TW: 未命名標題
+        en_US: Untitled title
+      processName:
+        zh_CN: 通用触发验证更新${{get_time()}}
+        zh_TW: 通用觸發驗證更新${{get_time()}}
+        en_US: 通用触发验证更新${{get_time()}}
+      projectName:
+        zh_CN: 项目名称
+        zh_TW: 專案名稱
+        en_US: Project Name
+      businessName:
+        zh_CN: 业务流测试更新${{get_time()}}
+        zh_TW: 業務流測試更新${{get_time()}}
+        en_US: BusinessFlowTest更新${{get_time()}}
+    application: ${{app2_code()}}
+    # 关键：使用从 process_UpsertGeneralTriggerVerify_001 缓存中获取的流程ID
+    objectId: $cache{process_objectId}
+    processId: $cache{process_verify_id}
+    code: $cache{process_verify_id}
+    processName: 通用触发验证更新${{get_time()}}
+    processType: 1
+    status: 2
+    # 关键：使用从 businessFlow_QueryProcess_001 缓存中获取的业务编码
+    businessCode: $cache{business_flow_test_business_code}
+    businessName: 业务流测试更新${{get_time()}}
+    projectCode: $cache{process_verify_id}
+    processConfig:
+      subjectRule: "AutoFixed_默认标题规则"
+      projectName: "AutoFixed_自动化测试项目"
+      sourceName: "AutoFixed_自动化数据源"
+      projectDescription: "自动化用例固定流程：开始→固定脚本→结束（ID仅含一个下划线）"
+      enableCustomProjectCard: false
+      inputData: { }
+      nodes:
+        # 开始节点：_nodeId 同步为 flowGraph.nodes.id（无前缀）
+        - id: "StartNode_AutoFixedInit"
+          type: "StartNode"
+          name: "AutoFixed_自动化开始"
+          lang:
+            name:
+              zh_CN: "AutoFixed_自动化开始"
+              zh_TW: "AutoFixed_自動化開始"
+              en_US: "AutoFixed_AutomationStart"
+          _nodeId: "AutoFixedInit"  # 关联 flowGraph.nodes.id（无前缀）
+          _nodeType: "StartManual"
+          _isValidPassed:
+            base: true
+          transfer: true
+        # 脚本节点：_nodeId 同步为 flowGraph.nodes.id（无前缀）
+        - id: "ServiceTask_AutoFixedScript"
+          type: "ServiceTask"
+          name: "AutoFixed_固定脚本执行"
+          lang:
+            name:
+              zh_CN: "AutoFixed_固定脚本执行"
+              zh_TW: "AutoFixed_固定腳本執行"
+              en_US: "AutoFixed_FixedScript"
+          executor:
+            type: "robot"
+            source: "NONE"
+            performer: "Athena_AutoTest"
+          serviceConfig:
+            type: "SCRIPT"
+            scheduleRule:
+              schedule_type: ""
+            responseScript: "// 自动化固定返回数据\nreturn {\n  \"AutoFixed_Flag\": true,\n  \"AutoFixed_Result\": \"success\",\n  \"AutoFixed_Data\": \"自动化用例固定输出\"\n}"
+          _nodeId: "AutoFixedScript"  # 关联 flowGraph.nodes.id（无前缀）
+          _nodeType: "AutoScript"
+          _isValidPassed:
+            base: true
+          processId: "PC_AutoFixed_001"
+        # 结束节点：_nodeId 同步为 flowGraph.nodes.id（无前缀）
+        - id: "EndNode_AutoFixedComplete"
+          type: "EndNode"
+          name: "AutoFixed_自动化结束"
+          lang:
+            name:
+              zh_CN: "AutoFixed_自动化结束"
+              zh_TW: "AutoFixed_自動化結束"
+              en_US: "AutoFixed_AutomationEnd"
+          _nodeId: "AutoFixedComplete"  # 关联 flowGraph.nodes.id（无前缀）
+          _nodeType: "EndFlow"
+          _isValidPassed:
+            base: true
+          _events:
+            - callBackType: "complete"
+              serviceCode: ""
+              type: 0
+              actionId: ""
+              modelCode: null
+              requestScript: null
+            - callBackType: "abort"
+              serviceCode: ""
+              type: 0
+              actionId: ""
+              modelCode: null
+              requestScript: null
+          transfer: true
+          endOutput:
+            endExecuteType: "script"
+            mapping: [ ]
+      links:
+        # 链路关联保持不变（fromId/toId 绑定 processConfig.nodes.id）
+        - id: "Link_StartToScript"
+          fromId: "StartNode_AutoFixedInit"
+          toId: "ServiceTask_AutoFixedScript"
+        - id: "Link_ScriptToEnd"
+          fromId: "ServiceTask_AutoFixedScript"
+          toId: "EndNode_AutoFixedComplete"
+    bindForm:
+      type: 0
+      modelCode: null
+      formCode: null
+      serviceCode: null
+      actionId: null
+    triggerType: page
+    triggerConfig: {}
+    flowGraph:
+      nodes:
+        # 开始节点：id 取消前缀，关联 processConfig.nodes._nodeId
+        - engine: "coze"
+          id: "AutoFixedInit"  # 无前缀，与 processConfig.nodes._nodeId 一致
+          type: "StartManual"
+          meta:
+            copyDisable: true
+            defaultPorts:
+              - type: "output"
+            deleteDisable: true
+            group: "base"
+            iconCode: "iconrengongchufa-graph"
+            isStart: true
+            selectable: true
+            nodePanelVisible: true
+            size:
+              width: 154
+              height: 60
+            position:
+              x: 100
+              y: 50
+          data:
+            name: "AutoFixed_自动化开始"
+            lang:
+              name:
+                zh_CN: "AutoFixed_自动化开始"
+                zh_TW: "AutoFixed_自動化開始"
+                en_US: "AutoFixed_AutomationStart"
+            nodeId: "StartNode_AutoFixedInit"  # 关联 processConfig.nodes.id（含类型前缀）
+            nodeType: "StartNode"
+            isVerificationPassed:
+              base: true
+        # 脚本节点：id 取消前缀，关联 processConfig.nodes._nodeId
+        - engine: "coze"
+          id: "AutoFixedScript"  # 无前缀，与 processConfig.nodes._nodeId 一致
+          type: "AutoScript"
+          meta:
+            copyDisable: false
+            defaultPorts:
+              - type: "input"
+              - type: "output"
+            deleteDisable: false
+            group: "auto"
+            iconCode: "iconjiaoben-graph"
+            isStart: false
+            selectable: true
+            nodePanelVisible: true
+            size:
+              width: 154
+              height: 60
+            position:
+              x: 400
+              y: 50
+          data:
+            name: "AutoFixed_固定脚本执行"
+            lang:
+              name:
+                zh_CN: "AutoFixed_固定脚本执行"
+                zh_TW: "AutoFixed_固定腳本執行"
+                en_US: "AutoFixed_FixedScript"
+            nodeId: "ServiceTask_AutoFixedScript"  # 关联 processConfig.nodes.id（含类型前缀）
+            nodeType: "ServiceTask"
+            isVerificationPassed:
+              base: true
+        # 结束节点：id 取消前缀，关联 processConfig.nodes._nodeId
+        - engine: "coze"
+          id: "AutoFixedComplete"  # 无前缀，与 processConfig.nodes._nodeId 一致
+          type: "EndFlow"
+          meta:
+            copyDisable: true
+            defaultPorts:
+              - type: "input"
+            deleteDisable: true
+            group: "base"
+            iconCode: "iconjieshu-graph"
+            isStart: false
+            isNodeEnd: true
+            selectable: true
+            nodePanelVisible: true
+            size:
+              width: 154
+              height: 60
+            position:
+              x: 700
+              y: 50
+          data:
+            name: "AutoFixed_自动化结束"
+            lang:
+              name:
+                zh_CN: "AutoFixed_自动化结束"
+                zh_TW: "AutoFixed_自動化結束"
+                en_US: "AutoFixed_AutomationEnd"
+            nodeId: "EndNode_AutoFixedComplete"  # 关联 processConfig.nodes.id（含类型前缀）
+            nodeType: "EndNode"
+            isVerificationPassed:
+              base: true
+      links:
+        # 链路关联更新：sourceNodeID/targetNodeID 绑定新的 flowGraph.nodes.id（无前缀）
+        - id: "Link_StartToScript"
+          sourceNodeID: "AutoFixedInit"  # 关联 flowGraph.nodes.id（无前缀）
+          targetNodeID: "AutoFixedScript"  # 关联 flowGraph.nodes.id（无前缀）
+          fromId: "StartNode_AutoFixedInit"  # 关联 processConfig.nodes.id（含类型前缀）
+          toId: "ServiceTask_AutoFixedScript"  # 关联 processConfig.nodes.id（含类型前缀）
+        - id: "Link_ScriptToEnd"
+          sourceNodeID: "AutoFixedScript"  # 关联 flowGraph.nodes.id（无前缀）
+          targetNodeID: "AutoFixedComplete"  # 关联 flowGraph.nodes.id（无前缀）
+          fromId: "ServiceTask_AutoFixedScript"  # 关联 processConfig.nodes.id（含类型前缀）
+          toId: "EndNode_AutoFixedComplete"  # 关联 processConfig.nodes.id（含类型前缀）
+    publishFlag: false
+    # 关键：使用从 businessFlow_CreateProcess_001 缓存中获取的业务流模型编码
+    businessModelCode: $cache{FlowtestModelcode}
+    businessServiceCode: DPBAS
+    _nodeId: $cache{process_verify_id}
+    _nodeType: GlobalSetting
+    addSourceType: object_perspective
+    adpRemarkNumber: 1
+    adpStatus: draft
+    engine: coze
+    _isValidPassed:
+      base: true
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 刷新资源树列表（业务流类型）
+resourceTree_QueryListOfSourceRefresh_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/resourceTree/queryListOfSourceRefresh
+  method: POST
+  detail: 刷新资源树列表（业务流类型）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    type: businessProcess
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 刷新业务目录部件
+businessDir_PartRefresh_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/part/refresh
+  method: POST
+  detail: 刷新业务目录部件
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    businessCode: $cache{business_flow_test_business_code}
+    type: businessProcess
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+
+processVersion_EffectProcessVersion_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/processVersion/effect
+  method: POST
+  detail: 生效指定的流程版本
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    processId: $cache{process_verify_id}
+    adpVersion: 202566666666666
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+processVersion_QueryVersionList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/processVersion/queryList
+  method: GET
+  detail: 查询指定流程的版本列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: PARAMS
+  is_run: true
+  data:
+    processId: $cache{process_verify_id}
+    adpStatus:
+    timeType:
+    adpRemark:
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+resourceTree_QueryListForRefresh_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/resourceTree/queryListOfSourceRefresh
+  method: POST
+  detail: 为资源刷新查询应用下的列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    type: businessProcess
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+businessDir_RefreshPart_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/part/refresh
+  method: POST
+  detail: 刷新业务目录中的指定部件
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    businessCode: $cache{business_flow_test_business_code}
+    type: businessProcess
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+modulePublish_PublishSingleModel_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modulePublish/modelSingle/publish
+  method: POST
+  detail: 发布单个模块模型
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    pkValue: $cache{process_verify_id}
+    module: process
+    application: ${{app2_code()}}
+    tenantUsers:
+      - tenantId: athenadeveloperTest
+        tenantSid: 847600433497088
+        tenantName: 配置测试器
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 根据给定curl生成，主要场景为：获取指定模式的活动列表、查询业务目录、按编码查询模型、创建流程版本、查询流程详情、查询模型分配列表。
+activityConfigs_GetActivityListByPattern_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/activityConfigs/getActivityListByPatternAndApplication
+  method: GET
+  detail: 根据模式和应用获取活动配置列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: PARAMS
+  is_run: true
+  data:
+    pattern: DATA_ENTRY
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+businessDir_QueryList_003:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/queryList
+  method: POST
+  detail: 查询应用下的业务目录列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+modelDriver_QueryModelByCodes_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modelDriver/queryModelByCodes
+  method: POST
+  detail: 根据模型编码列表批量查询模型信息002
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    - modelCode: $cache{FlowtestModelcode}
+      serviceCode: DPBAS
+    - modelCode: $cache{business_flow_test_25yljb5}
+      serviceCode: DPBAS
+    - modelCode: $cache{business_flow_test_rg4jock}
+      serviceCode: DPBAS
+    - modelCode: $cache{business_flow_test_dcojw1vs1}
+      serviceCode: DPBAS
+    - modelCode: zzzazzzazzzazzzazzza
+      serviceCode: DPBAS
+    - modelCode: abcabcabc
+      serviceCode: DPBAS
+    - modelCode: automatedtesting_basis
+      serviceCode: DPBAS
+    - modelCode: informationzzb
+      serviceCode: DPBAS
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+processVersion_CreateVersion_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/processVersion/create
+  method: POST
+  detail: 为流程创建新版本
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    processId: $cache{process_verify_id}
+    adpVersion: 202566666666666
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.adpVersion
+      name: NewAdpVersion
+
+resourceTree_QueryListForRefresh_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/resourceTree/queryListOfSourceRefresh
+  method: POST
+  detail: 为资源刷新查询应用下的列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    type: businessProcess
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+businessDir_RefreshPart_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/part/refresh
+  method: POST
+  detail: 刷新业务目录中的指定部件
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    businessCode: $cache{business_flow_test_business_code}
+    type: businessProcess
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+process_FindProcessById_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/process/findProcessById
+  method: GET
+  detail: 根据流程ID查询流程详情
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    adpstatus: draft
+    adpversion: $cache{NewAdpVersion}
+  requestType: PARAMS
+  is_run: true
+  data:
+    processId: $cache{process_verify_id}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+processVersion_QueryVersionList_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/processVersion/queryList
+  method: GET
+  detail: 查询指定流程的版本列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: PARAMS
+  is_run: true
+  data:
+    processId: $cache{process_verify_id}
+    adpStatus: ""
+    timeType: ""
+    adpRemark: ""
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+modelDriver_QueryModelAssignList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modelDriver/modelAssign/queryList
+  method: GET
+  detail: 查询模型分配列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    queryType: list
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+
+# 更新流程版本备注
+processVersion_UpdateRemark_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/processVersion/updateRemark
+  method: POST
+  detail: 更新流程版本的备注信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    processId: $cache{process_verify_id}
+    adpVersion: 202566666666666
+    adpRemark: 流程多版本V1(已被手动更新)
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+
+processVersion_QueryListByCreateDate_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/processVersion/queryList
+  method: GET
+  detail: 查询指定流程的版本列表（按创建时间排序）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: PARAMS
+  is_run: true
+  data:
+    processId: $cache{process_verify_id}
+    adpStatus: ""
+    timeType: createDate
+    adpRemark: ""
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+processVersion_RemoveVersion_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/processVersion/remove
+  method: POST
+  detail: 删除指定的流程版本
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    adpVersion: $cache{NewAdpVersion}
+    processId: $cache{process_verify_id}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+processVersion_QueryListNoTimeType_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/processVersion/queryList
+  method: GET
+  detail: 查询指定流程的版本列表（无时间类型过滤）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: PARAMS
+  is_run: true
+  data:
+    processId: $cache{process_verify_id}
+    adpStatus: ""
+    timeType: ""
+    adpRemark: ""
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+#------调试
+
+# 获取流程调试测试数据
+debug_GetDebugTestData_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/debug/getDebugTestData
+  method: GET
+  detail: 获取流程调试所需的测试数据
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: PARAMS
+  is_run: true
+  data:
+    debugType: all
+    processId: $cache{process_verify_id}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 调试流程执行
+debug_DebugProcess_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/debug/debugProcess
+  method: POST
+  detail: 执行流程调试
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    adpstatus: effect
+    adpversion: 202566666666666
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    processId: $cache{process_verify_id}
+    code: $cache{process_verify_id}
+    debugType: all
+    needSaveInput: true
+    inputParameters:
+      - checked: true
+        key: age
+        dataType: string
+        value: "18"
+    dispatchData:
+      - checked: true
+        key: name
+        dataType: string
+        value: test1
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.serialNumber
+      name: debug_serial_number
+
+# 获取流程调试进度
+debug_GetDebugProgress_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/debug/getDebugProgress
+  method: POST
+  detail: 查询流程调试执行进度
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    serialNumber: $cache{debug_serial_number}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.nodeList[1].uid
+      name: debug_activity_id
+
+
+# 获取流程调试变量
+debug_GetDebugVariables_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/debug/getDebugVariables
+  method: POST
+  detail: 获取流程调试过程中的变量信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    serialNumber: $cache{debug_serial_number}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+
+# 获取单个节点调试详情
+debug_GetDebugResult_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/debug/getDebugResult
+  method: POST
+  detail: 获取单个节点调试详情
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    serialNumber: $cache{debug_serial_number}
+    debugType: all
+    activityId: $cache{debug_activity_id}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.status
+      type: ==
+      value: 200
+      AssertType:
+
+# 清理业务流测试流程
+businessFlow_CleanupProcess_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/businessDir/delete
+  method: POST
+  detail: 清理业务流测试流程
+  headers:
+    digi-middleware-auth-user: $cache{token}
+  requestType: json
+  is_run: false
+  data:
+    type: "businessConstructor"
+    businessCode: "$cache{business_flow_test_business_code}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:

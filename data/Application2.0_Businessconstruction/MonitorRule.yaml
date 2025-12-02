@@ -315,7 +315,6 @@ monitor_SaveMonitorRule_001:
   detail: 保存定时侦测规则配置
   headers:
     digi-middleware-auth-user: $cache{token}
-    authorization: $cache{token}
     locale: zh_CN
     content-type: application/json
   requestType: json
@@ -514,7 +513,6 @@ monitorRule_UpdateMonitorRule_001:
   detail: 更新侦测规则配置
   headers:
     digi-middleware-auth-user: $cache{token}
-    authorization: $cache{token}
     locale: zh_CN
     content-type: application/json
   requestType: json
@@ -836,7 +834,6 @@ modulePublish_PublishMonitorRule_001:
     token: $cache{token}
     locale: zh_CN
     content-type: application/json
-    authorization: $cache{token}
     branch: develop
     routerkey: athenadeveloperTest
   requestType: json

@@ -12,7 +12,6 @@ report_GetActivityListByPattern_001:
   detail: 查询STATEMENT模式下的报表活动列表
   headers:
     digi-middleware-auth-user: $cache{token}
-    authorization: $cache{token}
     locale: zh_CN
   requestType: PARAMS
   is_run: true
@@ -37,7 +36,6 @@ report_AddActivityByPattern_001:
   detail: 创建STATEMENT模式的ABI报表活动
   headers:
     digi-middleware-auth-user: $cache{token}
-    authorization: $cache{token}
     locale: zh_CN
     content-type: application/json
   requestType: json
@@ -72,6 +70,12 @@ report_AddActivityByPattern_001:
     - type: response
       jsonpath: $.data.code
       name: report_activity_code
+    - type: response
+      jsonpath: $.data.resid
+      name: report_activity_resid
+
+
+
 
 report_GetActivityDetail_001:
   host: ${{athena_designer_host()}}
@@ -80,7 +84,6 @@ report_GetActivityDetail_001:
   detail: 获取报表活动详情信息
   headers:
     digi-middleware-auth-user: $cache{token}
-    authorization: $cache{token}
     locale: zh_CN
   requestType: PARAMS
   is_run: true
@@ -101,7 +104,6 @@ report_GetResidByCode_001:
   detail: 根据活动编码和语言获取资源ID
   headers:
     digi-middleware-auth-user: $cache{token}
-    authorization: $cache{token}
     locale: zh_CN
   requestType: PARAMS
   is_run: true
@@ -125,7 +127,6 @@ button_QueryReportButtons_001:
   detail: 查询报表相关按钮配置
   headers:
     digi-middleware-auth-user: $cache{token}
-    authorization: $cache{token}
     locale: zh_CN
   requestType: PARAMS
   is_run: true
@@ -148,7 +149,6 @@ customConfig_GetControlList_001:
   detail: 获取自定义控件列表
   headers:
     digi-middleware-auth-user: $cache{token}
-    authorization: $cache{token}
     locale: zh_CN
   requestType: PARAMS
   is_run: true
@@ -170,7 +170,6 @@ task_GetPageViewList_001:
   detail: 获取报表页面视图列表
   headers:
     digi-middleware-auth-user: $cache{token}
-    authorization: $cache{token}
     locale: zh_CN
   requestType: PARAMS
   is_run: true
@@ -194,7 +193,6 @@ report_UpsertActivityConfig_001:
   detail: 更新ABI报表活动配置信息
   headers:
     digi-middleware-auth-user: $cache{token}
-    authorization: $cache{token}
     locale: zh_CN
     content-type: application/json
   requestType: json
@@ -210,7 +208,7 @@ report_UpsertActivityConfig_001:
       pages:
         condition-detail:
           extendedFields:
-            STATEMENT__resid_zh_CN: "EANA$2$17$1$e5a7dacf1ced431480451fb4afb93ac3$af78e735b08545dfb16d11d66943bf7a"
+            STATEMENT__resid_zh_CN: "$cache{report_activity_resid}"
           submitActions:
             - sequence: "0"
               defaultAction: true
@@ -251,7 +249,6 @@ tenant_QueryCustomerTenants_001:
   detail: 查询客户租户列表用于发布
   headers:
     digi-middleware-auth-user: $cache{token}
-    authorization: $cache{token}
     locale: zh_CN
   requestType: PARAMS
   is_run: true
@@ -272,7 +269,6 @@ module_PublishActivity_001:
   detail: 发布报表活动到租户环境
   headers:
     digi-middleware-auth-user: $cache{token}
-    authorization: $cache{token}
     locale: zh_CN
     content-type: application/json
   requestType: json
@@ -303,7 +299,6 @@ operation_GetRecord_001:
   detail: 获取报表活动操作记录
   headers:
     digi-middleware-auth-user: $cache{token}
-    authorization: $cache{token}
     locale: zh_CN
   requestType: PARAMS
   is_run: true
@@ -328,7 +323,6 @@ report_DeleteActivityByCode_001:
   detail: 根据活动编码删除ABI报表配置
   headers:
     digi-middleware-auth-user: $cache{token}
-    authorization: $cache{token}
     locale: zh_CN
   requestType: PARAMS
   is_run: true
@@ -390,6 +384,9 @@ statement_CreateDetailTable_001:
     - type: response
       jsonpath: $.data.code
       name: detail_table_code
+    - type: response
+      jsonpath: $.data.resid
+      name: statement_activity_resid
 
 # 查询数据查询明细表列表用例 - 验证明细表活动配置查询功能
 statement_QueryTableList_001:
@@ -558,7 +555,7 @@ statement_UpdateTableConfig_001:
       pages:
         condition-detail:
           extendedFields:
-            STATEMENT__resid_zh_CN: "EANA$2$2$1$e5a7dacf1ced431480451fb4afb93ac3$bb934b9636124aeeac50ad885f303775"
+            STATEMENT__resid_zh_CN: "$cache{statement_activity_resid}"
           submitActions:
             - sequence: "0"
               defaultAction: true

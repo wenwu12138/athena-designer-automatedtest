@@ -420,7 +420,6 @@ event_testing_add_model_001:
   detail: 新增事件
   headers:
     digi-middleware-auth-user: $cache{token}
-    authorization: $cache{token}
     locale: zh_CN
   requestType: JSON
   is_run: true
@@ -494,7 +493,6 @@ event_testing_publish_model_001:
   detail: 发布事件模型
   headers:
     digi-middleware-auth-user: $cache{token}
-    authorization: $cache{token}
     locale: zh_CN
   requestType: JSON
   is_run: true
@@ -523,7 +521,6 @@ event_testing_delete_event_001:
   detail: 删除事件模型
   headers:
     digi-middleware-auth-user: $cache{token}
-    authorization: $cache{token}
     locale: zh_CN
   requestType: JSON
   is_run: true
