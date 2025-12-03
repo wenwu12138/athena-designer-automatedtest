@@ -16,18 +16,18 @@ import datetime
 import json
 
 
-case_id = ['template_CreateServiceOrchestration_001', 'template_GetAllTemplates_001', 'template_UpdateServiceOrchestration_001', 'template_PublishServiceOrchestration_001', 'template_GetTemplateByObjectId_001', 'template_DeleteTemplate_001', 'template_FindSvcParamList_001', 'template_SaveSvcParam_001', 'template_UpdateSvcParam_001', 'template_DeleteSvcParam_001']
+case_id = ['project_FindAppEffectAdpVersion_002', 'task_QueryTaskTree_001', 'code_GenerateStandardCode_001', 'task_SaveTask_001', 'process_UpsertProcess_001', 'task_GetTaskDetail_001', 'data_GetDataFeatures_001', 'processVersion_QueryBigTVersionList_001', 'process_FindBigTProcessById_001', 'modelDriver_QueryModelAssignList_002', 'activity_GetActivityListByPattern_001', 'process_UpdateBigTProcess_001', 'bigT_PublishProcess_001', 'debug_DebugBigTProcess_001', 'debug_GetDebugProgress_002']
 TestData = GetTestCase.case_data(case_id)
 re_data = regular(str(TestData))
 
 
 @allure.epic("开发平台接口")
-@allure.feature("2.0应用详情")
-class TestTemplate:
+@allure.feature("驱动执行")
+class TestTask:
 
-    @allure.story("服务编排")
+    @allure.story("任务")
     @pytest.mark.parametrize('in_data', eval(re_data), ids=[i['detail'] for i in TestData])
-    def test_Template(self, in_data, case_skip):
+    def test_Task(self, in_data, case_skip):
         """
         :param :
         :return:
@@ -49,4 +49,4 @@ class TestTemplate:
 
 
 if __name__ == '__main__':
-    pytest.main(['test_test_Template.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])
+    pytest.main(['test_test_Task.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])

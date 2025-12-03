@@ -878,7 +878,7 @@ project_DeleteProjectData_001:
     adpversion: $cache{project_adp_version}
     adpstatus: effect
   requestType: PARAMS
-  is_run: false
+  is_run: true
   data: {}
   dependence_case: false
   dependence_case_data: []

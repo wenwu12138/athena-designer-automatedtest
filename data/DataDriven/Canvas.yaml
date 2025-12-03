@@ -1,0 +1,241 @@
+# 公共参数
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 驱动执行
+  allureStory: 画布
+
+
+
+# 画布模块前置 - 查询项目生效的ADP版本（画布测试前置检查）
+canvas_pre_FindAppEffectAdpVersion_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/groupHistory/findAppEffectAdpVersion
+  method: GET
+  detail: 查询项目生效ADP版本（画布测试前置数据准备）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data
+      name: canvas_adp_version
+
+
+# 画布模块 - 获取设计态画布数据（画布设计前置数据准备）
+canvas_GetDtdCanvas_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/task/getDtdCanvas
+  method: GET
+  detail: 获取设计态画布数据（画布设计前置数据准备）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    adpversion: $cache{canvas_adp_version}  # 使用前置步骤获取的ADP版本
+    adpstatus: effect
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    groupCode: ${{app2_code()}}
+    isNeedContrast: false
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 画布模块 - 查询画布修改历史记录（查看画布变更记录）
+canvas_GetDataGroupHistory_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/groupHistory/getDataGroupHistory
+  method: GET
+  detail: 查询画布修改历史记录（查看画布变更记录）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{canvas_adp_version}  # 使用前置步骤获取的ADP版本
+    adpstatus: effect
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    code: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+
+
+# 画布模块 - 查询数据组操作记录（画布操作审计追踪）
+canvas_GetOperationRecord_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/operationRecord/get
+  method: GET
+  detail: 查询数据组操作记录（画布操作审计追踪）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    adpversion: $cache{canvas_adp_version}
+    adpstatus: effect
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    code: ${{app2_code()}}
+    collection: dataGroup
+    appCode: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 画布模块 - 更新画布版本备注（修改历史版本描述信息）
+canvas_UpdateRemark_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/groupHistory/updateRemark
+  method: POST
+  detail: 更新画布版本备注（修改历史版本描述信息）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    adpVersion: $cache{canvas_adp_version}
+    adpRemark: "画布版本备注自动化测试${{get_time()}}"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 画布模块 - 创建画布新版本（生成新的画布版本记录）
+canvas_CreateNewVersion_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/groupHistory/create
+  method: POST
+  detail: 创建画布新版本（生成新的画布版本记录）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    adpversion: $cache{canvas_adp_version}
+    adpstatus: effect
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    code: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.adpVersion
+      name: new_canvas_version
+    - type: response
+      jsonpath: $.data.objectId
+      name: new_canvas_objectId
+    - type: response
+      jsonpath: $.data.adpRemark
+      name: new_canvas_remark
+
+
+# 画布模块 - 查询画布版本列表（查看所有版本记录）
+canvas_QueryVersionList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/groupHistory/queryList
+  method: GET
+  detail: 查询画布版本列表（查看所有版本记录）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    adpversion: $cache{new_canvas_version}
+    adpstatus: draft
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    code: ${{app2_code()}}
+    adpStatus: ""
+    timeType: createDate
+    adpRemark: ""
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 画布模块 - 删除画布版本（清理测试版本数据）
+canvas_RemoveVersion_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/groupHistory/remove
+  method: POST
+  detail: 删除画布版本（清理测试版本数据）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    adpVersion: $cache{new_canvas_version}
+    application: ${{app2_code()}}
+    code: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:

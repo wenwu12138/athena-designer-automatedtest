@@ -16,18 +16,18 @@ import datetime
 import json
 
 
-case_id = ['template_CreateServiceOrchestration_001', 'template_GetAllTemplates_001', 'template_UpdateServiceOrchestration_001', 'template_PublishServiceOrchestration_001', 'template_GetTemplateByObjectId_001', 'template_DeleteTemplate_001', 'template_FindSvcParamList_001', 'template_SaveSvcParam_001', 'template_UpdateSvcParam_001', 'template_DeleteSvcParam_001']
+case_id = ['canvas_pre_FindAppEffectAdpVersion_001', 'canvas_GetDtdCanvas_001', 'canvas_GetDataGroupHistory_001', 'canvas_GetOperationRecord_001', 'canvas_UpdateRemark_001', 'canvas_CreateNewVersion_001', 'canvas_QueryVersionList_001', 'canvas_RemoveVersion_001']
 TestData = GetTestCase.case_data(case_id)
 re_data = regular(str(TestData))
 
 
 @allure.epic("开发平台接口")
-@allure.feature("2.0应用详情")
-class TestTemplate:
+@allure.feature("驱动执行")
+class TestCanvas:
 
-    @allure.story("服务编排")
+    @allure.story("画布")
     @pytest.mark.parametrize('in_data', eval(re_data), ids=[i['detail'] for i in TestData])
-    def test_Template(self, in_data, case_skip):
+    def test_Canvas(self, in_data, case_skip):
         """
         :param :
         :return:
@@ -49,4 +49,4 @@ class TestTemplate:
 
 
 if __name__ == '__main__':
-    pytest.main(['test_test_Template.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])
+    pytest.main(['test_test_Canvas.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])

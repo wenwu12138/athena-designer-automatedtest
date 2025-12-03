@@ -1,0 +1,1654 @@
+# 公共参数
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 驱动执行
+  allureStory: 任务
+
+# 项目模块 - 查询项目生效的ADP版本（项目部署前置检查）
+project_FindAppEffectAdpVersion_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/groupHistory/findAppEffectAdpVersion
+  method: GET
+  detail: 查询项目部署所需的生效ADP版本信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data
+      name: project_adp_version
+
+
+# 查询任务树结构（获取应用任务树信息）
+task_QueryTaskTree_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/task/taskTree
+  method: GET
+  detail: 查询任务树结构
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    applicationCode: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 生成标准代码（根据应用配置生成标准代码）
+code_GenerateStandardCode_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/code/generate/standard
+  method: POST
+  detail: 生成标准代码
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    typeCode: default
+    paramMap:
+      abbreviationCode: TK
+      application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data
+      name: Task_code
+
+# 保存任务信息（创建或更新任务配置）
+task_SaveTask_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/task/saveTask
+  method: POST
+  detail: 保存任务信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+    locale: zh_CN
+    content-type: application/json
+    Authorization: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    code: "$cache{Task_code}"
+    name: "信息加工处理${{get_time()}}"
+    driveType: flow
+    flowCode: "$cache{Task_code}"
+    versionNumber: 3
+    adpType: workflowTask
+    lang:
+      name:
+        zh_CN: "信息加工处理"
+        zh_TW: "資訊加工處理"
+        en_US: "信息加工处理"
+    groupCode: ${{app2_code()}}
+    tenantId: SYSTEM
+    category: PROCESS
+    pattern: BUSINESS
+    priority: 0
+    milestone: false
+    relaDataEntryCode: ""
+    merge: false
+    pageCode: null
+    dueDateType: null
+    evlModelCode: ""
+    dataFeatures: []
+    application: ${{app2_code()}}
+    allowSubLevel: false
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 新增或更新流程配置（保存任务关联的流程信息）
+process_UpsertProcess_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/process/upsertProcess
+  method: POST
+  detail: 新增或更新流程配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    adpType: workflowTask
+    taskCode: $cache{Task_code}
+    application: ${{app2_code()}}
+    addSourceType: auto_perspective
+    processName: "信息加工处理${{get_time()}}"
+    triggerType: page
+    triggerConfig:
+      businessCode: null
+      eventId: null
+    flowGraph:
+      nodes:
+        - position:
+            x: 690
+            y: 202
+          size:
+            width: 160
+            height: 38
+          attrs:
+            body:
+              strokeWidth: 1
+              stroke: "#E9E9E9"
+              fill: "#FFFFFF"
+              rx: 19
+              ry: 19
+              cursor: move
+              filter:
+                name: dropShadow
+                args:
+                  color: "#4943a3"
+                  dx: 0
+                  dy: 0
+                  blur: 4
+                  opacity: 0.4
+            label:
+              text: 开始
+              fontSize: 13
+              fill: "#333"
+              textWrap:
+                width: 104
+                ellipsis: true
+              x: -34
+              textAnchor: start
+              cursor: move
+            icon:
+              xlink:href: "data:image/svg+xml;base64,PHN2ZyB0PSIxNzE5OTczNzU5NjQ1IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjIwMjE2IiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiPjxwYXRoIGQ9Ik0wIDBtNTEyIDBsMCAwcTUxMiAwIDUxMiA1MTJsMCAwcTAgNTEyLTUxMiA1MTJsMCAwcS01MTIgMC01MTItNTEybDAgMHEwLTUxMiA1MTItNTEyWiIgZmlsbD0iI0E2QUZCQyIgcC1pZD0iMjAyMTciPjwvcGF0aD48cGF0aCBkPSJNNDc5Ljk4OTc2IDI1NmEyMC42ODQ4IDIwLjY4NDggMCAwIDEgMTYuOTM2OTYgOC44MDY0bDU0LjYwNDggNzcuOTAwOGgxODYuMzM3MjhjMjQuNzI5NiAwIDQ0Ljg0MDk2IDE5LjY5NjY0IDQ1LjQ3NTg0IDQ0LjIzMTY4bDAuMDE1MzYgMS4xODc4NHYzMzQuNDUzNzZjMCAyNS4wODgtMjAuMzY3MzYgNDUuNDE5NTItNDUuNDkxMiA0NS40MTk1MmgtNDQ2LjYxNzZjLTI1LjEyMzg0IDAtNDUuNDkxMi0yMC4zMzY2NC00NS40OTEyLTQ1LjQxOTUyVjMwMS40MTk1MmMwLTI1LjA4OCAyMC4zNjczNi00NS40MTk1MiA0NS40OTEyLTQ1LjQxOTUyeiBtLTEwLjc3MjQ4IDQxLjI5MjhoLTE3Ny45NzEyYTQuMTMxODQgNC4xMzE4NCAwIDAgMC00LjEzMTg0IDQuMTI2NzJ2NDIxLjE2MDk2YzAgMi4yNzg0IDEuODUzNDQgNC4xMjY3MiA0LjEzNjk2IDQuMTI2NzJoNDQ2LjYxNzZhNC4xMzE4NCA0LjEzMTg0IDAgMCAwIDQuMTM2OTYtNC4xMjY3MlYzODguMTI2NzJhNC4xMzE4NCA0LjEzMTg0IDAgMCAwLTQuMTM2OTYtNC4xMjY3MmgtMTk3LjEwNDY0YTIwLjY4NDggMjAuNjg0OCAwIDAgMS0xNi45MzY5Ni04LjgwNjRMNDY5LjIxNzI4IDI5Ny4yOTI4ek01NTUuOTYwMzIgNDE5Ljg0YzEzLjcyMTYgMCAyNC44MzcxMiAxMS4wNDM4NCAyNC44MzcxMiAyNC42NjgxNnY5MC40NTUwNGg1My44MjE0NGMxOC4zMTkzNiAwIDI3LjQ3OTA0IDIxLjc5NTg0IDE1LjAwMTYgMzQuNzI4OTZsLTAuNjI0NjQgMC42MTQ0LTEyMC4wNTg4OCAxMTUuMTIzMmEyMC44MDI1NiAyMC44MDI1NiAwIDAgMS0yOC43NTM5MiAwbC0xMjAuMDY0LTExNS4xMTgwOGMtMTMuMzg4OC0xMi44NDYwOC00LjIzNDI0LTM1LjM0ODQ4IDE0LjM4MjA4LTM1LjM0ODQ4bDUzLjgyMTQ0LTAuMDA1MTJWNDQ0LjUwODE2YzAtMTMuMzEyIDEwLjYxODg4LTI0LjE2NjQgMjMuOTEwNC0yNC42NTI4bDAuOTI2NzItMC4wMTUzNnogbS0xNi41NTgwOCA0MS4xMTM2aC00OS42ODQ0OHY5NC41NjY0YzAgMTEuMDQ4OTYtOC43ODA4IDIwLjA3MDQtMTkuNzk5MDQgMjAuNTMxMmwtMC44OTYgMC4wMjA0OGgtMjMuMjkwODhsNjguODI4MTYgNjUuOTkxNjggNjguODEyOC02NS45ODY1NmgtMjMuMjc1NTJjLTExLjEzMDg4IDAtMjAuMjA4NjQtOC43MjQ0OC0yMC42Nzk2OC0xOS42NjA4bC0wLjAxNTM2LTAuODk2VjQ2MC45NTM2eiIgZmlsbD0iI0ZGRkZGRiIgcC1pZD0iMjAyMTgiPjwvcGF0aD48L3N2Zz4="
+              width: 26
+              height: 26
+              x: 10
+              y: 6
+              cursor: move
+            tag:
+              display: none
+              xlink:href: "data:image/svg+xml;base64,PHN2ZyB0PSIxNjk5OTQ5NjIxODI2IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDE0NDEgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjEyNzA2IiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PHBhdGggZD0iTTAgMGg4NDYuMzkyODg5TDE0NDEuMTg1MTg1IDQyNi42NjY2NjdWMTAyNHoiIGZpbGw9IiNDRkNGRjYiIHAtaWQ9IjEyNzA3Ij48L3BhdGg+PHBhdGggZD0iTTY4MS45NDYwNzQgNDguODQ4NTkzbC04LjgzNjc0MSAxMi4xMzYyOTYtMjAuNTkzNzc3LTE0Ljk4MDc0MS0xMy4xMjIzNzEgMTguMDUyNzQxIDIwLjYzMTcwNCAxNC45ODA3NDEtNy4yMDU5MjYgOS45MzY1OTIgMTguMDE0ODE1IDEzLjEyMjM3MSA3LjIwNTkyNi05LjkzNjU5MyAyMC44MjEzMzMgMTUuMDk0NTE5LTkuMjUzOTI2IDEyLjcwNTE4NSAxOC4wNTI3NDEgMTMuMTIyMzcgOS4yNTM5MjYtMTIuNzA1MTg1IDE4LjIwNDQ0NCAxMy4yMzYxNDggMTMuMTIyMzcxLTE4LjA1Mjc0MS0xOC4yMDQ0NDUtMTMuMjM2MTQ4IDguOTEyNTkzLTEyLjMyNTkyNi0xOC4wMTQ4MTUtMTMuMTIyMzctOC45ODg0NDUgMTIuMzI1OTI2LTIwLjc4MzQwNy0xNS4wOTQ1MTkgOC44MzY3NDEtMTIuMTM2Mjk2LTE4LjA1Mjc0MS0xMy4xMjIzN3pNNjAxLjg4NDQ0NCAxMzUuNzc0ODE1bC0zMS40NDA1OTIgNDMuMjM1NTU1IDQ4LjQzMTQwNyAzNS4xOTUyNiA0MC45MjIwNzQtNTYuMzItMzguODM2MTQ4LTI4LjIxNjg4OWM1LjQ5OTI1OS0yLjE5OTcwNCAxMC45OTg1MTktNC43MDI4MTUgMTYuODM5MTExLTcuNzM2ODg5bDQyLjg5NDIyMyAzMS4xNzUxMTFjLTI4Ljk3NTQwNyAzOS4xMzk1NTYtNDYuMzgzNDA3IDYxLjkzMzAzNy01Mi4zMzc3NzggNjcuNzM1NzA0LTcuNTA5MzMzIDguMDQwMjk2LTE0LjcxNTI1OSA5Ljg2MDc0MS0yMC45NzMwMzcgNS4zMDk2MjlhMzQyLjYyMjgxNSAzNDIuNjIyODE1IDAgMCAxLTE4Ljg0OTE4NS0xNS4xMzI0NDRsLTguMDAyMzcxIDIwLjMyODI5NmM4LjA3ODIyMiA2LjcxMjg4OSAxMy44ODA4ODkgMTEuNDkxNTU2IDE3LjM3MDA3NCAxNC4wMzI1OTMgMTUuMjg0MTQ4IDExLjExMjI5NiAyOS4yNzg4MTUgMTAuMDUwMzcgNDEuNTY2ODE1LTIuOTk2MTQ4IDguNDk1NDA3LTguOTg4NDQ0IDI2LjYyNC0zMi4zODg3NDEgNTQuNDIzNzA0LTY5Ljg1OTU1NmwwLjk4NjA3NCAyMS44MDc0MDdhMTY4LjAxMTg1MiAxNjguMDExODUyIDAgMCAwIDE2LjYxMTU1NS03LjMxOTcwMyAzMTYuMDM2NzQxIDMxNi4wMzY3NDEgMCAwIDAtMTUuNTQ5NjI5IDUzLjA5NjI5NiAxMjMuMjU5MjU5IDEzMi4yNTkyNTkgMCAwIDEtNTguNTU3NjMgMTEuNzU3MDM3bC0xLjcwNjY2NyAyNC4zNDg0NDVjMTkuNDE4MDc0IDAgMzguMjI5MzMzLTMuNDEzMzMzIDU2LjY5OTI2LTEwLjI0LTEuNjY4NzQxIDE5LjMwNDI5Ni0wLjM0MTMzMyAzNi44MjYwNzQgNC40MzczMzMgNTIuNzE3MDM3bDIzLjU4OTkyNi04LjQ5NTQwOGMtNS40OTkyNTktMTYuMzg0LTcuMjQzODUyLTM0LjUxMjU5My01LjMwOTYzLTU0Ljk5MjU5MiAyNC44NDE0ODEtMTQuMDMyNTkzIDQ4LjE2NTkyNi0zNS4zNDY5NjMgNzAuNTQyMjIzLTY0LjEzMjc0MWw5Ljc0Njk2MyA3LjA5MjE0OCAxMy41MDE2MjktMTguNTgzNzA0LTQzLjI3MzQ4MS0zMS40Nzg1MThjNi44MjY2NjctNi4yNTc3NzggMTMuODgwODg5LTEzLjI3NDA3NCAyMS4xNjI2NjYtMjAuNTkzNzc4bC0xNi4xOTQzNy0xNi44MzkxMTFjLTI2LjI4MjY2NyAyOC40NDQ0NDQtNTEuMTI0MTQ4IDQ4LjM1NTU1Ni03NS4wOTMzMzMgNTkuNjU3NDgxbDE1LjkyODg4OS0yMS45MjExODUtNTMuMDIwNDQ1LTM4LjUzMjc0MWMxLjg5NjI5Ni0xLjEzNzc3OCAzLjY3ODgxNS0yLjM1MTQwNyA1Ljc2NDc0MS0zLjY3ODgxNGwtMTUuMjg0MTQ4LTE3LjI5NDIyM2MtMTguNTgzNzA0IDEyLjQwMTc3OC0zNS4yNzExMTEgMjAuMjUyNDQ0LTUwLjA2MjIyMyAyMy41NTJsMS42Njg3NDEgMjMuNzAzNzA0YzAuMjY1NDgxLTAuMzc5MjU5IDAuNzU4NTE5LTAuMjY1NDgxIDEuNDAzMjU5LTAuMzc5MjU5eiBtMTIuMzI1OTI2IDUwLjAyNDI5NmwtMTUuNDczNzc3LTExLjIyNjA3NCAxNy41MjE3NzctMjQuMTIwODg5IDE1LjQ3Mzc3OCAxMS4yMjYwNzQtMTcuNTIxNzc4IDI0LjEyMDg4OXogbTE1My45MDM0MDgtNy40MzM0ODFhMjQ0LjYyMjIyMiAyNDQuNjIyMjIyIDAgMCAxLTQ4LjAxNDIyMiA0Ny41MjExODVjNC4zNjE0ODEtMTcuNjM1NTU2IDEwLjk5ODUxOS0zNi40NDY4MTUgMjAuMTc2NTkyLTU2LjgxMzAzN2w3LjM5NTU1Ni01LjU3NTExMSAyMC40OCAxNC44NjY5NjN6TTk0Ny4yIDI0MC40NTAzN2wtNy4zNTc2MyAxMC4xMjYyMjMtNDIuMzI1MzMzLTMwLjc1NzkyNi0xMS4yMjYwNzQgMTUuNDM1ODUyIDQyLjMyNTMzMyAzMC43OTU4NTEtNS42MTMwMzcgNy42OTg5NjMtMzQuNjI2MzctMjUuMTQ0ODg5LTEwLjk2MDU5MyAxNS4wOTQ1MTkgMzQuNjI2MzcxIDI1LjE0NDg4OS01Ljc2NDc0MSA3Ljk2NDQ0NC00Ny40ODMyNTktMzQuNTEyNTkyLTExLjUyOTQ4MiAxNS44MTUxMTEgMTE0LjE1NzAzNyA4Mi45MDYwNzQgMTEuNDkxNTU2LTE1LjgxNTExMS00OC4wNTIxNDgtMzQuODkxODUyIDUuNzY0NzQtNy45NjQ0NDUgMzcuMTY3NDA4IDI3LjA0MTE4NiAxMC45OTg1MTgtMTUuMDk0NTE5LTM3LjE2NzQwNy0yNy4wMDMyNTkgNS41NzUxMTEtNy43MzY4ODkgNDMuNjE0ODE1IDMxLjcwNjA3NCAxMS4yNjQtMTUuNDczNzc4LTQzLjYxNDgxNS0zMS43MDYwNzQgNy4zNTc2My0xMC4xMjYyMjItMTguNTgzNzA0LTEzLjUwMTYzeiBtLTEwMi44OTMwMzcgMTA2LjM4MjIyM2w1Mi42NzkxMTEgMzguMjY3MjU5LTYuNTYxMTg1IDguOTg4NDQ0LTUyLjY0MTE4NS0zOC4yMjkzMzMgNi41MjMyNTktOS4wMjYzN3ogbTYzLjEwODc0MSAyMy44OTMzMzNsLTUyLjY3OTExMS0zOC4yNjcyNTkgNi43MTI4ODgtOS4xNzgwNzQgNTIuNjQxMTg2IDM4LjIyOTMzMy02LjY3NDk2MyA5LjIxNnogbS04MC4yMTMzMzQtMC4zNDEzMzNsNTIuNjQxMTg2IDM4LjI2NzI1OS0zLjc1NDY2NyA1LjE1NzkyNmMtMi44MDY1MTkgMy44Njg0NDQtNS45MTY0NDQgNC42NjQ4ODktOS4yMTYgMi4yNzU1NTVsLTE0LjAzMjU5My0xMS4zMDE5MjYtNy41ODUxODUgMjAuMTAwNzQxIDE1LjMyMjA3NCAxMS4xMTIyOTZjMTEuOTQ2NjY3IDguNjg1MDM3IDIyLjQ1MjE0OCA3LjAxNjI5NiAzMC45ODU0ODItNC43Nzg2NjZsNTIuMTg2MDc0LTcxLjc5Mzc3OC04OS4xMjU5MjYtNjQuNzM5NTU2LTY1LjkxNTI1OSA5MC43NTY3NDEgMTguMDE0ODE0IDEzLjEyMjM3MSAyMC40OC0yOC4xNzg5NjN6IG00MS43MTg1MTktMTg0LjgxMzAzN2wtMjMuMDk2ODg5IDMuMTQ3ODUxYzYuMTQ0IDE5LjA3Njc0MSA5Ljg2MDc0MSAzNS4yNzExMTEgMTAuNjU3MTg1IDQ4LjgxMDY2N2wyMi45MDcyNTktMy42MDI5NjNhMjk4LjU1Mjg4OSAyOTguNTUyODg5IDAgMCAwLTEwLjQyOTYyOS00OC4zNTU1NTV6IG0tNjQuNjI1Nzc4IDM0LjAxOTU1NWwtMTMuMzg3ODUyIDE4LjM5NDA3NCAyNC41MDAxNDggMTcuODI1MTg1LTQ3LjIxNzc3NyA2NC45NjcxMTFhMTYuNTM1NzA0IDE2LjUzNTcwNCAwIDAgMS0xMi4yODggNi44MjY2NjdsLTUuMzg1NDgyIDIyLjUyOGMxOC40MzIgMC4xNTE3MDQgMzcuMTI5NDgxLTEuMTM3Nzc4IDU2LjA1NDUxOS00LjAyMDE0OGw5LjU1NzMzMy0yMy45NjkxODVjLTguMDc4MjIyIDEuNDQxMTg1LTE1Ljg1MzAzNyAyLjgwNjUxOS0yMy4zMjQ0NDQgMy44MzA1MThsNTQuNTc1NDA3LTc1LjA5MzMzMy00My4wODM4NTItMzEuMjg4ODg5ek0xMDQwLjgwMTE4NSAzMDkuODU0ODE1bC0xMy4zODc4NTIgMTguMzk0MDc0LTkuMzY3NzAzLTYuODI2NjY3LTEyLjk3MDY2NyAxNy44NjMxMTEgOS4zNjc3MDQgNi44MjY2NjctNTIuMjk5ODUyIDcxLjk4MzQwNy0xMS4zNzc3NzgtOC4zMDU3NzctMTMuMDA4NTkzIDE3Ljg2MzExMSA4OC41NTcwMzcgNjQuMzYwMjk2IDEyLjk3MDY2Ny0xNy44NjMxMTEtOS45MzY1OTItNy4yMDU5MjYgNTIuMjk5ODUxLTcyLjAyMTMzMyA5LjAyNjM3MSA2LjU2MTE4NSAxMi45NzA2NjYtMTcuODI1MTg1LTkuMDI2MzctNi41OTkxMTEgMTMuMTIyMzctMTguMDE0ODE1LTE4LjQzMi0xMy4zODc4NTItMTMuMDg0NDQ0IDE4LjA1Mjc0MS0zMC4zNzg2NjctMjIuMDcyODg5IDEzLjM0OTkyNi0xOC40MzItMTguMzk0MDc0LTEzLjM0OTkyNnogbS02MC4yMjYzNyAxMjEuNjI4NDQ0bDkuMjE2LTEyLjcwNTE4NSAzMC4zNDA3NDEgMjIuMDcyODg5LTkuMTc4MDc1IDEyLjcwNTE4NS0zMC4zNzg2NjYtMjIuMDcyODg5eiBtODIuNjc4NTE4LTQ5LjkxMDUxOGwtOS4zNjc3MDMgMTIuODk0ODE1LTMwLjM3ODY2Ny0yMi4xMTA4MTUgOS4zNjc3MDQtMTIuODk0ODE1IDMwLjM0MDc0IDIyLjExMDgxNXogbS02MS4yODgyOTYgMjAuNDQyMDc0bDkuMzY3NzA0LTEyLjg5NDgxNSAzMC4zNDA3NCAyMi4wNzI4ODktOS4zMjk3NzcgMTIuODk0ODE1LTMwLjM3ODY2Ny0yI3A5Mjg4OXogbS0yLjIzNzYzIDcyLjM2MjY2NmwtMjEuNzMxNTU1LTEuNDQxMTg1Yy0wLjI2NTQ4MSAxNi42ODc0MDctMS4yNTE1NTYgMzEuMTM3MTg1LTMuMjYxNjMgNDMuMTk3NjNsMTYuNjg3NDA4IDAuMzAzNDA3IDQuNTg5MDM3IDIxLjg4MzI2YzIzLjYyNzg1Mi03LjMxOTcwNCA0NS41NDkwMzctMjEuOTk3MDM3IDY1LjgzOTQwNy00NC4xNDU3NzhsMjkuNDY4NDQ1IDIxLjQyODE0OC0yMy4wMjEwMzggMzEuNjMwMjIyYy0zLjYwMjk2MyA1LjAwNjIyMi03LjMxOTcwNCA2LjIxOTg1Mi0xMC45OTg1MTggMy41NjUwMzdhMjc2LjIxNDUxOSAyNzYuMjE0NTE5IDAgMCAxLTE3LjU1OTcwNC0xNC4xODQyOTZsLTguNDk1NDA3IDIyLjUyOCAxOS4xNTI1OTIgMTMuOTE4ODE1YzEyLjUxNTU1NiA5LjEwMjIyMiAyMy4zMjQ0NDQgNy4zOTU1NTYgMzIuMTYxMTg2LTQuNzc4NjY3bDEwNS4xMzA2NjYtMTQ0LjY4NzQwNy02Ni44MjU0ODEtNDguNTQ1MTg2LTY0LjQ3NDA3NCA4OC43NDY2NjdjLTE2Ljc2MzI1OSAyMi42Nzk3MDQtMzUuODAyMDc0IDM4LjM4MTAzNy01Ny4xOTIyOTcgNDcuMzMxNTU2IDAuODcyMjk2LTEwLjA4ODI5NiAxLjAyNC0yMi4zMzgzNyAwLjUzMDk2My0zNi43ODgxNDh6IG0tNDEuOTg0LTI5LjY5NmExNTMuOTAzNDA3IDE1My45MDM0MDcgMCAwIDEtNDUuMDkzOTI2IDEzLjY1MzMzNGw3LjQzMzQ4MiAyMi4zMDA0NDRhMTg2LjIxNjI5NiAxODYuMjE2Mjk2IDAgMCAwIDQ3LjU5NzAzNy0xNy40NDU5MjZsLTkuOTM2NTkzLTE4LjUwNzg1MnogbTEzNy4xNzgwNzQgNi4yOTU3MDRsMjguMzY4NTkzIDIwLjU5Mzc3OC0xOS4yNjYzNyAyNi41NDgxNDgtMjguMzY4NTkzLTIwLjYzMTcwNCAxOS4yNjYzNy0yNi41MTAyMjJ6IG00MS4wNzM3NzggMy4xMDk5MjZsLTI4LjM2ODU5Mi0yMC41OTM3NzggMTkuMjY2MzctMjYuNTEwMjIyIDI4LjMzMDY2NyAyMC41OTM3NzgtMTkuMjI4NDQ1IDI2LjU0ODE0OHpNMTI0OC45MDA3NDEgNDU3LjM4NjY2N2MtMjAuMzI4Mjk2IDExLjM3Nzc3OC00My4zMTE0MDcgMTcuNDQ1OTI2LTY4Ljc5NzYzIDE4LjA5MDY2NmwtNy42OTg5NjMgMjIuNTI4YzM0LjUxMjU5My0wLjIyNzU1NiA2My40MTIxNDgtNy4wOTIxNDggODcuMzA1NDgyLTIwLjY2OTYyOWwtMTAuODA4ODg5LTE5Ljk0OTAzN3ogbS0yNC4yNzI1OTMgNDcuMzMxNTU1YTE3OC42MzExMTEgMTc4LjYzMTExMSAwIDAgMS03OS43OTYxNDggMjIuNzU1NTU2bC03LjU0NzI1OSAyMi4zNzYyOTZjOS44NjA3NDEtMC40MTcxODUgMTkuNzIxNDgxLTEuMTM3Nzc4IDI5LjI3ODgxNS0yLjM1MTQwN2wtNTIuNzE3MDM3IDcyLjUxNDM3IDE4LjYyMTYyOSAxMy41MDE2MyA2OC4wNzcwMzctOTMuNjc3MDM3YzEyLjQwMTc3OC0zLjk0NDI5NiAyNC4xMjA4ODktOS4yMTYgMzQuODkxODUyLTE1LjQ3Mzc3OGwtMTAuODA4ODg5LTE5LjY0NTYzeiBtOTIuMzQ5NjMgMy43OTI1OTNsLTEzLjEyMjM3MSAxOC4wNTI3NDEtMzguODM2MTQ4LTI4LjIxNjg4OS0xMi43MDUxODUgMTcuNDQ1OTI2IDM4LjgzNjE0OCAyOC4yNTQ4MTQtMTIuNzA1MTg1IDE3LjQ4Mzg1Mi00NS41MTExMTEtMzIuOTk1NTU1LTEyLjgxODk2MyAxNy42MzU1NTUgMTEwLjgxOTU1NiA4MC41MTY3NDEgMTIuODU2ODg4LTE3LjY3MzQ4MS00Ni43NjI2NjYtMzMuOTgxNjMgMTIuNzA1MTg1LTE3LjQ0NTkyNiAzOS4yMTU0MDcgMjguNDQ0NDQ0IDEyLjcwNTE4Ni0xNy40NDU5MjYtMzkuMjE1NDA4LTI4LjUyMDI5NiAxMy4xMjIzNy0xOC4wNTI3NDEtMTguNTgzNzAzLTEzLjUwMTYyOXogbS0xMDguNjE5ODUyIDU0Ljk5MjU5MmwtMTIuOTcwNjY3IDE3Ljg2MzExMiA2OS4yMTQ4MTUgNTAuMjg5Nzc3LTI3LjAwMzI1OSAzNy4xNjc0MDhjLTQuMjg1NjMgNS45MTY0NDQtOS4zMjk3NzggNy4wNTQyMjItMTQuODI5MDM3IDMuMDM0MDc0YTM0MC4wNDM4NTIgMzQwLjA0MzM4NTIgMCAwIDEtMjIuOTQ1MTg1LTE4LjM1NjE0OGwtOC44MzY3NDEgMjEuNDI4MTQ4IDI2LjE2ODg4OSAxOC45NjI5NjNjMTMuNjE1NDA3IDkuOTM2NTkzIDI1Ljc4OTYzIDcuODEyNzQxIDM2LjEwNTQ4MS02LjMzMzYzbDMwLjQ5MjQ0NS00MS45ODQgMTkuMzQyMjIyIDE0LjAzMjU5MyAxMi45NzA2NjctMTcuODI1MTg1LTE5LjM0MjIyMy0xNC4wMzI1OTMgOC40NTc0ODItMTEuNjQzMjU5LTE5LjE1MjU5My0xMy45MTg4MTUtOC40MTk1NTUgMTEuNjA1MzMzLTY5LjI1Mjc0MS01MC4yODk3Nzh6IG05LjIxNiAzOS41OTQ2NjdsLTIxLjczMTU1Ni0xLjQ0MTE4NWMyLjE5OTcwNCAxNy4wNjY2NjcgMy4yNjE2MyAzMS44OTU3MDQgMi45NTgyMjMgNDQuMzczMzMzbDIyLjUyOCAwLjMwMzQwOGEyNDguNDE0ODE1IDI0OC40MTQ4MTUgMCAwIDAtMy43NTQ2NjctNDMuMjM1NTU2eiIgZmlsbD0iIzcxNzdGQyIgcC1pZD0iMTI3MDgiPjwvcGF0aD48L3N2Zz4="
+              width: 35
+              height: 35
+              x: 89
+              y: -5
+              cursor: move
+          visible: true
+          shape: rect
+          id: 03aed905d2993ec5667e89010903940d
+          markup:
+            - tagName: rect
+              selector: body
+            - tagName: text
+              selector: label
+            - tagName: image
+              selector: icon
+            - tagName: image
+              selector: tag
+          ports:
+            groups:
+              top:
+                position: top
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+              right:
+                position: right
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+              bottom:
+                position: bottom
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+              left:
+                position: left
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+            items:
+              - group: top
+                id: 8e4ddbe5e91b52a8d02826a7898bbcac
+                attrs:
+                  circle:
+                    style:
+                      visibility: hidden
+              - group: right
+                id: 415703caef8db8ae414224efc09437f8
+                attrs:
+                  circle:
+                    style:
+                      visibility: hidden
+              - group: bottom
+                id: 2bb308ac1c22ed976d4552961bb68a33
+                attrs:
+                  circle:
+                    style:
+                      visibility: hidden
+              - group: left
+                id: 74f16aa15cd79cf962f73f95900abb2f
+                attrs:
+                  circle:
+                    style:
+                      visibility: hidden
+          data:
+            nodeId: 03aed905d2993ec5667e89010903940d
+            nodeType: StartManual
+            nodeName: 开始
+            iconCode: iconkaishi-graph
+            isOpen: true
+            isSelected: false
+            isVerificationPassed: true
+          zIndex: 1
+          tools:
+            items: []
+            name: null
+        - position:
+            x: 690
+            y: 320
+          size:
+            width: 160
+            height: 38
+          attrs:
+            body:
+              strokeWidth: 1
+              stroke: "#E9E9E9"
+              fill: "#FFFFFF"
+              rx: 19
+              ry: 19
+              cursor: move
+              filter:
+                name: dropShadow
+                args:
+                  color: "#4943a3"
+                  dx: 0
+                  dy: 0
+                  blur: 4
+                  opacity: 0.4
+            label:
+              text: 结束
+              fontSize: 13
+              fill: "#333"
+              textWrap:
+                width: 104
+                ellipsis: true
+              x: -34
+              textAnchor: start
+              cursor: move
+            icon:
+              xlink:href: "data:image/svg+xml;base64,PHN2ZyB0PSIxNzAwMDIwMjE4NjA5IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjEzMzI2IiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PHBhdGggZD0iTTUxMiA1MTJtLTUxMiAwYTUxMiA1MTIgMCAxIDAgMTAyNCAwIDUxMiA1MTIgMCAxIDAtMTAyNCAwWiIgZmlsbD0iI0E2QUZCQyIgcC1pZD0iMTMzMjciPjwvcGF0aD48cGF0aCBkPSJNNjYwLjgzNDQ2MiAyNzUuMTAxNTM4YTI5OC41MzUzODUgMjk4LjUzNTM4NSAwIDAgMSA3NC40MzY5MjMgNjAuMjE5MDc3IDI5MS4yMDk4NDYgMjkxLjIwOTg0NiAwIDAgMSA3NC41NTUwNzcgMTk0Ljc1NjkyM2MwIDE2Mi41Nzk2OTItMTMzLjM5NTY5MiAyOTQuMjgxODQ2LTI5Ny44MjY0NjIgMjk0LjI4MTg0Ny0xNjQuNDMwNzY5IDAtMjk3Ljg2NTg0Ni0xMzEuNzAyMTU0LTI5Ny44NjU4NDYtMjk0LjI4MTg0NyAwLTcyLjc0MzM4NSAyNi44NjAzMDgtMTQxLjM5MDc2OSA3NC41OTQ0NjEtMTk0Ljc1NjkyM2EyOTguMTQxNTM4IDI5OC4xNDE1MzggMCAwIDEgNzQuNDM2OTIzLTYwLjIxOTA3NyAyMi4xMzQxNTQgMjIuMTM0MTU0IDAgMSAxIDIxLjk3NjYxNiAzOC40Nzg3NyAyNTQuMjY3MDc3IDI1NC4yNjcwNzcgMCAwIDAtNjMuNDA5MjMxIDUxLjIzOTM4NCAyNDYuOTAyMTU0IDI0Ni45MDIxNTQgMCAwIDAtNjMuMjkxMDc3IDE2NS4yNTc4NDZjMCAxMzguMDAzNjkyIDExMy40NjcwNzcgMjQ5Ljk3NDE1NCAyNTMuNTU4MTU0IDI0OS45NzQxNTRzMjUzLjUxODc2OS0xMTEuOTcwNDYyIDI1My41MTg3NjktMjQ5Ljk3NDE1NGEyNDYuOTAyMTU0IDI0Ni45MDIxNTQgMCAwIDAtNjMuMjUxNjkyLTE2NS4yNTc4NDYgMjUzLjgzMzg0NiAyNTMuODMzODQ2IDAgMCAwLTYzLjQwOTIzMS01MS4yIDIyLjE3MzUzOCAyMi4xNzM1MzggMCAwIDEgMjEuOTc2NjE2LTM4LjUxODE1NHpNNTEyIDIxNC4xMzQxNTRjMTIuMjA5MjMxIDAgMjIuMTM0MTU0IDkuOTI0OTIzIDIyLjEzNDE1NCAyMi4xNzM1Mzh2MjkwLjE4NTg0NmEyMi4xNzM1MzggMjIuMTM0MTU0IDAgMCAxLTQ0LjMwNzY5MiAwVjIzNi4zMDc2OTJjMC0xMi4yMDkyMzEgOS45MjQ5MjMtMjIuMTczNTM4IDIyLjE3MzUzOC0yMi4xNzM1Mzh6IiBmaWxsPSIjRkZGRkZGIiBwLWlkPSIxMzMyOCI+PC9wYXRoPjwvc3ZnPg=="
+              width: 26
+              height: 26
+              x: 10
+              y: 6
+              cursor: move
+            tag:
+              display: none
+              xlink:href: "data:image/svg+xml;base64,PHN2ZyB0PSIxNjk5OTQ5NjIxODI2IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDE0NDEgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjEyNzA2IiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PHBhdGggZD0iTTAgMGg4NDYuMzkyODg5TDE0NDEuMTg1MTg1IDQyNi42NjY2NjdWMTAyNHoiIGZpbGw9IiNDRkNGRjYiIHAtaWQ9IjEyNzA3Ij48L3BhdGg+PHBhdGggZD0iTTY4MS45NDYwNzQgNDguODQ4NTkzbC04LjgzNjc0MSAxMi4xMzYyOTYtMjAuNTkzNzc3LTE0Ljk4MDc0MS0xMy4xMjIzNzEgMTguMDUyNzQxIDIwLjYzMTcwNCAxNC45ODA3NDEtNy4yMDU5MjYgOS45MzY1OTIgMTguMDE0ODE1IDEzLjEyMjM3MSA3LjIwNTkyNi05LjkzNjU5MyAyMC44MjEzMzMgMTUuMDk0NTE5LTkuMjUzOTI2IDEyLjcwNTE4NSAxOC4wNTI3NDEgMTMuMTIyMzcgOS4yNTM5MjYtMTIuNzA1MTg1IDE4LjIwNDQ0NCAxMy4yMzYxNDggMTMuMTIyMzcxLTE4LjA1Mjc0MS0xOC4yMDQ0NDUtMTMuMjM2MTQ4IDguOTEyNTkzLTEyLjMyNTkyNi0xOC4wMTQ4MTUtMTMuMTIyMzctOC45ODg0NDUgMTIuMzI1OTI2LTIwLjc4MzQwNy0xNS4wOTQ1MTkgOC44MzY3NDEtMTIuMTM2Mjk2LTE4LjA1Mjc0MS0xMy4xMjIzN3pNNjAxLjg4NDQ0NCAxMzUuNzc0ODE1bC0zMS40NDA1OTIgNDMuMjM1NTU1IDQ4LjQzMTQwNyAzNS4xOTUyNiA0MC45MjIwNzQtNTYuMzItMzguODM2MTQ4LTI4LjIxNjg4OWM1LjQ5OTI1OS0yLjE5OTcwNCAxMC45OTg1MTktNC43MDI4MTUgMTYuODM5MTExLTcuNzM2ODg5bDQyLjg5NDIyMyAzMS4xNzUxMTFjLTI4Ljk3NTQwNyAzOS4xMzk1NTYtNDYuMzgzNDA3IDYxLjkzMzAzNy01Mi4zMzc3NzggNjcuNzM1NzA0LTcuNTA5MzMzIDguMDQwMjk2LTE0LjcxNTI1OSA5Ljg2MDc0MS0yMC45NzMwMzcgNS4zMDk2MjlhMzQyLjYyMjgxNSAzNDIuNjIyODE1IDAgMCAxLTE4Ljg0OTE4NS0xNS4xMzI0NDRsLTguMDAyMzcxIDIwLjMyODI5NmM4LjA3ODIyMiA2LjcxMjg4OSAxMy44ODA4ODkgMTEuNDkxNTU2IDE3LjM3MDA3NCAxNC4wMzI1OTMgMTUuMjg0MTQ4IDExLjExMjI5NiAyOS4yNzg4MTUgMTAuMDUwMzcgNDEuNTY2ODE1LTIuOTk2MTQ4IDguNDk1NDA3LTguOTg4NDQ0IDI2LjYyNC0zMi4zODg3NDEgNTQuNDIzNzA0LTY5Ljg1OTU1NmwwLjk4NjA3NCAyMS44MDc0MDdhMTY4LjAxMTg1MiAxNjguMDExODUyIDAgMCAwIDE2LjYxMTU1NS03LjMxOTcwMyAzMTYuMDM2NzQxIDMxNi4wMzY3NDEgMCAwIDAtMTUuNTQ5NjI5IDUzLjA5NjI5NiAxMjMuMjU5MjU5IDEzMi4yNTkyNTkgMCAwIDEtNTguNTU3NjMgMTEuNzU3MDM3bC0xLjcwNjY2NyAyNC4zNDg0NDVjMTkuNDE4MDc0IDAgMzguMjI5MzMzLTMuNDEzMzMzIDU2LjY5OTI2LTEwLjI0LTEuNjY4NzQxIDE5LjMwNDI5Ni0wLjM0MTMzMyAzNi44MjYwNzQgNC40MzczMzMgNTIuNzE3MDM3bDIzLjU4OTkyNi04LjQ5NTQwOGMtNS40OTkyNTktMTYuMzg0LTcuMjQzODUyLTM0LjUxMjU5My01LjMwOTYzLTU0Ljk5MjU5MiAyNC44NDE0ODEtMTQuMDMyNTkzIDQ4LjE2NTkyNi0zNS4zNDY5NjMgNzAuNTQyMjIzLTY0LjEzMjc0MWw5Ljc0Njk2MyA3LjA5MjE0OCAxMy41MDE2MjktMTguNTgzNzA0LTQzLjI3MzQ4MS0zMS40Nzg1MThjNi44MjY2NjctNi4yNTc3NzggMTMuODgwODg5LTEzLjI3NDA3NCAyMS4xNjI2NjYtMjAuNTkzNzc4bC0xNi4xOTQzNy0xNi44MzkxMTFjLTI2LjI4MjY2NyAyOC40NDQ0NDQtNTEuMTI0MTQ4IDQ4LjM1NTU1Ni03NS4wOTMzMzMgNTkuNjU3NDgxbDE1LjkyODg4OS0yMS45MjExODUtNTMuMDIwNDQ1LTM4LjUzMjc0MWMxLjg5NjI5Ni0xLjEzNzc3OCAzLjY3ODgxNS0yLjM1MTQwNyA1Ljc2NDc0MS0zLjY3ODgxNGwtMTUuMjg0MTQ4LTE3LjI5NDIyM2MtMTguNTgzNzA0IDEyLjQwMTc3OC0zNS4yNzExMTEgMjAuMjUyNDQ0LTUwLjA2MjIyMyAyMy41NTJsMS42Njg3NDEgMjMuNzAzNzA0YzAuMjY1NDgxLTAuMzc5MjU5IDAuNzU4NTE5LTAuMjY1NDgxIDEuNDAzMjU5LTAuMzc5MjU5eiBtMTIuMzI1OTI2IDUwLjAyNDI5NmwtMTUuNDczNzc3LTExLjIyNjA3NCAxNy41MjE3NzctMjQuMTIwODg5IDE1LjQ3Mzc3OCAxMS4yMjYwNzQtMTcuNTIxNzc4IDI0LjEyMDg4OXogbTE1My45MDM0MDgtNy40MzM0ODFhMjQ0LjYyMjIyMiAyNDQuNjIyMjIyIDAgMCAxLTQ4LjAxNDIyMiA0Ny41MjExODVjNC4zNjE0ODEtMTcuNjM1NTU2IDEwLjk5ODUxOS0zNi40NDY4MTUgMjAuMTc2NTkyLTU2LjgxMzAzN2w3LjM5NTU1Ni01LjU3NTExMSAyMC40OCAxNC44NjY5NjN6TTk0Ny4yIDI0MC40NTAzN2wtNy4zNTc2MyAxMC4xMjYyMjMtNDIuMzI1MzMzLTMwLjc1NzkyNi0xMS4yMjYwNzQgMTUuNDM1ODUyIDQyLjMyNTMzMyAzMC43OTU4NTEtNS42MTMwMzcgNy42OTg5NjMtMzQuNjI2MzctMjUuMTQ0ODg5LTEwLjk2MDU5MyAxNS4wOTQ1MTkgMzQuNjI2MzcxIDI1LjE0NDg4OS01Ljc2NDc0MSA3Ljk2NDQ0NC00Ny40ODMyNTktMzQuNTEyNTkyLTExLjUyOTQ4MiAxNS44MTUxMTEgMTE0LjE1NzAzNyA4Mi45MDYwNzQgMTEuNDkxNTU2LTE1LjgxNTExMS00OC4wNTIxNDgtMzQuODkxODUyIDUuNzY0NzQtNy45NjQ0NDUgMzcuMTY3NDA4IDI3LjA0MTE4NiAxMC45OTg1MTgtMTUuMDk0NTE5LTM3LjE2NzQwNy0yNy4wMDMyNTkgNS41NzUxMTEtNy43MzY4ODkgNDMuNjE0ODE1IDMxLjcwNjA3NCAxMS4yNjQtMTUuNDczNzc4LTQzLjYxNDgxNS0zMS43MDYwNzQgNy4zNTc2My0xMC4xMjYyMjItMTguNTgzNzA0LTEzLjUwMTYzeiBtLTEwMi44OTMwMzcgMTA2LjM4MjIyM2w1Mi42NzkxMTEgMzguMjY3MjU5LTYuNTYxMTg1IDguOTg4NDQ0LTUyLjY0MTE4NS0zOC4yMjkzMzMgNi41MjMyNTktOS4wMjYzN3ogbTYzLjEwODc0MSAyMy44OTMzMzNsLTUyLjY3OTExMS0zOC4yNjcyNTkgNi43MTI4ODgtOS4xNzgwNzQgNTIuNjQxMTg2IDM4LjIyOTMzMy02LjY3NDk2MyA5LjIxNnogbS04MC4yMTMzMzQtMC4zNDEzMzNsNTIuNjQxMTg2IDM4LjI2NzI1OS0zLjc1NDY2NyA5LjE1NzkyNmMtMi44MDY1MTkgMy44Njg0NDQtNS45MTY0NDQgNC42NjQ4ODktOS4yMTYgMi4yNzU1NTVsLTE0LjAzMjU5My0xMS4zMDE5MjYtNy41ODUxODUgMjAuMTAwNzQxIDE1LjMyMjA3NCAxMS4xMTIyOTZjMTEuOTQ2NjY3IDguNjg1MDM3IDIyLjQ1MjE0OCA3LjAxNjI5NiAzMC45ODU0ODItNC43Nzg2NjZsNTIuMTg2MDc0LTcxLjc5Mzc3OC04OS4xMjU5MjYtNjQuNzM5NTU2LTY1LjkxNTI1OSA5MC43NTY3NDEgMTguMDE0ODE0IDEzLjEyMjM3MSAyMC40OC0yOC4xNzg5NjN6IG00MS43MTg1MTktMTg0LjgxMzAzN2wtMjMuMDk2ODg5IDMuMTQ3ODUxYzYuMTQ0IDE5LjA3Njc0MSA5Ljg2MDc0MSAzNS4yNzExMTEgMTAuNjU3MTg1IDQ4LjgxMDY2N2wyMi45MDcyNTktMy42MDI5NjNhMjk4LjU1Mjg4OSAyOTguNTUyODg5IDAgMCAwLTEwLjQyOTYyOS00OC4zNTU1NTV6IG0tNjQuNjI1Nzc4IDM0LjAxOTU1NWwtMTMuMzg3ODUyIDE4LjM5NDA3NCAyNC41MDAxNDggMTcuODI1MTg1LTQ3LjIxNzc3NyA2NC45NjcxMTFhMTYuNTM1NzA0IDE2LjUzNTcwNCAwIDAgMS0xMi4yODggNi44MjY2NjdsLTUuMzg1NDgyIDIyLjUyOGMxOC40MzIgMC4xNTE3MDQgMzcuMTI5NDgxLTEuMTM3Nzc4IDU2LjA1NDUxOS00LjAyMDE0OGw5LjU1NzMzMy0yMy45NjkxODVjLTguMDc4MjIyIDEuNDQxMTg1LTE1Ljg1MzAzNyAyLjgwNjUxOS0yMy4zMjQ0NDQgMy44MzA1MThsNTQuNTc1NDA3LTc1LjA5MzMzMy00My4wODM4NTItMzEuMjg4ODg5ek0xMDQwLjgwMTE4NSAzMDkuODU0ODE1bC0xMy4zODc4NTIgMTguMzk0MDc0LTkuMzY3NzAzLTYuODI2NjY3LTEyLjk3MDY2NyAxNy44NjMxMTEgOS4zNjc3MDQgNi44MjY2NjctNTIuMjk5ODUyIDcxLjk4MzQwNy0xMS4zNzc3NzgtOC4zMDU3NzctMTMuMDA4NTkzIDE3Ljg2MzExMSA4OC41NTcwMzcgNjQuMzYwMjk2IDEyLjk3MDY2Ny0xNy44NjMxMTEtOS45MzY1OTItNy4yMDU5MjYgNTIuMjk5ODUxLTcyLjAyMTMzMyA5LjAyNjM3MSA2LjU2MTE4NSAxMi45NzA2NjYtMTcuODI1MTg1LTkuMDI2MzctNi41OTkxMTEgMTMuMTIyMzctMTguMDE0ODE1LTE4LjQzMi0xMy4zODc4NTItMTMuMDg0NDQ0IDE4LjA1Mjc0MS0zMC4zNzg2NjctMjIuMDcyODg5IDEzLjM0OTkyNi0xOC40MzItMTguMzk0MDc0LTEzLjM0OTkyNnogbS02MC4yMjYzNyAxMjEuNjI4NDQ0bDkuMjE2LTEyLjcwNTE4NSAzMC4zNDA3NDEgMjIuMDcyODg5LTkuMTc4MDc1IDEyLjcwNTE4NS0zMC4zNzg2NjYtMjIuMDcyODg5eiBtODIuNjc4NTE4LTQ5LjkxMDUxOGwtOS4zNjc3MDMgMTIuODk0ODE1LTMwLjM3ODY2Ny0yMi4xMTA4MTUgOS4zNjc3MDQtMTIuODk0ODE1IDMwLjM0MDc0IDIyLjExMDgxNXogbS02MS4yODgyOTYgMjAuNDQyMDc0bDkuMzY3NzA0LTEyLjg5NDgxNSAzMC4zNDA3NCAyMi4wNzI4ODktOS4zMjk3NzcgMTIuODk0ODE1LTMwLjM3ODY2Ny0yI3A5Mjg4OXogbS0yLjIzNzYzIDcyLjM2MjY2NmwtMjEuNzMxNTU1LTEuNDQxMTg1Yy0wLjI2NTQ4MSAxNi42ODc0MDctMS4yNTE1NTYgMzEuMTM3MTg1LTMuMjYxNjMgNDMuMTk3NjNsMTYuNjg3NDA4IDAuMzAzNDA3IDQuNTg5MDM3IDIxLjg4MzI2YzIzLjYyNzg1Mi03LjMxOTcwNCA0NS41NDkwMzctMjEuOTk3MDM3IDY1LjgzOTQwNy00NC4xNDU3NzhsMjkuNDY4NDQ1IDIxLjQyODE0OC0yMy4wMjEwMzggMzEuNjMwMjIyYy0zLjYwMjk2MyA1LjAwNjIyMi03LjMxOTcwNCA2LjIxOTg1Mi0xMC45OTg1MTggMy41NjUwMzdhMjc2LjIxNDUxOSAyNzYuMjE0NTE5IDAgMCAxLTE3LjU1OTcwNC0xNC4xODQyOTZsLTguNDk1NDA3IDIyLjUyOCAxOS4xNTI1OTIgMTMuOTE4ODE1YzEyLjUxNTU1NiA5LjEwMjIyMiAyMy4zMjQ0NDQgNy4zOTU1NTYgMzIuMTYxMTg2LTQuNzc4NjY3bDEwNS4xMzA2NjYtMTQ0LjY4NzQwNy02Ni44MjU0ODEtNDguNTQ1MTg2LTY0LjQ3NDA3NCA4OC43NDY2NjdjLTE2Ljc2MzI1OSAyMi42Nzk3MDQtMzUuODAyMDc0IDM4LjM4MTAzNy01Ny4xOTIyOTcgNDcuMzMxNTU2IDAuODcyMjk2LTEwLjA4ODI5NiAxLjAyNC0yMi4zMzgzNyAwLjUzMDk2My0zNi43ODgxNDh6IG0tNDEuOTg0LTI5LjY5NmExNTMuOTAzNDA3IDE1My45MDM0MDcgMCAwIDEtNDUuMDkzOTI2IDEzLjY1MzMzNGw3LjQzMzQ4MiAyMi4zMDA0NDRhMTg2LjIxNjI5NiAxODYuMjE2Mjk2IDAgMCAwIDQ3LjU5NzAzNy0xNy40NDU5MjZsLTkuOTM2NTkzLTE4LjUwNzg1MnogbTEzNy4xNzgwNzQgNi4yOTU3MDRsMjguMzY4NTkzIDIwLjU5Mzc3OC0xOS4yNjYzNyAyNi41NDgxNDgtMjguMzY4NTkzLTIwLjYzMTcwNCAxOS4yNjYzNy0yNi41MTAyMjJ6IG00MS4wNzM3NzggMy4xMDk5MjZsLTI4LjM2ODU5Mi0yMC41OTM3NzggMTkuMjY2MzctMjYuNTEwMjIyIDI4LjMzMDY2NyAyMC41OTM3NzgtMTkuMjI4NDQ1IDI2LjU0ODE0OHpNMTI0OC45MDA3NDEgNDU3LjM4NjY2N2MtMjAuMzI4Mjk2IDExLjM3Nzc3OC00My4zMTE0MDcgMTcuNDQ1OTI2LTY4Ljc5NzYzIDE4LjA5MDY2NmwtNy42OTg5NjMgMjIuNTI4YzM0LjUxMjU5My0wLjIyNzU1NiA2My40MTIxNDgtNy4wOTIxNDggODcuMzA1NDgyLTIwLjY2OTYyOWwtMTAuODA4ODg5LTE5Ljk0OTAzN3ogbS0yNC4yNzI1OTMgNDcuMzMxNTU1YTE3OC42MzExMTEgMTc4LjYzMTExMSAwIDAgMS03OS43OTYxNDggMjIuNzU1NTU2bC03LjU0NzI1OSAyMi4zNzYyOTZjOS44NjA3NDEtMC40MTcxODUgMTkuNzIxNDgxLTEuMTM3Nzc4IDI5LjI3ODgxNS0yLjM1MTQwN2wtNTIuNzE3MDM3IDcyLjUxNDM3IDE4LjYyMTYyOSAxMy41MDE2MyA2OC4wNzcwMzctOTMuNjc3MDM3YzEyLjQwMTc3OC0zLjk0NDI5NiAyNC4xMjA4ODktOS4yMTYgMzQuODkxODUyLTE1LjQ3Mzc3OGwtMTAuODA4ODg5LTE5LjY0NTYzeiBtOTIuMzQ5NjMgMy43OTI1OTNsLTEzLjEyMjM3MSAxOC4wNTI3NDEtMzguODM2MTQ4LTI4LjIxNjg4OS0xMi43MDUxODUgMTcuNDQ1OTI2IDM4LjgzNjE0OCAyOC4yNTQ4MTQtMTIuNzA1MTg1IDE3LjQ4Mzg1Mi00NS41MTExMTEtMzIuOTk1NTU1LTEyLjgxODk2MyAxNy42MzU1NTUgMTEwLjgxOTU1NiA4MC41MTY3NDEgMTIuODU2ODg4LTE3LjY3MzQ4MS00Ni43NjI2NjYtMzMuOTgxNjMgMTIuNzA1MTg1LTE3LjQ0NTkyNiAzOS4yMTU0MDcgMjguNDQ0NDQ0IDEyLjcwNTE4Ni0xNy40NDU5MjYtMzkuMjE1NDA4LTI4LjUyMDI5NiAxMy4xMjIzNy0xOC4wNTI3NDEtMTguNTgzNzAzLTEzLjUwMTYyOXogbS0xMDguNjE5ODUyIDU0Ljk5MjU5MmwtMTIuOTcwNjY3IDE3Ljg2MzExMiA2OS4yMTQ4MTUgNTAuMjg5Nzc3LTI3LjAwMzI1OSAzNy4xNjc0MDhjLTQuMjg1NjMgNS45MTY0NDQtOS4zMjk3NzggNy4wNTQyMjItMTQuODI5MDM3IDMuMDM0MDc0YTM0MC4wNDM4NTIgMzQwLjA0MzM4NTIgMCAwIDEtMjIuOTQ1MTg1LTE4LjM1NjE0OGwtOC44MzY3NDEgMjEuNDI4MTQ4IDI2LjE2ODg4OSAxOC45NjI5NjNjMTMuNjE1NDA3IDkuOTM2NTkzIDI1Ljc4OTYzIDcuODEyNzQxIDM2LjEwNTQ4MS02LjMzMzYzbDMwLjQ5MjQ0NS00MS45ODQgMTkuMzQyMjIyIDE0LjAzMjU5MyAxMi45NzA2NjctMTcuODI1MTg1LTE5LjM0MjIyMy0xNC4wMzI1OTMgOC40NTc0ODItMTEuNjQzMjU5LTE5LjE1MjU5My0xMy45MTg4MTUtOC40MTk1NTUgMTEuNjA1MzMzLTY5LjI1Mjc0MS01MC4yODk3Nzh6IG05LjIxNiAzOS41OTQ2NjdsLTIxLjczMTU1Ni0xLjQ0MTE4NWMyLjE5OTcwNCAxNy4wNjY2NjcgMy4yNjE2MyAzMS44OTU3MDQgMi45NTgyMjMgNDQuMzczMzMzbDIyLjUyOCAwLjMwMzQwOGEyNDguNDE0ODE1IDI0OC40MTQ4MTUgMCAwIDAtMy43NTQ2NjctNDMuMjM1NTU2eiIgZmlsbD0iIzcxNzdGQyIgcC1pZD0iMTI3MDgiPjwvcGF0aD48L3N2Zz4="
+              width: 35
+              height: 35
+              x: 89
+              y: -5
+              cursor: move
+          visible: true
+          shape: rect
+          id: 252cac8662bdf8c6c8a104572026893c
+          markup:
+            - tagName: rect
+              selector: body
+            - tagName: text
+              selector: label
+            - tagName: image
+              selector: icon
+            - tagName: image
+              selector: tag
+          ports:
+            groups:
+              top:
+                position: top
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+              right:
+                position: right
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+              bottom:
+                position: bottom
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+              left:
+                position: left
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+            items:
+              - group: top
+                id: 9b122eb24d65944caa42b1a8ca1e83e1
+              - group: right
+                id: 79fa4d8a5ed48fc4391e2b1cf88a532a
+              - group: bottom
+                id: b9eadb7f220495b50e0d4355627e209b
+              - group: left
+                id: 50b45bdab11b89ea631a59b3444f66f8
+          data:
+            nodeId: 252cac8662bdf8c6c8a104572026893c
+            nodeType: EndFlow
+            nodeName: 结束
+            iconCode: iconjieshu-graph
+            isOpen: true
+            isSelected: false
+            isVerificationPassed: true
+          zIndex: 3
+      links:
+        - shape: edge
+          attrs:
+            line:
+              stroke: "#A2B1C3"
+              strokeWidth: 1
+              targetMarker:
+                name: block
+                width: 6
+                height: 10
+          id: 847a9fc1ff1e6ddcc3b3d055729401de
+          connector:
+            name: rounded
+            args:
+              type: gap
+          router:
+            name: orth
+          source:
+            cell: 03aed905d2993ec5667e89010903940d
+            port: 2bb308ac1c22ed976d4552961bb68a33
+          target:
+            cell: 252cac8662bdf8c6c8a104572026893c
+            port: 9b122eb24d65944caa42b1a8ca1e83e1
+          tools:
+            items:
+              - name: vertices
+          zIndex: 2
+    processConfig:
+      sourceName: 未命名
+      subjectRule: 未命名标题
+      projectName: 项目名称
+      nodes:
+        - id: StartNode_03aed905d2993ec5667e89010903940d
+          type: StartNode
+          name: 开始
+          lang:
+            name:
+              zh_CN: 开始
+              zh_TW: 開始
+              en_US: Start
+          _nodeId: 03aed905d2993ec5667e89010903940d
+          _nodeType: StartManual
+        - id: EndNode_252cac8662bdf8c6c8a104572026893c
+          type: EndNode
+          name: 结束
+          lang:
+            name:
+              zh_CN: 结束
+              zh_TW: 結束
+              en_US: end
+          _nodeId: 252cac8662bdf8c6c8a104572026893c
+          _nodeType: EndFlow
+          _isValidPassed:
+            base: true
+          _events:
+            - type: 0
+      links:
+        - id: 847a9fc1ff1e6ddcc3b3d055729401de
+          fromId: StartNode_03aed905d2993ec5667e89010903940d
+          toId: EndNode_252cac8662bdf8c6c8a104572026893c
+    engine: coze
+    bindForm:
+      type: 0
+    dtdVariable:
+      - code: init_b1f78dc74c0c3c019c902e3d3375e8ca
+        dataType: DTDVar
+        description: 发起流程数据
+        isArray: false
+        mappingCode: data
+        required: false
+        varName: data
+    lang:
+      sourceName:
+        zh_CN: 未命名
+        zh_TW: 未命名
+        en_US: Untitled
+      subjectRule:
+        zh_CN: 未命名标题
+        zh_TW: 未命名標題
+        en_US: Untitled title
+      projectName:
+        zh_CN: 项目名称
+        en_US: Project Name
+        zh_TW: 專案名稱
+      processName:
+        zh_CN: 信息加工处理
+        zh_TW: 資訊加工處理
+        en_US: 信息加工处理
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.code
+      name: TaskProcess_code
+
+# 查询任务详情（根据任务编码获取任务详细信息）
+task_GetTaskDetail_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/task/getTask/$cache{Task_code}
+  method: GET
+  detail: 查询任务详情
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    taskCode: $cache{Task_code}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 查询任务数据特征（获取任务的数据特征配置信息）
+data_GetDataFeatures_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/data/dataFeatures/$cache{Task_code}
+  method: GET
+  detail: 查询任务数据特征
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    taskCode: $cache{Task_code}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 进入大T详情查询
+
+# 查询流程版本列表（获取指定大T流程的历史版本信息）
+processVersion_QueryBigTVersionList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/processVersion/queryList
+  method: GET
+  detail: 查询大T流程版本列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    processId: $cache{TaskProcess_code}
+    adpStatus: ""
+    timeType: ""
+    adpRemark: ""
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 根据ID查询大T流程详情（获取大T流程的详细信息）
+process_FindBigTProcessById_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/process/findProcessById
+  method: GET
+  detail: 根据ID查询大T流程详情
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    processId: $cache{TaskProcess_code}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.objectId
+      name: TaskProcess_objectId
+
+# 查询模型驱动分配列表（获取应用下的模型驱动配置信息）
+modelDriver_QueryModelAssignList_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modelDriver/modelAssign/queryList
+  method: GET
+  detail: 查询模型驱动分配列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    queryType: list
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 根据模式和应用查询活动配置列表（获取DATA_ENTRY模式的活动配置）
+activity_GetActivityListByPattern_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/activityConfigs/getActivityListByPatternAndApplication
+  method: GET
+  detail: 根据模式和应用查询活动配置列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    pattern: DATA_ENTRY
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 更新大T流程配置（更新已存在的流程信息）
+process_UpdateBigTProcess_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/process/upsertProcess
+  method: POST
+  detail: 更新大T流程配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    createBy: wenwu@digiwin.com
+    createDate: "2025-12-03 16:03:59"
+    editBy: wenwu@digiwin.com
+    editDate: "2025-12-03 16:03:59"
+    lang:
+      subjectRule:
+        zh_CN: "未命名标题"
+        zh_TW: "未命名標題"
+        en_US: "Untitled title"
+      processName:
+        zh_CN: "信息加工处理${{get_time()}}已编辑"
+        zh_TW: "資訊加工處理${{get_time()}}已编辑"
+        en_US: "信息加工处理${{get_time()}}已编辑"
+      sourceName:
+        zh_CN: "未命名"
+        zh_TW: "未命名"
+        en_US: "Untitled"
+      projectName:
+        zh_CN: "项目名称"
+        zh_TW: "專案名稱"
+        en_US: "Project Name"
+    application: ${{app2_code()}}
+    objectId: "$cache{TaskProcess_objectId}"
+    processId: $cache{TaskProcess_code}
+    code: $cache{TaskProcess_code}
+    processName: "信息加工处理${{get_time()}}已编辑"
+    processType: 1
+    status: 2
+    processConfig:
+      sourceName: "未命名"
+      subjectRule: "未命名标题"
+      projectName: "项目名称"
+      enableCustomProjectCard: false
+      projectDescription: ""
+      inputData: {}
+      nodes:
+        - id: "StartNode_03aed905d2993ec5667e89010903940d"
+          type: "StartNode"
+          name: "开始"
+          lang:
+            name:
+              zh_CN: "开始"
+              zh_TW: "開始"
+              en_US: "Start"
+          _nodeId: "03aed905d2993ec5667e89010903940d"
+          _nodeType: "StartManual"
+          transfer: true
+        - id: "EndNode_252cac8662bdf8c6c8a104572026893c"
+          type: "EndNode"
+          name: "结束"
+          lang:
+            name:
+              zh_CN: "结束"
+              zh_TW: "結束"
+              en_US: "end"
+          _nodeId: "252cac8662bdf8c6c8a104572026893c"
+          _nodeType: "EndFlow"
+          _isValidPassed:
+            base: true
+          _events:
+            - type: 0
+              modelCode: null
+              serviceCode: ""
+              actionId: ""
+              callBackType: "complete"
+              requestScript: null
+            - type: 0
+              modelCode: null
+              serviceCode: ""
+              actionId: ""
+              callBackType: "abort"
+              requestScript: null
+          transfer: true
+      links:
+        - id: "03aed905d2993ec5667e89010903940d_-252cac8662bdf8c6c8a104572026893c_"
+          fromId: "StartNode_03aed905d2993ec5667e89010903940d"
+          toId: "EndNode_252cac8662bdf8c6c8a104572026893c"
+    bindForm:
+      type: 0
+      modelCode: null
+      formCode: null
+      serviceCode: null
+      actionId: null
+    triggerType: "page"
+    triggerConfig: {}
+    flowGraph:
+      nodes:
+        - engine: "coze"
+          id: "03aed905d2993ec5667e89010903940d"
+          type: "StartManual"
+          meta:
+            copyDisable: true
+            defaultPorts:
+              - type: "output"
+            deleteDisable: true
+            group: "base"
+            iconCode: "iconrengongchufa-graph"
+            isStart: true
+            selectable: true
+            nodePanelVisible: true
+            size:
+              width: 154
+              height: 60
+            position:
+              x: 77
+              y: 0
+          data:
+            name: "开始"
+            lang:
+              name:
+                zh_CN: "开始"
+                zh_TW: "開始"
+                en_US: "Start"
+            nodeId: "StartNode_03aed905d2993ec5667e89010903940d"
+            nodeType: "StartNode"
+        - engine: "coze"
+          id: "252cac8662bdf8c6c8a104572026893c"
+          type: "EndFlow"
+          meta:
+            copyDisable: true
+            defaultPorts:
+              - type: "input"
+            deleteDisable: true
+            group: "base"
+            iconCode: "iconjieshu-graph"
+            isStart: false
+            isNodeEnd: true
+            selectable: true
+            nodePanelVisible: true
+            size:
+              width: 154
+              height: 60
+            position:
+              x: 331
+              y: 0
+          data:
+            name: "结束"
+            lang:
+              name:
+                zh_CN: "结束"
+                zh_TW: "結束"
+                en_US: "end"
+            nodeId: "EndNode_252cac8662bdf8c6c8a104572026893c"
+            nodeType: "EndNode"
+            isVerificationPassed:
+              base: true
+      links:
+        - id: "03aed905d2993ec5667e89010903940d_-252cac8662bdf8c6c8a104572026893c_"
+          sourceNodeID: "03aed905d2993ec5667e89010903940d"
+          targetNodeID: "252cac8662bdf8c6c8a104572026893c"
+          fromId: "StartNode_03aed905d2993ec5667e89010903940d"
+          toId: "EndNode_252cac8662bdf8c6c8a104572026893c"
+    publishFlag: false
+    systemVariable:
+      - dataType: "String"
+        varName: "$process.processId"
+        isArray: false
+        required: false
+        description: "流程定义ID"
+        lang:
+          variableName:
+            zh_TW: "流程定義ID"
+            en_US: "process id"
+            zh_CN: "流程定义ID"
+          description:
+            zh_TW: "流程定義ID"
+            en_US: "process id"
+            zh_CN: "流程定义ID"
+      - dataType: "String"
+        varName: "$process.name"
+        isArray: false
+        required: false
+        description: "流程名称"
+        lang:
+          variableName:
+            zh_TW: "流程名稱"
+            en_US: "process name"
+            zh_CN: "流程名称"
+          description:
+            zh_TW: "流程名稱"
+            en_US: "process name"
+            zh_CN: "流程名称"
+      - dataType: "String"
+        varName: "$process.version"
+        isArray: false
+        required: false
+        description: "流程版本"
+        lang:
+          variableName:
+            zh_TW: "流程版本"
+            en_US: "process version"
+            zh_CN: "流程版本"
+          description:
+            zh_TW: "流程版本"
+            en_US: "process version"
+            zh_CN: "流程版本"
+      - dataType: "String"
+        varName: "$process.serialNumber"
+        isArray: false
+        required: false
+        description: "流程序号"
+        lang:
+          variableName:
+            zh_TW: "流程式號"
+            en_US: "process serial number"
+            zh_CN: "流程序号"
+          description:
+            zh_TW: "流程式號"
+            en_US: "process serial number"
+            zh_CN: "流程序号"
+      - dataType: "String"
+        varName: "$process.eocCompanyId"
+        isArray: false
+        required: false
+        description: "发起公司别名"
+        lang:
+          variableName:
+            zh_TW: "發起公司別名"
+            en_US: "process eoc company id"
+            zh_CN: "发起公司别名"
+          description:
+            zh_TW: "發起公司別名"
+            en_US: "process eoc company id"
+            zh_CN: "发起公司别名"
+      - dataType: "String"
+        varName: "$process.eocSiteId"
+        isArray: false
+        required: false
+        description: "发起公厂别名"
+        lang:
+          variableName:
+            zh_TW: "發起公廠別名"
+            en_US: "process eoc site id"
+            zh_CN: "发起公厂别名"
+          description:
+            zh_TW: "發起公廠別名"
+            en_US: "process eoc site id"
+            zh_CN: "发起公厂别名"
+      - dataType: "String"
+        varName: "$process.tenantId"
+        isArray: false
+        required: false
+        description: "租户ID"
+        lang:
+          variableName:
+            zh_TW: "租戶ID"
+            en_US: "process tenant id"
+            zh_CN: "租户ID"
+          description:
+            zh_TW: "租戶ID"
+            en_US: "process tenant id"
+            zh_CN: "租户ID"
+      - dataType: "String"
+        varName: "$process.tenantSid"
+        isArray: false
+        required: false
+        description: "租户SID"
+        lang:
+          variableName:
+            zh_TW: "租戶SID"
+            en_US: "process tenant sid"
+            zh_CN: "租户SID"
+          description:
+            zh_TW: "租戶SID"
+            en_US: "process tenant sid"
+            zh_CN: "租户SID"
+      - dataType: "String"
+        varName: "$process.initiatorId"
+        isArray: false
+        required: false
+        description: "发起者账号"
+        lang:
+          variableName:
+            zh_TW: "發起者帳號"
+            en_US: "process initiator id"
+            zh_CN: "发起者账号"
+          description:
+            zh_TW: "發起者帳號"
+            en_US: "process initiator id"
+            zh_CN: "发起者账号"
+      - dataType: "String"
+        varName: "$process.initiatorName"
+        isArray: false
+        required: false
+        description: "发起者姓名"
+        lang:
+          variableName:
+            zh_TW: "發起者姓名"
+            en_US: "process initiator name"
+            zh_CN: "发起者姓名"
+          description:
+            zh_TW: "發起者姓名"
+            en_US: "process initiator name"
+            zh_CN: "发起者姓名"
+      - dataType: "String"
+        varName: "$process.emergency"
+        isArray: false
+        required: false
+        description: "紧急程度"
+        lang:
+          variableName:
+            zh_TW: "緊急程度"
+            en_US: "process emergency"
+            zh_CN: "紧急程度"
+          description:
+            zh_TW: "緊急程度"
+            en_US: "process emergency"
+            zh_CN: "紧急程度"
+      - dataType: "Integer"
+        varName: "$process.state"
+        isArray: false
+        required: false
+        description: "流程状态"
+        lang:
+          variableName:
+            zh_TW: "流程狀態"
+            en_US: "process state"
+            zh_CN: "流程状态"
+          description:
+            zh_TW: "流程狀態"
+            en_US: "process state"
+            zh_CN: "流程状态"
+      - dataType: "String"
+        varName: "$process.completeState"
+        isArray: false
+        required: false
+        description: "流程完成状态"
+        lang:
+          variableName:
+            zh_TW: "流程完成狀態"
+            en_US: "process complete state"
+            zh_CN: "流程完成状态"
+          description:
+            zh_TW: "流程完成狀態"
+            en_US: "process complete state"
+            zh_CN: "流程完成状态"
+      - dataType: "String"
+        varName: "$process.subject"
+        isArray: false
+        required: false
+        description: "流程主旨"
+        lang:
+          variableName:
+            zh_TW: "流程主旨"
+            en_US: "process subject"
+            zh_CN: "流程主旨"
+          description:
+            zh_TW: "流程主旨"
+            en_US: "process subject"
+            zh_CN: "流程主旨"
+      - dataType: "DateTime"
+        varName: "$process.createTime"
+        isArray: false
+        required: false
+        description: "流程创建时间"
+        lang:
+          variableName:
+            zh_TW: "流程創建時間"
+            en_US: "process create time"
+            zh_CN: "流程创建时间"
+          description:
+            zh_TW: "流程創建時間"
+            en_US: "process create time"
+            zh_CN: "流程创建时间"
+      - dataType: "DateTime"
+        varName: "$process.completeTime"
+        isArray: false
+        required: false
+        description: "流程完成时间"
+        lang:
+          variableName:
+            zh_TW: "流程完成時間"
+            en_US: "process complete time"
+            zh_CN: "流程完成时间"
+          description:
+            zh_TW: "流程完成時間"
+            en_US: "process complete time"
+            zh_CN: "流程完成时间"
+      - dataType: "String"
+        varName: "$process.parent"
+        isArray: false
+        required: false
+        description: "父流程信息"
+        lang:
+          variableName:
+            zh_TW: "父流程資訊"
+            en_US: "process parent information"
+            zh_CN: "父流程信息"
+          description:
+            zh_TW: "父流程資訊"
+            en_US: "process parent information"
+            zh_CN: "父流程信息"
+      - dataType: "String"
+        varName: "$process.personInChargeId"
+        isArray: false
+        required: false
+        description: "当责者id"
+        lang:
+          variableName:
+            zh_TW: "當責者id"
+            en_US: "process person incharge id"
+            zh_CN: "当责者id"
+          description:
+            zh_TW: "當責者id"
+            en_US: "process person incharge id"
+            zh_CN: "当责者id"
+      - dataType: "String"
+        varName: "$process.personInChargeNo"
+        isArray: false
+        required: false
+        description: "当责者编号"
+        lang:
+          variableName:
+            zh_TW: "當責者編號"
+            en_US: "process person incharge no"
+            zh_CN: "当责者编号"
+          description:
+            zh_TW: "當責者編號"
+            en_US: "process person incharge no"
+            zh_CN: "当责者编号"
+      - dataType: "String"
+        varName: "$process.personInChargeName"
+        isArray: false
+        required: false
+        description: "当责者名称"
+        lang:
+          variableName:
+            zh_TW: "當責者名稱"
+            en_US: "process person incharge name"
+            zh_CN: "当责者名称"
+          description:
+            zh_TW: "當責者名稱"
+            en_US: "process person incharge name"
+            zh_CN: "当责者名称"
+      - dataType: "String"
+        varName: "$process.processLocale"
+        isArray: false
+        required: false
+        description: "语系"
+        lang:
+          variableName:
+            zh_TW: "語系"
+            en_US: "process locale"
+            zh_CN: "语系"
+          description:
+            zh_TW: "語系"
+            en_US: "process locale"
+            zh_CN: "语系"
+      - dataType: "String"
+        varName: "$process.tenantName"
+        isArray: false
+        required: false
+        description: "租户名称"
+        lang:
+          variableName:
+            zh_TW: "租戶名稱"
+            en_US: "process tenant name"
+            zh_CN: "租户名称"
+          description:
+            zh_TW: "租戶名稱"
+            en_US: "process tenant name"
+            zh_CN: "租户名称"
+      - dataType: "String"
+        varName: "$activity.activityId"
+        isArray: false
+        required: false
+        description: "关卡ID"
+        lang:
+          variableName:
+            zh_TW: "關卡ID"
+            en_US: "activity id"
+            zh_CN: "关卡ID"
+          description:
+            zh_TW: "關卡ID"
+            en_US: "activity id"
+            zh_CN: "关卡ID"
+      - dataType: "String"
+        varName: "$activity.activityName"
+        isArray: false
+        required: false
+        description: "关卡名称"
+        lang:
+          variableName:
+            zh_TW: "關卡名稱"
+            en_US: "activity name"
+            zh_CN: "关卡名称"
+          description:
+            zh_TW: "關卡名稱"
+            en_US: "activity name"
+            zh_CN: "关卡名称"
+      - dataType: "String"
+        varName: "$activity.state"
+        isArray: false
+        required: false
+        description: "关卡状态"
+        lang:
+          variableName:
+            zh_TW: "關卡狀態"
+            en_US: "activity state"
+            zh_CN: "关卡状态"
+          description:
+            zh_TW: "關卡狀態"
+            en_US: "activity state"
+            zh_CN: "关卡状态"
+      - dataType: "String"
+        varName: "$activity.completeState"
+        isArray: false
+        required: false
+        description: "关卡完成状态"
+        lang:
+          variableName:
+            zh_TW: "關卡完成狀態"
+            en_US: "activity complete state"
+            zh_CN: "关卡完成状态"
+          description:
+            zh_TW: "關卡完成狀態"
+            en_US: "activity complete state"
+            zh_CN: "关卡完成状态"
+      - dataType: "DateTime"
+        varName: "$activity.createTime"
+        isArray: false
+        required: false
+        description: "关卡创建时间"
+        lang:
+          variableName:
+            zh_TW: "關卡創建時間"
+            en_US: "activity create time"
+            zh_CN: "关卡创建时间"
+          description:
+            zh_TW: "關卡創建時間"
+            en_US: "activity create time"
+            zh_CN: "关卡创建时间"
+      - dataType: "DateTime"
+        varName: "$activity.completeTime"
+        isArray: false
+        required: false
+        description: "关卡完成时间"
+        lang:
+          variableName:
+            zh_TW: "關卡完成時間"
+            en_US: "activity complete time"
+            zh_CN: "关卡完成时间"
+          description:
+            zh_TW: "關卡完成時間"
+            en_US: "activity complete time"
+            zh_CN: "关卡完成时间"
+      - dataType: "String"
+        varName: "$activity.items[0].state"
+        isArray: false
+        required: false
+        description: "工作状态"
+        lang:
+          variableName:
+            zh_TW: "工作狀態"
+            en_US: "activity state"
+            zh_CN: "工作状态"
+          description:
+            zh_TW: "工作狀態"
+            en_US: "activity state"
+            zh_CN: "工作状态"
+      - dataType: "String"
+        varName: "$activity.items[0].completeState"
+        isArray: false
+        required: false
+        description: "工作完成状态"
+        lang:
+          variableName:
+            zh_TW: "工作完成狀態"
+            en_US: "activity complete state"
+            zh_CN: "工作完成状态"
+          description:
+            zh_TW: "工作完成狀態"
+            en_US: "activity complete state"
+            zh_CN: "工作完成状态"
+      - dataType: "DateTime"
+        varName: "$activity.items[0].createTime"
+        isArray: false
+        required: false
+        description: "工作创建时间"
+        lang:
+          variableName:
+            zh_TW: "工作創建時間"
+            en_US: "activity create time"
+            zh_CN: "工作创建时间"
+          description:
+            zh_TW: "工作創建時間"
+            en_US: "activity create time"
+            zh_CN: "工作创建时间"
+      - dataType: "DateTime"
+        varName: "$activity.items[0].completeTime"
+        isArray: false
+        required: false
+        description: "工作完成时间"
+        lang:
+          variableName:
+            zh_TW: "工作完成時間"
+            en_US: "activity complete time"
+            zh_CN: "工作完成时间"
+          description:
+            zh_TW: "工作完成時間"
+            en_US: "activity complete time"
+            zh_CN: "工作完成时间"
+      - dataType: "String"
+        varName: "$activity.items[0].performerId"
+        isArray: false
+        required: false
+        description: "工作处理者用户账号"
+        lang:
+          variableName:
+            zh_TW: "工作處理者用戶帳號"
+            en_US: "activity performer id"
+            zh_CN: "工作处理者用户账号"
+          description:
+            zh_TW: "工作處理者用戶帳號"
+            en_US: "activity performer id"
+            zh_CN: "工作处理者用户账号"
+      - dataType: "String"
+        varName: "$activity.items[0].performerName"
+        isArray: false
+        required: false
+        description: "工作处理者姓名"
+        lang:
+          variableName:
+            zh_TW: "工作處理者姓名"
+            en_US: "activity performer name"
+            zh_CN: "工作处理者姓名"
+          description:
+            zh_TW: "工作處理者姓名"
+            en_US: "activity performer name"
+            zh_CN: "工作处理者姓名"
+      - dataType: "String"
+        varName: "$activity.items[0].performerNo"
+        isArray: false
+        required: false
+        description: "工作处理者员工编号"
+        lang:
+          variableName:
+            zh_TW: "工作處理者員工編號"
+            en_US: "activity performer no"
+            zh_CN: "工作处理者员工编号"
+          description:
+            zh_TW: "工作處理者員工編號"
+            en_US: "activity performer no"
+            zh_CN: "工作处理者员工编号"
+      - dataType: "String"
+        varName: "$activity.items[0].workItemId"
+        isArray: false
+        required: false
+        description: "待办Id"
+        lang:
+          variableName:
+            zh_TW: "待辦Id"
+            en_US: "activity work item id"
+            zh_CN: "待办Id"
+          description:
+            zh_TW: "待辦Id"
+            en_US: "activity work item id"
+            zh_CN: "待办Id"
+    dtdVariable:
+      - dataType: "DTDVar"
+        varName: "data"
+        isArray: false
+        required: false
+        description: "发起流程数据"
+        mappingCode: "data"
+        code: "init_b1f78dc74c0c3c019c902e3d3375e8ca"
+    addSourceType: "auto_perspective"
+    adpVersion: $cache{project_adp_version}
+    adpRemarkNumber: 1
+    adpStatus: "effect"
+    adpType: "workflowTask"
+    taskCode: $cache{Task_code}
+    adpRemark: "流程多版本V1${{get_time()}}"
+    engine: "coze"
+    businessObjectVariables: []
+    mechanismVariables: []
+    daemon: false
+    customVariables: []
+    dueDateTimeDistance: null
+    supportConditionAssign: false
+    personInCharge:
+      type: "default"
+      personnel: []
+      source: "personnel"
+    merge: false
+    planEndTime:
+      settingType: "no"
+    nodeVariables: []
+    allModelList:
+      - createBy: "wenwu@digiwin.com"
+        createDate: "2025-12-03 14:00:26"
+        editBy: "wenwu@digiwin.com"
+        editDate: "2025-12-03 14:00:38"
+        objectId: "692fd1faac35737c624f229a"
+        code: "business_flow_test_ke4k2"
+        id: 1762833412858
+        name: "业务流测试2025-12-03 13:56:12"
+        tenantId: "athenadeveloperTest"
+        serviceCode: "DPBAS"
+        subTableCounts: 0
+        application: ${{app2_code()}}
+        dependOnGroundEnd: false
+        needCreateApi: true
+        lang:
+          name:
+            zh_TW: "業務流測試2025-12-03 13:56:12"
+            en_US: "BusinessFlowTest2025-12-03 13:56:12"
+            zh_CN: "业务流测试2025-12-03 13:56:12"
+        modelType: "transaction"
+        relateBusinessCode: "BN_8fccf582100019f9"
+        customProperties: {}
+        generateModelSource: "manual"
+      - createBy: "wenwu@digiwin.com"
+        createDate: "2025-12-02 11:57:46"
+        editBy: "wenwu@digiwin.com"
+        editDate: "2025-12-02 11:57:57"
+        objectId: "692e63baac35737c624f1ed7"
+        code: "business_flow_test_rg9j9ku6o"
+        id: 1765717480163
+        name: "业务流测试2025-12-02 11:53:49"
+        tenantId: "athenadeveloperTest"
+        serviceCode: "DPBAS"
+        subTableCounts: 0
+        application: ${{app2_code()}}
+        dependOnGroundEnd: false
+        needCreateApi: true
+        lang:
+          name:
+            zh_TW: "業務流測試2025-12-02 11:53:49"
+            en_US: "BusinessFlowTest2025-12-02 11:53:49"
+            zh_CN: "业务流测试2025-12-02 11:53:49"
+        modelType: "transaction"
+        relateBusinessCode: "BN_2a222742100023fe"
+        customProperties: {}
+        generateModelSource: "manual"
+      - createBy: "wenwu@digiwin.com"
+        createDate: "2025-11-06 17:47:36"
+        editBy: "wenwu@digiwin.com"
+        editDate: "2025-11-06 17:47:48"
+        objectId: "690c6eb8981aee47a1b6ae11"
+        code: "zzzazzzazzzazzzazzza"
+        id: 1760319917100
+        name: "业务方zzza"
+        tenantId: "athenadeveloperTest"
+        serviceCode: "DPBAS"
+        subTableCounts: 0
+        application: ${{app2_code()}}
+        dependOnGroundEnd: false
+        needCreateApi: true
+        lang:
+          name:
+            zh_TW: "業務方zzza"
+            en_US: "业务方zzza"
+            zh_CN: "业务方zzza"
+        modelType: "transaction"
+        relateBusinessCode: "BN_00de27c210001344"
+        customProperties: {}
+        generateModelSource: "manual"
+      - createBy: "wenwu@digiwin.com"
+        createDate: "2025-11-06 16:12:01"
+        editBy: "integration"
+        editDate: "2025-11-07 20:11:05"
+        objectId: "690c5851981aee47a1b6ad84"
+        code: "abcabcabc"
+        id: 1760375573072
+        name: "abc"
+        tenantId: "athenadeveloperTest"
+        serviceCode: "DPBAS"
+        subTableCounts: 0
+        application: ${{app2_code()}}
+        dependOnGroundEnd: false
+        needCreateApi: true
+        lang:
+          name:
+            zh_TW: "abc"
+            en_US: "abc"
+            zh_CN: "abc"
+        modelType: "param"
+        relateBusinessCode: "BN_eafdd442100000b7"
+        customProperties: {}
+        generateModelSource: "manual"
+      - createBy: "wenwu@digiwin.com"
+        createDate: "2025-11-06 15:25:15"
+        editBy: "integration"
+        editDate: "2025-11-07 20:11:12"
+        objectId: "690c4d5b981aee47a1b6ad6a"
+        code: "automatedtesting_basis"
+        id: 1761994696363
+        name: "自动化测试_基础档"
+        tenantId: "athenadeveloperTest"
+        serviceCode: "DPBAS"
+        subTableCounts: 0
+        application: ${{app2_code()}}
+        dependOnGroundEnd: false
+        needCreateApi: true
+        lang:
+          name:
+            zh_TW: "自動化測試_基礎檔"
+            en_US: "自动化测试_基础档"
+            zh_CN: "自动化测试_基础档"
+        modelType: "basic"
+        relateBusinessCode: "BN_e049f882100016d2"
+        customProperties: {}
+        generateModelSource: "manual"
+      - createBy: "wenwu@digiwin.com"
+        createDate: "2025-10-20 13:43:54"
+        editBy: "integration"
+        editDate: "2025-10-20 15:21:11"
+        objectId: "68f5cc1ae43bfd127516cdd5"
+        code: "informationzzb"
+        id: 1762105495882
+        name: "信息验证z"
+        tenantId: "athenadeveloperTest"
+        serviceCode: "DPBAS"
+        subTableCounts: 0
+        application: ${{app2_code()}}
+        dependOnGroundEnd: false
+        needCreateApi: true
+        lang:
+          name:
+            zh_TW: "資訊驗證z"
+            en_US: "信息验证z"
+            zh_CN: "信息验证z"
+        modelType: "transaction"
+        relateBusinessCode: "BN_e6106e82100010f5"
+        switchCfg:
+          dataPermission: "N"
+        customProperties: {}
+        generateModelSource: "manual"
+    modelVariables: []
+    _isValidPassed:
+      base: true
+    _nodeId: $cache{TaskProcess_code}
+    _nodeType: "GlobalSetting"
+    businessCode: ""
+    subApproveConditionDropDownConfig:
+      sourceSubApproveConditionDropDownConfig: []
+    allowInteractiveFlag: false
+    interactiveAbleConfig: {}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 大T流程发布（发布已配置的大T流程到目标租户）
+bigT_PublishProcess_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/modulePublish/modelSingle/publish
+  method: POST
+  detail: 大T流程发布
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+    Authorization: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    pkValue: $cache{TaskProcess_code}
+    module: process
+    application: ${{app2_code()}}
+    tenantUsers:
+      - tenantId: "athenadeveloperTest"
+        tenantSid: 847600433497088
+        tenantName: "配置测试器"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 调试大T流程（启动流程调试会话）
+debug_DebugBigTProcess_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/debug/debugProcess
+  method: POST
+  detail: 调试大T流程
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    processId: $cache{TaskProcess_code}
+    code: $cache{TaskProcess_code}
+    debugType: all
+    needSaveInput: true
+    inputParameters:
+      - checked: true
+        key: name
+        dataType: string
+        value: "test1${{get_time()}}"
+    dispatchData:
+      - checked: true
+        key: age
+        dataType: string
+        value: "18"
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.serialNumber
+      name: debug_serial_number
+
+# 获取大T流程调试进度（查询调试执行状态和结果）
+debug_GetDebugProgress_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/debug/getDebugProgress
+  method: POST
+  detail: 获取大T流程调试进度
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    serialNumber: $cache{debug_serial_number}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
