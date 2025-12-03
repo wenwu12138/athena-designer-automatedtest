@@ -192,6 +192,12 @@ class Context:
         """获取app的host"""
         return config.Data_Code
 
+    @classmethod
+    def Project_Data_Code(cls) -> str:
+        from utils import config
+        """获取app的host"""
+        return config.Project_Data_Code
+
 
 
 

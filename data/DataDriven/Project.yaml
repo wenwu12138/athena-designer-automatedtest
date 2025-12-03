@@ -1,0 +1,963 @@
+# 公共参数
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 驱动执行
+  allureStory: 项目
+
+
+
+
+# 项目模块 - 查询项目生效的ADP版本（项目部署前置检查）
+project_FindAppEffectAdpVersion_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/groupHistory/findAppEffectAdpVersion
+  method: GET
+  detail: 查询项目部署所需的生效ADP版本信息
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data
+      name: project_adp_version
+
+# 新增项目依赖数据配置
+project_AddProjectData_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/data/saveDataDescriptionAndState
+  method: POST
+  detail: 新增数据，数据状态（生成项目依赖）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+  requestType: json
+  is_run: true
+  data:
+    dataDescription:
+      code: "${{Project_Data_Code()}}"
+      application: ${{app2_code()}}
+      name: "项目数据${{get_time()}}"
+      tenantId: "SYSTEM"
+      uniKeys:
+        - "project_data_id"
+      dataStruct:
+        name: "项目数据${{get_time()}}"
+        key: "project_basic_data"
+        dataType: "ARRAY"
+        componentType: "OBJECT"
+        fields:
+          - name: "项目数据主键"
+            key: "project_data_id"
+            dataType: "LONG"
+          - name: "项目状态"
+            key: "project_status"
+            dataType: "STRING"
+          - name: "项目名称"
+            key: "project_name"
+            dataType: "STRING"
+    dataFeatures: []
+    dataStates:
+      - dataCode: "${{Project_Data_Code()}}"
+        code: "${{random_hexcode()}}"
+        name: "生效"
+        condition:
+          type: "script"
+          expression: ""
+        dataFeatureSets: []
+        application: ${{app2_code()}}
+        tenantId: "SYSTEM"
+        variables: []
+        lang: {}
+      - dataCode: "${{Project_Data_Code()}}"
+        code: "${{random_hexcode()}}"
+        name: "失效"
+        condition:
+          type: "script"
+          expression: ""
+        dataFeatureSets: []
+        application: ${{app2_code()}}
+        tenantId: "SYSTEM"
+        variables: []
+        lang: {}
+    decision: []
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.code
+      name: project_data_code
+
+#-------------前置依赖
+
+
+# 检查画布不升级是否存在（项目模块前置检查）
+project_CanvasNotUpgradeExists_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/project/canvas/notUpgrade/exists
+  method: GET
+  detail: 检查画布不升级状态是否存在（项目创建前置检查）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 项目模块 - 查询项目列表和检查画布升级状态
+project_QueryProjectList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/project/v2/queryProjectList
+  method: POST
+  detail: 查询应用下的项目列表（分页查询）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    projectFrom: ""
+    triggerType: ""
+    searchValue: ""
+    pageNum: 1
+    pageSize: 10
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+
+# 项目模块 - 查询组合来源项目列表
+project_QueryCombinationProjectList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/project/v2/queryProjectList
+  method: POST
+  detail: 查询组合来源类型的项目列表（过滤项目来源）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    projectFrom: combination
+    triggerType: ""
+    searchValue: ""
+    pageNum: 1
+    pageSize: 10
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 项目模块 - 查询单一项目通用触发类型的项目列表
+project_QuerySinglePageTriggerProjectList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/project/v2/queryProjectList
+  method: POST
+  detail: 查询单一项目通用触发类型的项目列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    projectFrom: single
+    triggerType: page
+    searchValue: ""
+    pageNum: 1
+    pageSize: 10
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 查询项目数据列表
+project_GetDataList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/task/getDataList
+  method: GET
+  detail: 查询数据列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    groupCode: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data[0].dataDescription.code
+      name: project_data_code
+    - type: response
+      jsonpath: $.data[0].dataStateList[0].code
+      name: init_state_code
+    - type: response
+      jsonpath: $.data[0].dataStateList[1].code
+      name: end_state_code
+
+
+
+# 生成数据整理项目code
+code_GenerateDataOrgProjectCode_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/code/generate/standard
+  method: POST
+  detail: 生成数据整理项目code
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    typeCode: default
+    paramMap:
+      abbreviationCode: PM
+      application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data
+      name: data_org_project_code
+
+
+# 新增数据整理项目配置
+project_SaveProject_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/project/saveProject
+  method: POST
+  detail: 新增数据整理项目配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+    content-type: application/json
+    Authorization: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    name: "项目数据整理${{get_time()}}"
+    description: "项目数据整理描述"
+    code: "$cache{data_org_project_code}"
+    executeType: mainline
+    init:
+      code: $cache{init_state_code}
+      dataCode: $cache{project_data_code}
+    end:
+      code: $cache{end_state_code}
+      dataCode: $cache{project_data_code}
+    projectFrom: combination
+    type: BUSINESS
+    tenantId: SYSTEM
+    manualAble: false
+    authorityPrefix: ""
+    subTasks: []
+    lang:
+      name:
+        zh_CN: "项目数据整理${{get_time()}}"
+        zh_TW: "項目數據整理${{get_time()}}"
+        en_US: "Project Data Organization${{get_time()}}"
+      description:
+        zh_CN: "项目数据整理描述"
+        zh_TW: "項目數據整理描述"
+        en_US: "Project data organization description"
+    application: ${{app2_code()}}
+    groupCode: ${{app2_code()}}
+    engine: coze
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 生成可追踪项目code
+code_GenerateTrackableProjectCode_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/code/generate/standard
+  method: POST
+  detail: 生成可追踪项目code
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    typeCode: default
+    paramMap:
+      abbreviationCode: PU
+      application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data
+      name: trackable_project_gen_code
+
+# 新增可追踪项目配置
+project_SaveTrackableProject_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/project/saveProject
+  method: POST
+  detail: 新增可追踪项目配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+    content-type: application/json
+    Authorization: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    name: "可追踪项目${{get_time()}}"
+    description: "可追踪项目描述"
+    code: "$cache{trackable_project_gen_code}"
+    executeType: user
+    init:
+      code: $cache{init_state_code}
+      dataCode: $cache{project_data_code}
+    end:
+      code: $cache{end_state_code}
+      dataCode: $cache{project_data_code}
+    executor:
+      type: default
+      personnel: []
+      source: personnel
+    projectFrom: combination
+    type: BUSINESS
+    tenantId: SYSTEM
+    manualAble: false
+    authorityPrefix: ""
+    subTasks: []
+    lang:
+      name:
+        zh_CN: "可追踪项目${{get_time()}}"
+        zh_TW: "可追蹤項目${{get_time()}}"
+        en_US: "Trackable Project${{get_time()}}"
+      description:
+        zh_CN: "可追踪项目描述"
+        zh_TW: "可追蹤項目描述"
+        en_US: "Trackable project description"
+    application: ${{app2_code()}}
+    groupCode: ${{app2_code()}}
+    engine: coze
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+#------------点击项目进入画布查询动作
+
+# 查询数据分组历史
+groupHistory_GetDataGroupHistory_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/groupHistory/getDataGroupHistory
+  method: GET
+  detail: 查询数据分组历史
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    code: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询项目详情
+project_GetProject_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/project/getProject/$cache{trackable_project_gen_code}
+  method: GET
+  detail: 查询可追踪项目详情
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 检查引导是否跳过
+guide_IsSkip_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/guide/isSkip
+  method: GET
+  detail: 检查引导是否跳过
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    type: dtd
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询任务列表
+task_GetTaskList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/task/getTaskList
+  method: GET
+  detail: 查询任务列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    groupCode: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询数据列表
+task_GetDataList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/task/getDataList
+  method: GET
+  detail: 查询数据列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    groupCode: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询项目树
+project_ProjectTree_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/project/projectTree/${{app2_code()}}
+  method: GET
+  detail: 查询项目树
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询DTD画布
+task_GetDtdCanvas_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/task/getDtdCanvas
+  method: GET
+  detail: 查询DTD画布
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    groupCode: ${{app2_code()}}
+    isNeedContrast: false
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询数据分组列表
+data_DataGroupListByApplication_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/data/dataGroup/listByApplication
+  method: GET
+  detail: 查询数据分组列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询应用数据状态
+data_FindDataStatesByApplication_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/data/findDataStatesByApplication
+  method: GET
+  detail: 查询应用数据状态
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 根据状态查询任务列表
+task_GetTaskListByState_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/task/getTaskList
+  method: POST
+  detail: 根据状态查询任务列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    startStateCode: $cache{init_state_code}
+    endStateCode: $cache{end_state_code}
+    application: ${{app2_code()}}
+    groupCode: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+
+
+# 生成子项目code
+code_GenerateSubProjectCode_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/code/generate/standard
+  method: POST
+  detail: 生成子项目code
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    typeCode: default
+    paramMap:
+      abbreviationCode: PU
+      application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data
+      name: generated_sub_project_code
+
+#### 新增子项目
+# 保存组合子项目
+project_SaveSubProject_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/project/saveProject
+  method: POST
+  detail: 新增组合子项目
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+    content-type: application/json
+    Authorization: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    code: "$cache{generated_sub_project_code}"
+    name: "全流程验证项目${{get_time()}}"
+    description: "全流程验证项目描述"
+    init:
+      code: $cache{init_state_code}
+      dataCode: $cache{project_data_code}
+    end:
+      code: $cache{end_state_code}
+      dataCode: $cache{project_data_code}
+    executeType: user
+    type: BUSINESS
+    groupCode: ${{app2_code()}}
+    tenantId: SYSTEM
+    daemon: null
+    sourceName: "来源名称"
+    sourceEntityName: "来源实体名称"
+    dueDateName: "99"
+    mergeFields: null
+    assignAble: false
+    merge: false
+    pattern: null
+    manualAble: null
+    allowInteractiveFlag: null
+    interactiveAbleConfig:
+      responsibilityAble: null
+    primaryProjectCode: $cache{data_org_project_code}
+    lang:
+      name:
+        en_US: "Full process verification project${{get_time()}}"
+        zh_CN: "全流程验证项目${{get_time()}}"
+        zh_TW: "全流程驗證項目${{get_time()}}"
+      description:
+        en_US: "Full process verification project description"
+        zh_CN: "全流程验证项目描述"
+        zh_TW: "全流程驗證項目描述"
+      sourceName:
+        zh_CN: "来源名称"
+        zh_TW: "來源名稱"
+        en_US: "Source name"
+      dueDateName:
+        zh_CN: "99"
+        zh_TW: "99"
+        en_US: "99"
+    target:
+      name: ""
+      code: ""
+      lang:
+        name:
+          zh_CN: ""
+          zh_TW: ""
+          en_US: ""
+    dueDateTimeDistance: null
+    milestone: false
+    phases: []
+    application: ${{app2_code()}}
+    atmcDatas:
+      - proVarKey: sourceIds
+        athenaKey: sourceIds
+        errorKeys: []
+      - proVarKey: dueDate
+        athenaKey: dueDate
+        errorKeys: []
+    executor:
+      type: default
+      source: personnel
+      variable: []
+      personnel: []
+    presetVariables: []
+    assignConfig:
+      assignAble: false
+    projectFrom: combination
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+
+
+
+
+
+
+
+
+# 根据数据状态获取任务列表
+task_GetTaskListByDataState_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/task/getTaskList
+  method: POST
+  detail: 根据数据状态获取任务列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    startStateCode: $cache{init_state_code}
+    endStateCode: $cache{end_state_code}
+    application: ${{app2_code()}}
+    groupCode: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+#----清除依赖
+# 删除项目依赖数据配置
+project_DeleteProjectData_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/data/deleteDataDescriptionByCode/$cache{project_data_code}
+  method: GET
+  detail: 删除项目依赖数据配置（删除数据状态）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+  requestType: PARAMS
+  is_run: false
+  data: {}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 删除子项目
+project_DeleteSubProject_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/project/deleteProject/$cache{generated_sub_project_code}
+  method: GET
+  detail: 删除子项目
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 删除父项目（数据整理项目）
+project_DeleteParentProject_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/project/deleteProject/$cache{data_org_project_code}
+  method: GET
+  detail: 删除父项目
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 删除可追踪项目
+project_DeleteTrackableProject_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/project/deleteProject/$cache{trackable_project_gen_code}
+  method: GET
+  detail: 删除可追踪项目
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:

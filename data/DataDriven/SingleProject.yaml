@@ -1,0 +1,513 @@
+# 公共参数
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 驱动执行
+  allureStory: 单一项目
+
+
+# 项目模块 - 查询单一来源项目列表
+project_QuerySingleProjectList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/project/v2/queryProjectList
+  method: POST
+  detail: 查询单一来源类型的项目列表（过滤项目来源）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    projectFrom: single
+    triggerType: ""
+    searchValue: ""
+    pageNum: 1
+    pageSize: 10
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 创建通用触发单一项目
+process_UpsertSingleProject_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/process/upsertSingleProject
+  method: POST
+  detail: 新增通用触发单一项目
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    processName: "通用触发单一项目${{get_time()}}"
+    projectName: "通用触发单一项目${{get_time()}}"
+    projectCode: "PC_${{random_hexcode()}}"
+    projectFrom: single
+    triggerType: page
+    triggerConfig:
+      businessCode: null
+      eventId: null
+    flowGraph:
+      nodes:
+        - position:
+            x: 690
+            y: 202
+          size:
+            width: 160
+            height: 38
+          attrs:
+            body:
+              strokeWidth: 1
+              stroke: "#E9E9E9"
+              fill: "#FFFFFF"
+              rx: 19
+              ry: 19
+              cursor: move
+              filter:
+                name: dropShadow
+                args:
+                  color: "#4943a3"
+                  dx: 0
+                  dy: 0
+                  blur: 4
+                  opacity: 0.4
+            label:
+              text: "通用触发"
+              fontSize: 13
+              fill: "#333"
+              textWrap:
+                width: 104
+                ellipsis: true
+              x: -34
+              textAnchor: start
+              cursor: move
+            icon:
+              xlink:href: "data:image/svg+xml;base64,PHN2ZyB0PSIxNzE5OTczNzU5NjQ1IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjIwMjE2IiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiPjxwYXRoIGQ9Ik0wIDBtNTEyIDBsMCAwcTUxMiAwIDUxMiA1MTJsMCAwcTAgNTEyLTUxMiA1MTJsMCAwcS01MTIgMC01MTItNTEybDAgMHEwLTUxMiA1MTItNTEyWiIgZmlsbD0iI0E2QUZCQyIgcC1pZD0iMjAyMTciPjwvcGF0aD48cGF0aCBkPSJNNDc5Ljk4OTc2IDI1NmEyMC42ODQ4IDIwLjY4NDggMCAwIDEgMTYuOTM2OTYgOC44MDY0bDU0LjYwNDggNzcuOTAwOGgxODYuMzM3MjhjMjQuNzI5NiAwIDQ0Ljg0MDk2IDE5LjY5NjY0IDQ1LjQ3NTg0IDQ0LjIzMTY4bDAuMDE1MzYgMS4xODc4NHYzMzQuNDUzNzZjMCAyNS4wODgtMjAuMzY3MzYgNDUuNDE5NTItNDUuNDkxMiA0NS40MTk1MmgtNDQ2LjYxNzZjLTI1LjEyMzg0IDAtNDUuNDkxMi0yMC4zMzY2NC00NS40OTEyLTQ1LjQxOTUyVjMwMS40MTk1MmMwLTI1LjA4OCAyMC4zNjczNi00NS40MTk1MiA0NS40OTEyLTQ1LjQxOTUyeiBtLTEwLjc3MjQ4IDQxLjI5MjhoLTE3Ny45NzEyYTQuMTMxODQgNC4xMzE4NCAwIDAgMC00LjEzMTg0IDQuMTI2NzJ2NDIxLjE2MDk2YzAgMi4yNzg0IDEuODUzNDQgNC4xMjY3MiA0LjEzNjk2IDQuMTI2NzJoNDQ2LjYxNzZhNC4xMzE4NCA0LjEzMTg0IDAgMCAwIDQuMTM2OTYtNC4xMjY3MlYzODguMTI2NzJhNC4xMzE4NCA0LjEzMTg0IDAgMCAwLTQuMTM2OTYtNC4xMjY3MmgtMTk3LjEwNDY0YTIwLjY4NDggMjAuNjg0OCAwIDAgMS0xNi45MzY5Ni04LjgwNjRMNDY5LjIxNzI4IDI5Ny4yOTI4ek01NTUuOTYwMzIgNDE5LjhjMTMuNzIxNiAwIDI0LjgzNzEyIDExLjA0Mzg0IDI0LjgzNzEyIDI0LjY2ODE2djkwLjQ1NTA0aDUzLjgyMTQ0YzE4LjMxOTM2IDAgMjcuNDc5MDQgMjEuNzk1ODQgMTUuMDAxNiAzNC43Mjg5NmwtMC42MjQ2NCAwLjYxNDQtMTIwLjA1ODg4IDExNS4xMjMyYTIwLjgwMjU2IDIwLjgwMjU2IDAgMCAxLTI4Ljc1MzkyIDBsLTEyMC4wNjQtMTE1LjExODA4Yy0xMy4zODg4LTEyLjg0NjA4LTQuMjM0MjQtMzUuMzQ4NDggMTQuMzgyMDgtMzUuMzQ4NDhsNTMuODIxNDQtMC4wMDUxMlY0NDQuNTA4MTZjMC0xMy4zMTIgMTAuNjE4ODgtMjQuMTY2NCAyMy45MTA0LTI0LjY1MjhsMC45MjY3Mi0wLjAxNTM2WiBtLTE2LjU1ODA4IDQxLjExMzZoLTQ5LjY4NDQ4djEwMC4wOHY4MC44OGMwIDExLjA0ODk2LTguNzgwOCAyMC4wNzA0LTE5Ljc5OTA0IDIwLjUzMTJsLTAuODk2IDAuMDIwNDhoLTIzLjI5MDg4bDY4LjgyODE2IDY1Ljk5MTY4IDY4LjgxMjgtNjUuOTg2NTZoLTIzLjI3NTUyYy0xMS4xMzA4OCAwLTIwLjIwODY0LTguNzI0NDgtMjAuNjc5NjgtMTkuNjYwOGwtMC4wMTUzNi0wLjg5NlY0NjAuOTUzNnogIiBmaWxsPSIjRkZGRkZGIiBwLWlkPSIyMDIxOCI+PC9wYXRoPjwvc3ZnPg=="
+              width: 26
+              height: 26
+              x: 10
+              y: 6
+              cursor: move
+            tag:
+              display: none
+              xlink:href: "data:image/svg+xml;base64,PHN2ZyB0PSIxNjk5OTQ5NjIxODI2IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDE0NDEgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjEyNzA2IiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PHBhdGggZD0iTTAgMGg4NDYuMzkyODg5TDE0NDEuMTg1MTg1IDQyNi42NjY2NjdWMTAyNHoiIGZpbGw9IiNDRkNGRjYiIHAtaWQ9IjEyNzA3Ij48L3BhdGg+PHBhdGggZD0iTTY4MS45NDYwNzQgNDguODQ4NTkzbC04LjgzNjc0MSAxMi4xMzYyOTYtMjAuNTkzNzc3LTE0Ljk4MDc0MS0xMy4xMjIzNzEgMTguMDUyNzQxIDIwLjYzMTcwNCAxNC45ODA3NDEtNy4yMDU5MjYgOS45MzY1OTIgMTguMDE0ODE1IDEzLjEyMjM3MSA3LjIwNTkyNi05LjkzNjU5MyAyMC44MjEzMzMgMTUuMDk0NTE5LTkuMjUzOTI2IDEyLjcwNTE4NSAxOC4wNTI3NDEgMTMuMTIyMzcgOS4yNTM5MjYtMTIuNzA1MTg1IDE4LjIwNDQ0NCAxMy4yMzYxNDggMTMuMTIyMzcxLTE4LjA1Mjc0MS0xOC4yMDQ0NDUtMTMuMjM2MTQ4IDguOTEyNTkzLTEyLjMyNTkyNi0xOC4wMTQ4MTUtMTMuMTIyMzctOC45ODg0NDUgMTIuMzI1OTI2LTIwLjc4MzQwNy0xNS4wOTQ1MTkgOC44MzY3NDEtMTIuMTM2Mjk2LTE4LjA1Mjc0MS0xMy4xMjIzN3pNNjAxLjg4NDQ0NCAxMzUuNzc0ODE1bC0zMS40NDA1OTIgNDMuMjM1NTU1IDQ4LjQzMTQwNyAzNS4xOTUyNiA0MC45MjIwNzQtNTYuMzItMzguODM2MTQ4LTI4LjIxNjg4OWM1LjQ5OTI1OS0yLjE5OTcwNCAxMC45OTg1MTktNC43MDI4MTUgMTYuODM5MTExLTcuNzM2ODg5bDQyLjg5NDIyMyAzMS4xNzUxMTFjLTI4Ljk3NTQwNyAzOS4xMzk1NTYtNDYuMzgzNDA3IDYxLjkzMzAzNy01Mi4zMzc3NzggNjcuNzM1NzA0LTcuNTA5MzMzIDguMDQwMjk2LTE0LjcxNTI1OSA5Ljg2MDc0MS0yMC45NzMwMzcgNS4zMDk2MjlhMzQyLjYyMjgxNSAzNDIuNjIyODE1IDAgMCAxLTE4Ljg0OTE4NS0xNS4xMzI0NDRsLTguMDAyMzcxIDIwLjMyODI5NmM4LjA3ODIyMiA2LjcxMjg4OSAxMy44ODA4ODkgMTEuNDkxNTU2IDE3LjM3MDA3NCAxNC4wMzI1OTMgMTUuMjg0MTQ4IDExLjExMjI5NiAyOS4yNzg4MTUgMTAuMDUwMzcgNDEuNTY2ODE1LTIuOTk2MTQ4IDguNDk1NDA3LTguOTg4NDQ0IDI2LjYyNC0zMi4zODg3NDEgNTQuNDIzNzA0LTY5Ljg1OTU1NmwwLjk4NjA3NCAyMS44MDc0MDdhMTY4LjAxMTg1MiAxNjguMDExODUyIDAgMCAwIDE2LjYxMTU1NS03LjMxOTcwMyAzMTYuMDM2NzQxIDMxNi4wMzY3NDEgMCAwIDAtMTUuNTQ5NjI5IDUzLjA5NjI5NiAxMjMuMjU5MjU5IDEyMy4yNTkyNTkgMCAwIDEtNTguNTU3NjMgMTEuNzU3MDM3bC0xLjcwNjY2NyAyNC4zNDg0NDVjMTkuNDE4MDc0IDAgMzguMjI5MzMzLTMuNDEzMzMzIDU2LjY5OTI2LTEwLjI0LTEuNjY4NzQxIDE5LjMwNDI5Ni0wLjM0MTMzMyAzNi44MjYwNzQgNC40MzczMzMgNTIuNzE3MDM3bDIzLjU4OTkyNi04LjQ5NTQwOC01LjQ5OTI1OS0xNi4zODQtNy4yNDM4NTItMzQuNTEyNTkzLTUuMzA5NjMtNTQuOTkyNTkyIDI0Ljg0MTQ4MS0xNC4wMzI1OTMgNDguMTY1OTI2LTM1LjM0Njk2MyA3MC41NDIyMjMtNjQuMTMyNzQxbDkuNzQ2OTYzIDcuMDkyMTQ4IDEzLjUwMTYyOS0xOC41ODM3MDQtNDMuMjczNDgxLTMxLjQ3ODUxOGM2LjgyNjY2Ny02LjI1Nzc3OCAxMy44ODA4ODktMTMuMjc0MDc0IDIxLjE2MjY2Ni0yMC41OTM3NzhsLTE2LjE5NDM3LTE2LjgzOTExMWMtMjYuMjgyNjY3IDI4LjQ0NDQ0NC01MS4xMjQxNDggNDguMzU1NTU2LTc1LjA5MzMzMyA1OS42NTc0ODFsMTUuOTI4ODg5LTIxLjkyMTE4NS01My4wMjA0NDUtMzguNTMyNzQxYzEuODk2Mjk2LTEuMTM3Nzc4IDMuNjc4ODE1LTIuMzUxNDA3IDUuNzY0NzQxLTMuNjc4ODE0bC0xNS4yODQxNDgtMTcuMjk0MjIzLTE4LjU4MzcwNCAxMi40MDE3NzgtMzUuMjcxMTExIDIwLjI1MjQ0NC01MC4wNjIyMjMgMjMuNTUybDEuNjY4NzQxIDIzLjcwMzcwNGMwLjI2NTQ4MS0wLjM3OTI1OSAwLjc1ODUxOS0wLjI2NTQ4MSAxLjQwMzI1OS0wLjM3OTI1OXogbTEyLjMyNTkyNiA1MC4wMjQyOTZsLTE1LjQ3Mzc3Ny0xMS4yMjYwNzQgMTcuNTIxNzc3LTI0LjEyMDg4OSAxNS40NzM3NzggMTEuMjI2MDc0LTE3LjUyMTc3OCAyNC4xMjA4ODl6IG0xNTMuOTAzNDA4LTcuNDMzNDgxYTI0NC42MjIyMjIgMjQ0LjYyMjIyMiAwIDAgMS00OC4wMTQyMjIgNDcuNTIxMTg1YzQuMzYxNDgxLTE3LjYzNTU1NiAxMC45OTg1MTktMzYuNDQ2ODE1IDIwLjE3NjU5Mi01Ni44MTMwMzdsNy4zOTU1NTYtNS41NzUxMTEgMjAuNDggMTQuODY2OTYzek05NDcuMiAyNDAuNDUwMzdsLTcuMzU3NjMgMTAuMTI2MjIzLTQyLjMyNTMzMy0zMC43NTc5MjYtMTEuMjI2MDc0IDE1LjQzNTg1MiA0Mi4zMjUzMzMgMzAuNzk1ODUxLTUuNjEzMDM3IDcuNjk4OTYzLTM0LjYyNjM3LTI1LjE0NDg4OS0xMC45NjA1OTMgMTUuMDk0NTE5IDM0LjYyNjM3MSAyNS4xNDQ4ODktNS43NjQ3NDEgNy45NjQ0NDQtNDcuNDgzMjU5LTM0LjUxMjU5Mi0xMS41Mjk0ODIgMTUuODE1MTExIDExNC4xNTcwMzcgODIuOTA2MDc0IDExLjQ5MTU1Ni0xNS44MTUxMTEtNDguMDUyMTQ4LTM0Ljg5MTg1MiA1Ljc2NDc0LTcuOTY0NDQ1IDM3LjE2NzQwOCAyNy4wNDExODYgMTAuOTk4NTE4LTE1LjA5NDUxOS0zNy4xNjc0MDctMjcuMDAzMjU5IDUuNTc1MTExLTcuNzM2ODg5IDQzLjYxNDgxNSAzMS43MDYwNzQgMTEuMjY0LTE1LjQ3Mzc3OC00My42MTQ4MTUtMzEuNzA2MDc0IDcuMzU3NjMtMTAuMTI2MjIyLTE4LjU4MzcwNC0xMy41MDE2M3ogbS0xMDIuODkzMDM3IDEwNi4zODIyMjNsNTIuNjc5MTExIDM4LjI2NzI1OS02LjU2MTE4NSA4Ljk4ODQ0NC01Mi42NDExODUtMzguMjI5MzMzIDYuNTIzMjU5LTkuMDI2Mzd6IG02My4xMDg3NDEgMjMuODkzMzMzbC01Mi42NzkxMTEtMzguMjY3MjU5IDYuNzEyODg4LTkuMTc4MDc0IDUyLjY0MTE4NiAzOC4yMjkzMzMtNi42NzQ5NjMgOS4yMTZ6IG0tODAuMjEzMzM0LTAuMzQxMzMzbDUyLjY0MTE4NiAzOC4yNjcyNTktMy43NTQ2NjcgNS4xNTc5MjZjLTIuODA2NTE5IDMuODY4NDQ0LTUuOTE2NDQ0IDQuNjY0ODg5LTkuMjE2IDIuMjc1NTU1bC0xNC4wMzI1OTMtMTEuMzAxOTI2LTcuNTg1MTg1IDIwLjEwMDc0MSAxNS4zMjIwNzQgMTEuMTEyMjk2YzExLjk0NjY2NyA4LjY4NTAzNyAyMi40NTIxNDggNy4wMTYyOTYgMzAuOTg1NDgyLTQuNzc4NjY2bDUyLjE4NjA3NC03MS43OTM3NzgtODkuMTI1OTI2LTY0LjczOTU1Ni02NS45MTUyNTkgOTAuNzU2NzQxIDE4LjAxNDgxNCAxMy4xMjIzNzEgMjAuNDgtMjguMTc4OTYzek00NTUuMDk4NjY3IDM0Ni40OTMyNTlsLTIzLjA5Njg4OSAzLjE0Nzg1MWM2LjE0NCAxOS4wNzY3NDEgOS44NjA3NDEgMzUuMjcxMTExIDEwLjY1NzE4NSA0OC44MTA2NjdsMjIuOTA3MjU5LTMuNjAyOTYzYTI5OC41NTI4ODkgMjk4LjU1Mjg4OSAwIDAgMC0xMC40Mjk2MjktNDguMzU1NTU1eiBtLTY0LjYyNTc3OCAzNC4wMTk1NTVsLTEzLjM4Nzg1MiAxOC4zOTQwNzQgMjQuNTAwMTQ4IDE3LjgyNTE4NS00Ny4yMTc3NzcgNjQuOTY3MTExYTE2LjUzNTcwNCAxNi41MzU3MDQgMCAwIDEtMTIuMjg4IDYuODI2NjY3bC01LjM4NTQ4MiAyMi41MjhjMTguNDMyIDAuMTUxNzA0IDM3LjEyOTQ4MS0xLjEzNzc3OCA1Ni4wNTQ1MTktNC4wMjAxNDhsOS41NTczMzMtMjMuOTY5MTg1Yy04LjA3ODIyMiAxLjQ0MTE4NS0xNS44NTMwMzcgMi44MDY1MTktMjMuMzI0NDQ0IDMuODMwNTE4bDU0LjU3NTQwNy03NS4wOTMzMzMtNDMuMDgzODUyLTMxLjI4ODg4OXpNMTA0MC44MDExODUgMzA5Ljg1NDgxNWwtMTMuMzg3ODUyIDE4LjM5NDA3NC05LjM2NzcwMy02LjgyNjY2Ny0xMi45NzA2NjcgMTcuODYzMTExIDkuMzY3NzA0IDYuODI2NjY3LTUyLjI5OTg1MiA3MS45ODM0MDctMTEuMzc3Nzc4LTguMzA1Nzc3LTEzLjAwODU5MyAxNy44NjMxMTEgODguNTU3MDM3IDY0LjM2MDI5NiAxMi45NzA2NjctMTcuODYzMTExLTkuOTM2NTkyLTcuMjA1OTI2IDUyLjI5OTg1MS03Mi4wMjEzMzMgOS4wMjYzNzEgNi41NjExODUgMTIuOTcwNjY2LTE3LjgyNTE4NS05LjAyNjM3LTYuNTk5MTExIDEzLjEyMjM3LTE4LjAxNDgxNS0xOC40MzItMTMuMzg3ODUyLTEzLjA4NDQ0NCAxOC4wNTI3NDEtMzAuMzc4NjY3LTIyLjA3Mjg4OSAxMy4zNDk5MjYtMTguNDMyLTE4LjM5NDA3NC0xMy4zNDk5MjZ6IG0tNjAuMjI2MzcgMTIxLjYyODQ0NGw5LjIxNi0xMi43MDUxODUgMzAuMzQwNzQxIDIyLjA3Mjg4OS05LjE3ODA3NSAxMi43MDUxODUtMzAuMzc4NjY2LTIyLjA3Mjg4OXogbTgyLjY3ODUxOC00OS45MTA1MThsLTkuMzY3NzAzIDEyLjg5NDgxNS0zMC4zNzg2NjctMjIuMTEwODE1IDkuMzY3NzA0LTEyLjg5NDgxNSAzMC4zNDA3NCAyMi4xMTA4MTV6IG0tNjEuMjg4Mjk2IDIwLjQ0MjA3NGw5LjM2NzcwNC0xMi44OTQ4MTUgMzAuMzQwNzQgMjIuMDcyODg5LTkuMzI5Nzc3IDEyLjg5NDgxNS0zMC4zNzg2NjctMjIuMDcyODg5eiBtLTIuMjM3NjMgNzIuMzYyNjY2bC0yMS43MzE1NTUtMS40NDExODVjLTAuMjY1NDgxIDE2LjY4NzQwNy0xLjI1MTU1NiAzMS4xMzcxODUtMy4yNjE2MyA0My4xOTc2M2wxNi42ODc0MDggMC4zMDM0MDcgNC41ODkwMzcgMjEuODgzMjZjMjMuNjI3ODUyLTcuMzE5NzA0IDQ1LjU0OTAzNy0yMS45OTcwMzcgNjUuODM5NDA3LTQ0LjE0NTc3OGwyOS40Njg0NDUgMjEuNDI4MTQ4LTIzLjAyMTAzOCAzMS42MzAyMjJjLTMuNjAyOTYzIDUuMDA2MjIyLTcuMzE5NzA0IDYuMjE5ODUyLTEwLjk5ODUxOCAzLjU2NTAzN2EyNzYuMjE0NTE5IDI3Ni4yMTQ1MTkgMCAwIDEtMTcuNTU5NzA0LTE0LjE4NDI5NmwtOC40OTU0MDcgMjIuNTI4IDE5LjE1MjU5MiAxMy45MTg4MTVjMTIuNTE1NTU2IDkuMTAyMjIyIDIzLjMyNDQ0NCA3LjM5NTU1NiAzMi4xNjExODYtNC43Nzg2NjdsMTA1LjEzMDY2Ni0xNDQuNjg3NDA3LTY2LjgyNTQ4MS00OC41NDUxODYtNjQuNDc0MDc0IDg4Ljc0NjY2N2MtMTYuNzYzMjU5IDIyLjY3OTcwNC0zNS44MDIwNzQgMzguMzgxMDM3LTU3LjE5MjI5NyA0Ny4zMzE1NTYgMC44NzIyOTYtMTAuMDg4Mjk2IDEuMDI0LTIyLjMzODM3IDAuNTMwOTYzLTM2Ljc4ODE0OHogbS00MS45ODQtMjkuNjk2YTE1My45MDM0MDcgMTUzLjkwMzQwNyAwIDAgMS00NS4wOTM5MjYgMTMuNjUzMzM0bDcuNDMzNDgyIDIyLjMwMDQ0NGExODYuMjE2Mjk2IDE4Ni4yMTYyOTYgMCAwIDAgNDcuNTk3MDM3LTE3LjQ0NTkyNmwtOS45MzY1OTMtMTguNTA3ODUyek01MzYuOTg1MTg1IDM3OC44MjQ1OTNsMjguMzY4NTkzIDIwLjU5Mzc3OC0xOS4yNjYzNyAyNi41NDgxNDgtMjguMzY4NTkzLTIwLjYzMTcwNCAxOS4yNjYzNy0yNi41MTAyMjJ6IG00MS4wNzM3NzggMy4xMDk5MjZsLTI4LjM2ODU5Mi0yMC41OTM3NzggMTkuMjY2MzctMjYuNTEwMjIyIDI4LjMzMDY2NyAyMC41OTM3NzgtMTkuMjI4NDQ1IDI2LjU0ODE0OHpNMTI0OC45MDA3NDEgNDU3LjM4NjY2N2MtMjAuMzI4Mjk2IDExLjM3Nzc3OC00My4zMTE0MDcgMTcuNDQ1OTI2LTY4Ljc5NzYzIDE4LjA5MDY2NmwtNy42OTg5NjMgMjIuNTI4YzM0LjUxMjU5My0wLjIyNzU1NiA2My40MTIxNDgtNy4wOTIxNDggODcuMzA1NDgyLTIwLjY2OTYyOWwtMTAuODA4ODg5LTE5Ljk0OTAzN3ogbS0yNC4yNzI1OTMgNDcuMzMxNTU1YTE3OC42MzExMTEgMTc4LjYzMTExMSAwIDAgMS03OS43OTYxNDggMjIuNzU1NTU2bC03LjU0NzI1OSAyMi4zNzYyOTZjOS44NjA3NDEtMC40MTcxODUgMTkuNzIxNDgxLTEuMTM3Nzc4IDI5LjI3ODgxNS0yLjM1MTQwN2wtNTIuNzE3MDM3IDcyLjUxNDM3IDE4LjYyMTYyOSAxMy41MDE2MyA2OC4wNzcwMzctOTMuNjc3MDM3YzEyLjQwMTc3OC0zLjk0NDI5NiAyNC4xMjA4ODktOS4yMTYgMzQuODkxODUyLTE1LjQ3Mzc3OGwtMTAuODA4ODg5LTE5LjY0NTYzek05ODQuMDM2Mjk2IDUzMC4wODc4NTJsLTEzLjEyMjM3MSAxOC4wNTI3NDEtMzguODM2MTQ4LTI4LjIxNjg4OS0xMi43MDUxODUgMTcuNDQ1OTI2IDM4LjgzNjE0OCAyOC4yNTQ4MTQtMTIuNzA1MTg1IDE3LjQ4Mzg1Mi00NS41MTExMTEtMzIuOTk1NTU1LTEyLjgxODk2MyAxNy42MzU1NTUgMTEwLjgxOTU1NiA4MC41MTY3NDEgMTIuODU2ODg4LTE3LjY3MzQ4MS00Ni43NjI2NjYtMzMuOTgxNjMgMTIuNzA1MTg1LTE3LjQ0NTkyNiAzOS4yMTU0MDcgMjguNDQ0NDQ0IDEyLjcwNTE4Ni0xNy40NDU5MjYtMzkuMjE1NDA4LTI4LjUyMDI5NiAxMy4xMjIzNy0xOC4wNTI3NDEtMTguNTgzNzAzLTEzLjUwMTYyOXogbS0xMDguNjE5ODUyIDU0Ljk5MjU5MmwtMTIuOTcwNjY3IDE3Ljg2MzExMiA2OS4yMTQ4MTUgNTAuMjg5Nzc3LTI3LjAwMzI1OSAzNy4xNjc0MDhjLTQuMjg1NjMgNS45MTY0NDQtOS4zMjk3NzggNy4wNTQyMjItMTQuODI5MDM3IDMuMDM0MDc0YTM0MC4wNDM4NTIgMzQwLjA0Mzg1MiAwIDAgMS0yMi45NDUxODUtMTguMzU2MTQ4bC04LjgzNjc0MSAyMS40MjgxNDggMjYuMTY4ODg5IDE4Ljk2Mjk2M2MxMy42MTU0MDcgOS45MzY1OTMgMjUuNzg5NjMgNy44MTI3NDEgMzYuMTA1NDgxLTYuMzMzNjNsMzAuNDkyNDQ1LTQxLjk4NCAxOS4zNDIyMjIgMTQuMDMyNTkzIDEyLjk3MDY2Ny0xNy44MjUxODUtMTkuMzQyMjIzLTE0LjAzMjU5MyA4LjQ1NzQ4Mi0xMS42NDMyNTktMTkuMTUyNTkzLTEzLjkxODgxNS04LjQxOTU1NSAxMS42MDUzMzMtNjkuMjUyNzQxLTUwLjI4OTc3OHogbTkuMjE2IDM5LjU5NDY2N2wtMjEuNzMxNTU2LTEuNDQxMTg1YzIuMTk5NzA0IDE3LjA2NjY2NyAzLjI2MTYzIDMxLjg5NTcwNCAyLjk1ODIyMyA0NC4zNzMzMzNsMjIuNTI4IDAuMzAzNDA4YTI0OC40MTQ4MTUgMjQ4LjQxNDgxNSAwIDAgMC0zLjc1NDY2Ny00My4yMzU1NTZ6IiBmaWxsPSIjNzE3N0ZDIiBwLWlkPSIxMjcwOCI+PC9wYXRoPjwvc3ZnPg=="
+              width: 35
+              height: 35
+              x: 89
+              y: -5
+              cursor: move
+          visible: true
+          shape: rect
+          id: 32b7be336dd89a4f5def6bc681f36a3a
+          markup:
+            - tagName: rect
+              selector: body
+            - tagName: text
+              selector: label
+            - tagName: image
+              selector: icon
+            - tagName: image
+              selector: tag
+          ports:
+            groups:
+              top:
+                position: top
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+              right:
+                position: right
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+              bottom:
+                position: bottom
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+              left:
+                position: left
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+            items:
+              - group: top
+                id: 6260ca66340df25b42e5ac8177bb2f83
+                attrs:
+                  circle:
+                    style:
+                      visibility: hidden
+              - group: right
+                id: 113af31adcbb85f6d34c2357c13db8bc
+                attrs:
+                  circle:
+                    style:
+                      visibility: hidden
+              - group: bottom
+                id: a0f0633b56a1f64201421774278485fa
+                attrs:
+                  circle:
+                    style:
+                      visibility: hidden
+              - group: left
+                id: c073b3ff6c18f9693f5903d2034c3f05
+                attrs:
+                  circle:
+                    style:
+                      visibility: hidden
+          data:
+            nodeId: 32b7be336dd89a4f5def6bc681f36a3a
+            nodeType: StartManual
+            nodeName: 通用触发
+            iconCode: iconkaishi-graph
+            isOpen: true
+            isSelected: false
+            isVerificationPassed: true
+          zIndex: 1
+          tools:
+            items: []
+            name: null
+        - position:
+            x: 690
+            y: 320
+          size:
+            width: 160
+            height: 38
+          attrs:
+            body:
+              strokeWidth: 1
+              stroke: "#E9E9E9"
+              fill: "#FFFFFF"
+              rx: 19
+              ry: 19
+              cursor: move
+              filter:
+                name: dropShadow
+                args:
+                  color: "#4943a3"
+                  dx: 0
+                  dy: 0
+                  blur: 4
+                  opacity: 0.4
+            label:
+              text: 结束
+              fontSize: 13
+              fill: "#333"
+              textWrap:
+                width: 104
+                ellipsis: true
+              x: -34
+              textAnchor: start
+              cursor: move
+            icon:
+              xlink:href: "data:image/svg+xml;base64,PHN2ZyB0PSIxNzAwMDIwMjE4NjA5IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjEzMzI2IiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PHBhdGggZD0iTTUxMiA1MTJtLTUxMiAwYTUxMiA1MTIgMCAxIDAgMTAyNCAwIDUxMiA1MTIgMCAxIDAtMTAyNCAwWiIgZmlsbD0iI0E2QUZCQyIgcC1pZD0iMTMzMjciPjwvcGF0aD48cGF0aCBkPSJNNjYwLjgzNDQ2MiAyNzUuMTAxNTM4YTI5OC41MzUzODUgMjk4LjUzNTM4NSAwIDAgMSA3NC40MzY5MjMgNjAuMjE5MDc3IDI5MS4yMDk4NDYgMjkxLjIwOTg0NiAwIDAgMSA3NC41NTUwNzcgMTk0Ljc1NjkyM2MwIDE2Mi41Nzk2OTItMTMzLjM5NTY5MiAyOTQuMjgxODQ2LTI5Ny44MjY0NjIgMjk0LjI4MTg0Ny0xNjQuNDMwNzY5IDAtMjk3Ljg2NTg0Ni0xMzEuNzAyMTU0LTI5Ny44NjU4NDYtMjk0LjI4MTg0NyAwLTcyLjc0MzM4NSAyNi44NjAzMDgtMTQxLjM5MDc2OSA3NC41OTQ0NjEtMTk0Ljc1NjkyM2EyOTguMTQxNTM4IDI5OC4xNDE1MzggMCAwIDEgNzQuNDM2OTIzLTYwLjIxOTA3NyAyMi4xMzQxNTQgMjIuMTM0MTU0IDAgMSAxIDIxLjk3NjYxNiAzOC40Nzg3NyAyNTQuMjY3MDc3IDI1NC4yNjcwNzcgMCAwIDAtNjMuNDA5MjMxIDUxLjIzOTM4NCAyNDYuOTAyMjE1IDI0Ni45MDIyMTUgMCAwIDAtNjMuMjkxMDc3IDE2NS4yNTc4NDZjMCAxMzguMDAzNjkyIDExMy40NjcwNzcgMjQ5Ljk3NDE1NCAyNTMuNTU4MTU0IDI0OS45NzQxNTRzMjUzLjUxODc2OS0xMTEuOTcwNDYyIDI1My41MTg3NjktMjQ5Ljk3NDE1NGEyNDYuOTAyMjE1IDI0Ni45MDIyMTUgMCAwIDAtNjMuMjUxNjkyLTE2NS4yNTc4NDYgMjUzLjgzMzg0NiAyNTMuODMzODQ2IDAgMCAwLTYzLjQwOTIzMS01MS4yIDIyLjE3MzUzOCAyMi4xNzM1MzggMCAwIDEgMjEuOTc2NjE2LTM4LjUxODE1NHpNNTEyIDIxNC4xMzQxNTRjMTIuMjA5MjMxIDAgMjIuMTM0MTU0IDkuOTI0OTIzIDIyLjEzNDE1NCAyMi4xNzM1Mzh2MjkwLjE4NTg0NmEyMi4xNzM1MzggMjIuMTczNTM4IDAgMCAxLTQ0LjMwNzY5MiAwVjIzNi4zMDc2OTJjMC0xMi4yMDkyMzEgOS45MjQ5MjMtMjIuMTczNTM4IDIyLjE3MzUzOC0yMi4xNzM1Mzh6IiBmaWxsPSIjRkZGRkZGIiBwLWlkPSIxMzMyOCI+PC9wYXRoPjwvc3ZnPg=="
+              width: 26
+              height: 26
+              x: 10
+              y: 6
+              cursor: move
+            tag:
+              display: none
+              xlink:href: "data:image/svg+xml;base64,PHN2ZyB0PSIxNjk5OTQ5NjIxODI2IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDE0NDEgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjEyNzA2IiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PHBhdGggZD0iTTAgMGg4NDYuMzkyODg5TDE0NDEuMTg1MTg1IDQyNi42NjY2NjdWMTAyNHoiIGZpbGw9IiNDRkNGRjYiIHAtaWQ9IjEyNzA3Ij48L3BhdGg+PHBhdGggZD0iTTY4MS45NDYwNzQgNDguODQ4NTkzbC04LjgzNjc0MSAxMi4xMzYyOTYtMjAuNTkzNzc3LTE0Ljk4MDc0MS0xMy4xMjIzNzEgMTguMDUyNzQxIDIwLjYzMTcwNCAxNC45ODA3NDEtNy4yMDU5MjYgOS45MzY1OTIgMTguMDE0ODE1IDEzLjEyMjM3MSA3LjIwNTkyNi05LjkzNjU5MyAyMC44MjEzMzMgMTUuMDk0NTE5LTkuMjUzOTI2IDEyLjcwNTE4NSAxOC4wNTI3NDEgMTMuMTIyMzcgOS4yNTM5MjYtMTIuNzA1MTg1IDE4LjIwNDQ0NCAxMy4yMzYxNDggMTMuMTIyMzcxLTE4LjA1Mjc0MS0xOC4yMDQ0NDUtMTMuMjM2MTQ4IDguOTEyNTkzLTEyLjMyNTkyNi0xOC4wMTQ4MTUtMTMuMTIyMzctOC45ODg0NDUgMTIuMzI1OTI2LTIwLjc4MzQwNy0xNS4wOTQ1MTkgOC44MzY3NDEtMTIuMTM2Mjk2LTE4LjA1Mjc0MS0xMy4xMjIzN3pNNjAxLjg4NDQ0NCAxMzUuNzc0ODE1bC0zMS40NDA1OTIgNDMuMjM1NTU1IDQ4LjQzMTQwNyAzNS4xOTUyNiA0MC45MjIwNzQtNTYuMzItMzguODM2MTQ4LTI4LjIxNjg4OWM1LjQ5OTI1OS0yLjE5OTcwNCAxMC45OTg1MTktNC43MDI4MTUgMTYuODM5MTExLTcuNzM2ODg5bDQyLjg5NDIyMyAzMS4xNzUxMTFjLTI4Ljk3NTQwNyAzOS4xMzk1NTYtNDYuMzgzNDA3IDYxLjkzMzAzNy01Mi4zMzc3NzggNjcuNzM1NzA0LTcuNTA5MzMzIDguMDQwMjk2LTE0LjcxNTI1OSA5Ljg2MDc0MS0yMC45NzMwMzcgNS4zMDk2MjlhMzQyLjYyMjgxNSAzNDIuNjIyODE1IDAgMCAxLTE4Ljg0OTE4NS0xNS4xMzI0NDRsLTguMDAyMzcxIDIwLjMyODI5NmM4LjA3ODIyMiA2LjcxMjg4OSAxMy44ODA4ODkgMTEuNDkxNTU2IDE3LjM3MDA3NCAxNC4wMzI1OTMgMTUuMjg0MTQ4IDExLjExMjI5NiAyOS4yNzg4MTUgMTAuMDUwMzcgNDEuNTY2ODE1LTIuOTk2MTQ4IDguNDk1NDA3LTguOTg4NDQ0IDI2LjYyNC0zMi4zODg3NDEgNTQuNDIzNzA0LTY5Ljg1OTU1NmwwLjk4NjA3NCAyMS44MDc0MDdhMTY4LjAxMTg1MiAxNjguMDExODUyIDAgMCAwIDE2LjYxMTU1NS03LjMxOTcwMyAzMTYuMDM2NzQxIDMxNi4wMzY3NDEgMCAwIDAtMTUuNTQ5NjI5IDUzLjA5NjI5NiAxMjMuMjU5MjU5IDEyMy4yNTkyNTkgMCAwIDEtNTguNTU3NjMgMTEuNzU3MDM3bC0xLjcwNjY2NyAyNC4zNDg0NDVjMTkuNDE4MDc0IDAgMzguMjI5MzMzLTMuNDEzMzMzIDU2LjY5OTI2LTEwLjI0LTEuNjY4NzQxIDE5LjMwNDI5Ni0wLjM0MTMzMyAzNi44MjYwNzQgNC40MzczMzMgNTIuNzE3MDM3bDIzLjA1OTQwNy04LjQ5NTQwOC01LjQ5OTI1OS0xNi4zODQtNy4yNDM4NTItMzQuNTEyNTkzLTUuMzA5NjMtNTQuOTkyNTkyIDI0Ljg0MTQ4MS0xNC4wMzI1OTMgNDguMTY1OTI2LTM1LjM0Njk2MyA3MC41NDIyMjMtNjQuMTMyNzQxbDkuNzQ2OTYzIDcuMDkyMTQ4IDEzLjUwMTYyOS0xOC41ODM3MDQtNDMuMjczNDgxLTMxLjQ3ODUxOGM2LjgyNjY2Ny02LjI1Nzc3OCAxMy44ODA4ODktMTMuMjc0MDc0IDIxLjE2MjY2Ni0yMC41OTM3NzhsLTE2LjE5NDM3LTE2LjgzOTExMWMtMjYuMjgyNjY3IDI4LjQ0NDQ0NC01MS4xMjQxNDggNDguMzU1NTU2LTc1LjA5MzMzMyA1OS42NTc0ODFsMTUuOTI4ODg5LTIxLjkyMTE4NS01My4wMjA0NDUtMzguNTMyNzQxYzEuODk2Mjk2LTEuMTM3Nzc4IDMuNjc4ODE1LTIuMzUxNDA3IDUuNzY0NzQxLTMuNjc4ODE0bC0xNS4yODQxNDgtMTcuMjk0MjIzLTE4LjU4MzcwNCAxMi40MDE3NzgtMzUuMjcxMTExIDIwLjI1MjQ0NC01MC4wNjIyMjMgMjMuNTUybDEuNjY4NzQxIDIzLjcwMzcwNGMwLjI2NTQ4MS0wLjM3OTI1OSAwLjc1ODUxOS0wLjI2NTQ4MSAxLjQwMzI1OS0wLjM3OTI1OXogbTEyLjMyNTkyNiA1MC4wMjQyOTZsLTE1LjQ3Mzc3Ny0xMS4yMjYwNzQgMTcuNTIxNzc3LTI0LjEyMDg4OSAxNS40NzM3NzggMTEuMjI2MDc0LTE3LjUyMTc3OCAyNC4xMjA4ODl6IG0xNTMuOTAzNDA4LTcuNDMzNDgxYTI0NC42MjIyMjIgMjQ0LjYyMjIyMiAwIDAgMS00OC4wMTQyMjIgNDcuNTIxMTg1YzQuMzYxNDgxLTE3LjYzNTU1NiAxMC45OTg1MTktMzYuNDQ2ODE1IDIwLjE3NjU5Mi01Ni44MTMwMzdsNy4zOTU1NTYtNS41NzUxMTEgMjAuNDggMTQuODY2OTYzek05NDcuMiAyNDAuNDUwMzdsLTcuMzU3NjMgMTAuMTI2MjIzLTQyLjMyNTMzMy0zMC43NTc5MjYtMTEuMjI2MDc0IDE1LjQzNTg1MiA0Mi4zMjUzMzMgMzAuNzk1ODUxLTUuNjEzMDM3IDcuNjk4OTYzLTM0LjYyNjM3LTI1LjE0NDg4OS0xMC45NjA1OTMgMTUuMDk0NTE5IDM0LjYyNjM3MSAyNS4xNDQ4ODktNS43NjQ3NDEgNy45NjQ0NDQtNDcuNDgzMjU5LTM0LjUxMjU5Mi0xMS41Mjk0ODIgMTUuODE1MTExIDExNC4xNTcwMzcgODIuOTA2MDc0IDExLjQ5MTU1Ni0xNS44MTUxMTEtNDguMDUyMTQ4LTM0Ljg5MTg1MiA1Ljc2NDc0LTcuOTY0NDQ1IDM3LjE2NzQwOCAyNy4wNDExODYgMTAuOTk4NTE4LTE1LjA5NDUxOS0zNy4xNjc0MDctMjcuMDAzMjU5IDUuNTc1MTExLTcuNzM2ODg5IDQzLjYxNDgxNSAzMS43MDYwNzQgMTEuMjY0LTE1LjQ3Mzc3OC00My42MTQ4MTUtMzEuNzA2MDc0IDcuMzU3NjMtMTAuMTI2MjIyLTE4LjU4MzcwNC0xMy41MDE2M3ogbS0xMDIuODkzMDM3IDEwNi4zODIyMjNsNTIuNjc5MTExIDM4LjI2NzI1OS02LjU2MTE4NSA4Ljk4ODQ0NC01Mi42NDExODUtMzguMjI5MzMzIDYuNTIzMjU5LTkuMDI2Mzd6IG02My4xMDg3NDEgMjMuODkzMzMzbC01Mi42NzkxMTEtMzguMjY3MjU5IDYuNzEyODg4LTkuMTc4MDc0IDUyLjY0MTE4NiAzOC4yMjkzMzMtNi42NzQ5NjMgOS4yMTZ6IG0tODAuMjEzMzM0LTAuMzQxMzMzbDUyLjY0MTE4NiAzOC4yNjcyNTktMy43NTQ2NjcgNS4xNTc5MjZjLTIuODA2NTE5IDMuODY4NDQ0LTUuOTE2NDQ0IDQuNjY0ODg5LTkuMjE2IDIuMjc1NTU1bC0xNC4wMzI1OTMtMTEuMzAxOTI2LTcuNTg1MTg1IDIwLjEwMDc0MSAxNS4zMjIwNzQgMTEuMTEyMjk2YzExLjk0NjY2NyA4LjY4NTAzNyAyMi40NTIxNDggNy4wMTYyOTYgMzAuOTg1NDgyLTQuNzc4NjY2bDUyLjE4NjA3NC03MS43OTM3NzgtODkuMTI1OTI2LTY0LjczOTU1Ni02NS45MTUyNTkgOTAuNzU2NzQxIDE4LjAxNDgxNCAxMy4xMjIzNzEgMjAuNDgtMjguMTc4OTYzek00NTUuMDk4NjY3IDM0Ni40OTMyNTlsLTIzLjA5Njg4OSAzLjE0Nzg1MWM2LjE0NCAxOS4wNzY3NDEgOS44NjA3NDEgMzUuMjcxMTExIDEwLjY1NzE4NSA0OC44MTA2NjdsMjIuOTA3MjU5LTMuNjAyOTYzYTI5OC41NTI4ODkgMjk4LjU1Mjg4OSAwIDAgMC0xMC40Mjk2MjktNDguMzU1NTU1eiBtLTY0LjYyNTc3OCAzNC4wMTk1NTVsLTEzLjM4Nzg1MiAxOC4zOTQwNzQgMjQuNTAwMTQ4IDE3LjgyNTE4NS00Ny4yMTc3NzcgNjQuOTY3MTExYTE2LjUzNTcwNCAxNi41MzU3MDQgMCAwIDEtMTIuMjg4IDYuODI2NjY3bC01LjM4NTQ4MiAyMi41MjhjMTguNDMyIDAuMTUxNzA0IDM3LjEyOTQ4MS0xLjEzNzc3OCA1Ni4wNTQ1MTktNC4wMjAxNDhsOS41NTczMzMtMjMuOTY5MTg1Yy04LjA3ODIyMiAxLjQ0MTE4NS0xNS44NTMwMzcgMi44MDY1MTktMjMuMzI0NDQ0IDMuODMwNTE4bDU0LjU3NTQwNy03NS4wOTMzMzMtNDMuMDgzODUyLTMxLjI4ODg4OXpNMTA0MC44MDExODUgMzA5Ljg1NDgxNWwtMTMuMzg3ODUyIDE4LjM5NDA3NC05LjM2NzcwMy02LjgyNjY2Ny0xMi45NzA2NjcgMTcuODYzMTExIDkuMzY3NzA0IDYuODI2NjY3LTUyLjI5OTg1MiA3MS45ODM0MDctMTEuMzc3Nzc4LTguMzA1Nzc3LTEzLjAwODU5MyAxNy44NjMxMTEgODguNTU3MDM3IDY0LjM2MDI5NiAxMi45NzA2NjctMTcuODYzMTExLTkuOTM2NTkyLTcuMjA1OTI2IDUyLjI5OTg1MS03Mi4wMjEzMzMgOS4wMjYzNzEgNi41NjExODUgMTIuOTcwNjY2LTE3LjgyNTE4NS05LjAyNjM3LTYuNTk5MTExIDEzLjEyMjM3LTE4LjAxNDgxNS0xOC40MzItMTMuMzg3ODUyLTEzLjA4NDQ0NCAxOC4wNTI3NDEtMzAuMzc4NjY3LTIyLjA3Mjg4OSAxMy4zNDk5MjYtMTguNDMyLTE4LjM5NDA3NC0xMy4zNDk5MjZ6IG0tNjAuMjI2MzcgMTIxLjYyODQ0NGw5LjIxNi0xMi43MDUxODUgMzAuMzQwNzQxIDIyLjA3Mjg4OS05LjE3ODA3NSAxMi43MDUxODUtMzAuMzc4NjY2LTIyLjA3Mjg4OXogbTgyLjY3ODUxOC00OS45MTA1MThsLTkuMzY3NzAzIDEyLjg5NDgxNS0zMC4zNzg2NjctMjIuMTEwODE1IDkuMzY3NzA0LTEyLjg5NDgxNSAzMC4zNDA3NCAyMi4xMTA4MTV6IG0tNjEuMjg4Mjk2IDIwLjQ0MjA3NGw5LjM2NzcwNC0xMi44OTQ4MTUgMzAuMzQwNzQgMjIuMDcyODg5LTkuMzI5Nzc3IDEyLjg5NDgxNS0zMC4zNzg2NjctMjIuMDcyODg5eiBtLTIuMjM3NjMgNzIuMzYyNjY2bC0yMS43MzE1NTUtMS40NDExODVjLTAuMjY1NDgxIDE2LjY4NzQwNy0xLjI1MTU1NiAzMS4xMzcxODUtMy4yNjE2MyA0My4xOTc2M2wxNi42ODc0MDggMC4zMDM0MDcgNC41ODkwMzcgMjEuODgzMjZjMjMuNjI3ODUyLTcuMzE5NzA0IDQ1LjU0OTAzNy0yMS45OTcwMzcgNjUuODM5NDA3LTQ0LjE0NTc3OGwyOS40Njg0NDUgMjEuNDI4MTQ4LTIzLjAyMTAzOCAzMS42MzAyMjJjLTMuNjAyOTYzIDUuMDA2MjIyLTcuMzE5NzA0IDYuMjE5ODUyLTEwLjk5ODUxOCAzLjU2NTAzN2EyNzYuMjE0NTE5IDI3Ni4yMTQ1MTkgMCAwIDEtMTcuNTU5NzA0LTE0LjE4NDI5NmwtOC40OTU0MDcgMjIuNTI4IDE5LjE1MjU5MiAxMy45MTg4MTVjMTIuNTE1NTU2IDkuMTAyMjIyIDIzLjMyNDQ0NCA3LjM5NTU1NiAzMi4xNjExODYtNC43Nzg2NjdsMTA1LjEzMDY2Ni0xNDQuNjg3NDA3LTY2LjgyNTQ4MS00OC41NDUxODYtNjQuNDc0MDc0IDg4Ljc0NjY2N2MtMTYuNzYzMjU5IDIyLjY3OTcwNC0zNS44MDIwNzQgMzguMzgxMDM3LTU3LjE5MjI5NyA0Ny4zMzE1NTYgMC44NzIyOTYtMTAuMDg4Mjk2IDEuMDI0LTIyLjMzODM3IDAuNTMwOTYzLTM2Ljc4ODE0OHogbS00MS45ODQtMjkuNjk2YTE1My45MDM0MDcgMTUzLjkwMzQwNyAwIDAgMS00NS4wOTM5MjYgMTMuNjUzMzM0bDcuNDMzNDgyIDIyLjMwMDQ0NGExODYuMjE2Mjk2IDE4Ni4yMTYyOTYgMCAwIDAgNDcuNTk3MDM3LTE3LjQ0NTkyNmwtOS45MzY1OTMtMTguNTA3ODUyek01MzYuOTg1MTg1IDM3OC44MjQ1OTNsMjguMzY4NTkzIDIwLjU5Mzc3OC0xOS4yNjYzNyAyNi41NDgxNDgtMjguMzY4NTkzLTIwLjYzMTcwNCAxOS4yNjYzNy0yNi41MTAyMjJ6IG00MS4wNzM3NzggMy4xMDk5MjZsLTI4LjM2ODU5Mi0yMC41OTM3NzggMTkuMjY2MzctMjYuNTEwMjIyIDI4LjMzMDY2NyAyMC41OTM3NzgtMTkuMjI4NDQ1IDI2LjU0ODE0OHpNMTI0OC45MDA3NDEgNDU3LjM4NjY2N2MtMjAuMzI4Mjk2IDExLjM3Nzc3OC00My4zMTE0MDcgMTcuNDQ1OTI2LTY4Ljc5NzYzIDE4LjA5MDY2NmwtNy42OTg5NjMgMjIuNTI4YzM0LjUxMjU5My0wLjIyNzU1NiA2My40MTIxNDgtNy4wOTIxNDggODcuMzA1NDgyLTIwLjY2OTYyOWwtMTAuODA4ODg5LTE5Ljk0OTAzN3ogbS0yNC4yNzI1OTMgNDcuMzMxNTU1YTE3OC42MzExMTEgMTc4LjYzMTExMSAwIDAgMS03OS43OTYxNDggMjIuNzU1NTU2bC03LjU0NzI1OSAyMi4zNzYyOTZjOS44NjA3NDEtMC40MTcxODUgMTkuNzIxNDgxLTEuMTM3Nzc4IDI5LjI3ODgxNS0yLjM1MTQwN2wtNTIuNzE3MDM3IDcyLjUxNDM3IDE4LjYyMTYyOSAxMy41MDE2MyA2OC4wNzcwMzctOTMuNjc3MDM3YzEyLjQwMTc3OC0zLjk0NDI5NiAyNC4xMjA4ODktOS4yMTYgMzQuODkxODUyLTE1LjQ3Mzc3OGwtMTAuODA4ODg5LTE5LjY0NTYzek05ODQuMDM2Mjk2IDUzMC4wODc4NTJsLTEzLjEyMjM3MSAxOC4wNTI3NDEtMzguODM2MTQ4LTI4LjIxNjg4OS0xMi43MDUxODUgMTcuNDQ1OTI2IDM4LjgzNjE0OCAyOC4yNTQ4MTQtMTIuNzA1MTg1IDE3LjQ4Mzg1Mi00NS41MTExMTEtMzIuOTk1NTU1LTEyLjgxODk2MyAxNy42MzU1NTUgMTEwLjgxOTU1NiA4MC41MTY3NDEgMTIuODU2ODg4LTE3LjY3MzQ4MS00Ni43NjI2NjYtMzMuOTgxNjMgMTIuNzA1MTg1LTE3LjQ0NTkyNiAzOS4yMTU0MDcgMjguNDQ0NDQ0IDEyLjcwNTE4Ni0xNy40NDU5MjYtMzkuMjE1NDA4LTI4LjUyMDI5NiAxMy4xMjIzNy0xOC4wNTI3NDEtMTguNTgzNzAzLTEzLjUwMTYyOXogbS0xMDguNjE5ODUyIDU0Ljk5MjU5MmwtMTIuOTcwNjY3IDE3Ljg2MzExMiA2OS4yMTQ4MTUgNTAuMjg5Nzc3LTI3LjAwMzI1OSAzNy4xNjc0MDhjLTQuMjg1NjMgNS45MTY0NDQtOS4zMjk3NzggNy4wNTQyMjItMTQuODI5MDM3IDMuMDM0MDc0YTM0MC4wNDM4NTIgMzQwLjA0Mzg1MiAwIDAgMS0yMi45NDUxODUtMTguMzU2MTQ4bC04LjgzNjc0MSAyMS40MjgxNDggMjYuMTY4ODg5IDE4Ljk2Mjk2M2MxMy42MTU0MDcgOS45MzY1OTMgMjUuNzg5NjMgNy44MTI3NDEgMzYuMTA1NDgxLTYuMzMzNjNsMzAuNDkyNDQ1LTQxLjk4NCAxOS4zNDIyMjIgMTQuMDMyNTkzIDEyLjk3MDY2Ny0xNy44MjUxODUtMTkuMzQyMjIzLTE0LjAzMjU5MyA4LjQ1NzQ4Mi0xMS42NDMyNTktMTkuMTUyNTkzLTEzLjkxODgxNS04LjQxOTU1NSAxMS42MDUzMzMtNjkuMjUyNzQxLTUwLjI4OTc3OHogbTkuMjE2IDM5LjU5NDY2N2wtMjEuNzMxNTU2LTEuNDQxMTg1YzIuMTk5NzA0IDE3LjA2NjY2NyAzLjI2MTYzIDMxLjg5NTcwNCAyLjk1ODIyMyA0NC4zNzMzMzNsMjIuNTI4IDAuMzAzNDA4YTI0OC40MTQ4MTUgMjQ4LjQxNDgxNSAwIDAgMC0zLjc1NDY2Ny00My4yMzU1NTZ6IiBmaWxsPSIjNzE3N0ZDIiBwLWlkPSIxMjcwOCI+PC9wYXRoPjwvc3ZnPg=="
+              width: 35
+              height: 35
+              x: 89
+              y: -5
+              cursor: move
+          visible: true
+          shape: rect
+          id: b6a48d1a88aa74fa2de93e04dfad5785
+          markup:
+            - tagName: rect
+              selector: body
+            - tagName: text
+              selector: label
+            - tagName: image
+              selector: icon
+            - tagName: image
+              selector: tag
+          ports:
+            groups:
+              top:
+                position: top
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+              right:
+                position: right
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+              bottom:
+                position: bottom
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+              left:
+                position: left
+                attrs:
+                  circle:
+                    r: 4
+                    magnet: true
+                    stroke: "#6A4CFF"
+                    strokeWidth: 1
+                    fill: "#fff"
+                    style:
+                      visibility: hidden
+            items:
+              - group: top
+                id: a9e819c701316b5e8eeea3808e675970
+              - group: right
+                id: b3a70fac7f7ac686ade777e1a5abf7f7
+              - group: bottom
+                id: fe6318fab0e44a8b1b80b378e51cfe93
+              - group: left
+                id: 9c68c47aff7accbf204727227bb704e4
+          data:
+            nodeId: b6a48d1a88aa74fa2de93e04dfad5785
+            nodeType: EndFlow
+            nodeName: 结束
+            iconCode: iconjieshu-graph
+            isOpen: true
+            isSelected: false
+            isVerificationPassed: true
+          zIndex: 3
+      links:
+        - shape: edge
+          attrs:
+            line:
+              stroke: "#A2B1C3"
+              strokeWidth: 1
+              targetMarker:
+                name: block
+                width: 6
+                height: 10
+          id: d1d967ac9b6a0be1d0b21c832ce30c07
+          connector:
+            name: rounded
+            args:
+              type: gap
+          router:
+            name: orth
+          source:
+            cell: 32b7be336dd89a4f5def6bc681f36a3a
+            port: a0f0633b56a1f64201421774278485fa
+          target:
+            cell: b6a48d1a88aa74fa2de93e04dfad5785
+            port: a9e819c701316b5e8eeea3808e675970
+          tools:
+            items:
+              - name: vertices
+          zIndex: 2
+    processConfig:
+      sourceName: 未命名
+      subjectRule: 未命名标题
+      projectName: 通用触发单一项目${{get_time()}}
+      nodes:
+        - id: StartNode_32b7be336dd89a4f5def6bc681f36a3a
+          type: StartNode
+          name: 通用触发
+          lang:
+            name:
+              zh_CN: 通用触发
+              zh_TW: 通用觸發
+              en_US: Universal triggering
+          _nodeId: 32b7be336dd89a4f5def6bc681f36a3a
+          _nodeType: StartManual
+        - id: EndNode_b6a48d1a88aa74fa2de93e04dfad5785
+          type: EndNode
+          name: 结束
+          lang:
+            name:
+              zh_CN: 结束
+              zh_TW: 結束
+              en_US: end
+          _nodeId: b6a48d1a88aa74fa2de93e04dfad5785
+          _nodeType: EndFlow
+          _isValidPassed:
+            base: true
+          _events:
+            - type: 0
+      links:
+        - id: d1d967ac9b6a0be1d0b21c832ce30c07
+          fromId: StartNode_32b7be336dd89a4f5def6bc681f36a3a
+          toId: EndNode_b6a48d1a88aa74fa2de93e04dfad5785
+    bindForm:
+      type: 0
+    lang:
+      sourceName:
+        zh_CN: 未命名
+        zh_TW: 未命名
+        en_US: Untitled
+      subjectRule:
+        zh_CN: 未命名标题
+        zh_TW: 未命名標題
+        en_US: Untitled title
+      processName:
+        zh_CN: 通用触发单一项目${{get_time()}}
+        zh_TW: 通用觸發單一專案${{get_time()}}
+        en_US: Universal triggering single project${{get_time()}}
+      projectName:
+        zh_CN: 通用触发单一项目${{get_time()}}
+        zh_TW: 通用觸發單一專案${{get_time()}}
+        en_US: Universal triggering single project${{get_time()}}
+    application: ${{app2_code()}}
+    engine: coze
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.projectCode
+      name: single_project_code
+
+
+# 复制单一通用触发项目
+process_CopySingleProject_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/process/copySingleProject
+  method: POST
+  detail: 复制单一通用触发项目
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    processId: $cache{single_project_code}
+    processName: "通用触发单一项目副本${{get_time()}}"
+    projectName: "通用触发单一项目副本${{get_time()}}"
+    projectCode: "PC_${{random_hexcode()}}"
+    lang:
+      processName:
+        zh_CN: "通用触发单一项目副本${{get_time()}}"
+        zh_TW: "通用觸發單一專案副本${{get_time()}}"
+        en_US: "Universal triggering single project copy${{get_time()}}"
+      projectName:
+        zh_CN: "通用触发单一项目副本${{get_time()}}"
+        zh_TW: "通用觸發單一專案副本${{get_time()}}"
+        en_US: "Universal triggering single project copy${{get_time()}}"
+    triggerType: page
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.processId
+      name: copied_single_project_code
+
+
+# 删除通用触发项目
+process_RemoveProcess_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/process/removeProcess
+  method: POST
+  detail: 删除通用触发项目
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    processId: $cache{single_project_code}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 删除复制通用触发项目
+process_RemoveCopiedProcess_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/process/removeProcess
+  method: POST
+  detail: 删除复制通用触发项目
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    processId: $cache{copied_single_project_code}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:

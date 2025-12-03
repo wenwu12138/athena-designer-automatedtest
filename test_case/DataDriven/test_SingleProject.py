@@ -16,18 +16,18 @@ import datetime
 import json
 
 
-case_id = ['model_testing_create_business_001', 'model_testing_query_business_001', 'dataView_queryDataViewContent_001', 'modelAssign_queryListV2_001', 'pageDesign_generateBlankPage_001', 'dataView_generateJustQueryPlan_001', 'dataView_coverageQueryPlan_001', 'dataView_queryDataViewByModel_001', 'pageDesign_generateTableWithQueryPlan_001', 'pageDesign_modelDefaultFields_001', 'modelDriver_modelAssign_update_001', 'resourceTree_queryRefreshList_001', 'businessDir_refreshResource_001', 'modulePublish_modelSingle_publish_001', 'operationRecord_get_001', 'dataEntry_modelSqlExport_001', 'model_testing_check_bindings_001', 'model_testing_cleanup_business_001']
+case_id = ['project_QuerySingleProjectList_001', 'process_UpsertSingleProject_001', 'process_CopySingleProject_001', 'process_RemoveProcess_001', 'process_RemoveCopiedProcess_001']
 TestData = GetTestCase.case_data(case_id)
 re_data = regular(str(TestData))
 
 
 @allure.epic("开发平台接口")
-@allure.feature("2.0应用详情")
-class TestModel:
+@allure.feature("驱动执行")
+class TestSingleproject:
 
-    @allure.story("业务搭建-模型")
+    @allure.story("单一项目")
     @pytest.mark.parametrize('in_data', eval(re_data), ids=[i['detail'] for i in TestData])
-    def test_Model(self, in_data, case_skip):
+    def test_SingleProject(self, in_data, case_skip):
         """
         :param :
         :return:
@@ -49,4 +49,4 @@ class TestModel:
 
 
 if __name__ == '__main__':
-    pytest.main(['test_test_Model.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])
+    pytest.main(['test_test_SingleProject.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])
