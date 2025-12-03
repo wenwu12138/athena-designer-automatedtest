@@ -26,6 +26,16 @@ class Context:
         Id = ''.join(random.choice(characters) for _ in range(length))
         return Id
 
+    @classmethod
+    def random_hexcode(cls):
+        """生成32位hex格式的随机代码（只包含0-9和a-f）"""
+        import random
+        # hex字符集：只包含0-9和a-f
+        hex_chars = '0123456789abcdef'
+        # 生成32位hex字符串
+        hex_code = ''.join(random.choice(hex_chars) for _ in range(32))
+        return hex_code
+
 
     @classmethod
     def random_int(cls) -> int:
@@ -175,6 +185,12 @@ class Context:
         from utils import config
         """获取app的host"""
         return config.TestApp_code
+
+    @classmethod
+    def Data_Code(cls) -> str:
+        from utils import config
+        """获取app的host"""
+        return config.Data_Code
 
 
 

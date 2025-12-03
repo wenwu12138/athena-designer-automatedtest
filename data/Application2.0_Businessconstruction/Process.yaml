@@ -1626,7 +1626,7 @@ businessFlow_CleanupProcess_001:
   headers:
     digi-middleware-auth-user: $cache{token}
   requestType: json
-  is_run: false
+  is_run: true
   data:
     type: "businessConstructor"
     businessCode: "$cache{business_flow_test_business_code}"

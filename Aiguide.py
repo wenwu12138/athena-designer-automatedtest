@@ -2,7 +2,7 @@
 学习自动化yaml用例格式，并且我会给你一些curl，帮我依照你学习的规范生成yaml用例
 
 有一些生成规范请注意一下：
-1.请求头中仅保留digi-middleware-auth-user， token，locale，并且igi-middleware-auth-user， token的value为$cache{token}
+1.请求头中仅保留digi-middleware-auth-user， token，adpversion,adpstatus,locale(本身curl里面有则生成否则不生成)，并且igi-middleware-auth-user， token的value为$cache{token}
 2.如果请求信息中存在application等应用code 替换成变量 ${{app2_code()}}
 3.如果存在新增/更新数据接口中存在name，descrition 等名称描述字段 尽量贴合用例描述 言简意赅 并且 拼接后缀${{get_time()}}。。接口数据都在data或headers下
 4.在明确结构的前提上，学会使用 current_request_set_cache 添加缓存已经缓存使用方法 当多个curl之间存在关联关系能自动将存在关联的接口使用缓存串联起来  需要根据明确结构生成缓存不可猜测 例如大部分curl是没有response的
@@ -12,7 +12,7 @@
 8.生成用例第一行存在备注 描述和备注结合入参和url生成，detail中不必说明具体数据 说明接口场景即可
 9.如果有用例数据 data 中存在id或code等唯一键  那么期望可以参照类似生成随机 Id actionId: "auto_action_${{random_id()}}"
 10.用例detail里面不用存在变量
-11.assert 暂时使用简略的code断言
+11.assert 暂时使用简略的code断言  完全参照已有即可
 
 
 

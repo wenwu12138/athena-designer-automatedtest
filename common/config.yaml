@@ -21,6 +21,7 @@ app_host:
 #app2_code: Ae3affbb64AT
 #app2_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFlM2FmZmJiNjRBVCIsInNpZCI6MH0.Y6TOeZ1he6Qgi3F2Xuqx2b6gbWUWH3YCF5bvZ_7q7zU
 #TestApp_code: "${{random_id()}}AT"
+#Data_Code: "${{random_id()}}"
 #
 
 
@@ -32,6 +33,7 @@ athena_deployer_host: https://aadc-test.apps.digiwincloud.com.cn
 iam_host: https://iam-test.digiwincloud.com.cn
 #用例配置
 TestApp_code: "${{random_id()}}AT"
+Data_Code: "${{random_hexcode()}}"
 app1_code: Aautotest1AT
 app1_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFhdXRvdGVzdDFBVCIsInNpZCI6MH0.x51q6SkRChvBOr1ca-iqzHU6SS_Mu2DqnrrJfFKO-7o
 app2_code: AautotestZAT

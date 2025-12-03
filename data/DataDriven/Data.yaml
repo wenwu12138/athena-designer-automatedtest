@@ -1,0 +1,365 @@
+# 公共参数
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 驱动执行
+  allureStory: 数据
+
+
+
+# 查询应用生效的ADP版本
+groupHistory_findAppEffectAdpVersion_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/groupHistory/findAppEffectAdpVersion
+  method: GET
+  detail: 查询应用生效的ADP版本
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data
+      name: EffectAdpVersion
+
+
+
+# 查询数据列表
+designer_GetDataList_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/task/getDataList
+  method: GET
+  detail: 查询数据列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    groupCode: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+
+# 新增数据描述和状态配置
+designer_SaveDataDescriptionAndState_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/data/saveDataDescriptionAndState
+  method: POST
+  detail: 新增数据描述和状态配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{EffectAdpVersion}
+    adpstatus: effect
+  requestType: json
+  is_run: true
+  data:
+    dataDescription:
+      code: "${{Data_Code()}}"
+      application: ${{app2_code()}}
+      name: "订单状态${{get_time()}}"
+      tenantId: "SYSTEM"
+      uniKeys:
+        - "automatedtesting_basis_id"
+      dataStruct:
+        name: "自动化测试_基础档${{get_time()}}"
+        key: "automatedtesting_basis"
+        dataType: "ARRAY"
+        componentType: "OBJECT"
+        fields:
+          - name: "自动化测试_基础档主键"
+            key: "automatedtesting_basis_id"
+            dataType: "LONG"
+          - name: "状态"
+            key: "manage_status"
+            dataType: "STRING"
+          - name: "租户sid"
+            key: "tenantsid"
+            dataType: "LONG"
+          - name: "租户Id"
+            key: "tenant_id"
+            dataType: "STRING"
+          - name: "创建者"
+            key: "create_by"
+            dataType: "STRING"
+          - name: "创建时间"
+            key: "create_date"
+            dataType: "DATE"
+          - name: "修改者"
+            key: "modified_by"
+            dataType: "STRING"
+          - name: "修改时间"
+            key: "modified_date"
+            dataType: "DATE"
+          - name: "创建者名称"
+            key: "creator_name"
+            dataType: "STRING"
+          - name: "修改者名称"
+            key: "modifier_name"
+            dataType: "STRING"
+    dataFeatures: [ ]
+    dataStates:
+      - dataCode: "${{Data_Code()}}"
+        code: "${{random_hexcode()}}"
+        name: "生效"
+        condition:
+          type: "script"
+          expression: ""
+        dataFeatureSets: [ ]
+        application: ${{app2_code()}}
+        tenantId: "SYSTEM"
+        variables: [ ]
+        lang: { }
+      - dataCode: "${{Data_Code()}}"
+        code: "${{random_hexcode()}}"
+        name: "失效"
+        condition:
+          type: "script"
+          expression: ""
+        dataFeatureSets: [ ]
+        application: ${{app2_code()}}
+        tenantId: "SYSTEM"
+        variables: [ ]
+        lang: { }
+      - dataCode: "${{Data_Code()}}"
+        code: "${{random_hexcode()}}"
+        name: "未生效"
+        condition:
+          type: "script"
+          expression: ""
+        dataFeatureSets: [ ]
+        application: ${{app2_code()}}
+        tenantId: "SYSTEM"
+        variables: [ ]
+        lang: { }
+    decision: [ ]
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.code
+      name: DataCode
+    - type: request
+      jsonpath: $.dataStates[0].code
+      name: EffectStateCode
+    - type: request
+      jsonpath: $.dataStates[1].code
+      name: InvalidStateCode
+    - type: request
+      jsonpath: $.dataStates[2].code
+      name: InactiveStateCode
+
+
+# 编辑数据描述和状态配置
+designer_SaveDataDescriptionAndState_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/data/saveDataDescriptionAndState
+  method: POST
+  detail: 编辑数据描述和状态配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{EffectAdpVersion}
+    adpstatus: effect
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    dataDescription:
+      code: $cache{DataCode}
+      application: ${{app2_code()}}
+      name: "订单状态编辑${{get_time()}}"
+      tenantId: SYSTEM
+      uniKeys:
+        - automatedtesting_basis_id
+      dataStruct:
+        name: "自动化测试_基础档编辑${{get_time()}}"
+        key: automatedtesting_basis
+        dataType: ARRAY
+        componentType: OBJECT
+        fields:
+          - name: "自动化测试_基础档主键"
+            key: automatedtesting_basis_id
+            dataType: LONG
+          - name: "状态"
+            key: manage_status
+            dataType: STRING
+          - name: "租户sid"
+            key: tenantsid
+            dataType: LONG
+          - name: "租户Id"
+            key: tenant_id
+            dataType: STRING
+          - name: "创建者"
+            key: create_by
+            dataType: STRING
+          - name: "创建时间"
+            key: create_date
+            dataType: DATE
+          - name: "修改者"
+            key: modified_by
+            dataType: STRING
+          - name: "修改时间"
+            key: modified_date
+            dataType: DATE
+          - name: "创建者名称"
+            key: creator_name
+            dataType: STRING
+          - name: "修改者名称"
+            key: modifier_name
+            dataType: STRING
+    dataFeatures: []
+    dataStates:
+      - createBy: wenwu@digiwin.com
+        createDate: "2025-12-03 10:00:16"
+        editBy: wenwu@digiwin.com
+        editDate: "2025-12-03 10:00:16"
+        lang: {}
+        application: ${{app2_code()}}
+        objectId: 692f99b0ac35737c624f2115
+        code: $cache{InactiveStateCode}
+        name: "未生效"
+        groupCode: ${{app2_code()}}
+        tenantId: SYSTEM
+        dataCode: $cache{DataCode}
+        priority: 0
+        condition:
+          type: script
+          expression: ""
+        dataFeatureSets: []
+        variables: []
+        adpStatus: effect
+        adpVersion: $cache{EffectAdpVersion}
+      - createBy: wenwu@digiwin.com
+        createDate: "2025-12-03 10:00:16"
+        editBy: wenwu@digiwin.com
+        editDate: "2025-12-03 10:00:16"
+        lang: {}
+        application: ${{app2_code()}}
+        objectId: 692f99b0ac35737c624f2114
+        code: $cache{InvalidStateCode}
+        name: "失效"
+        groupCode: ${{app2_code()}}
+        tenantId: SYSTEM
+        dataCode: $cache{DataCode}
+        priority: 0
+        condition:
+          type: script
+          expression: ""
+        dataFeatureSets: []
+        variables: []
+        adpStatus: effect
+        adpVersion: $cache{EffectAdpVersion}
+      - createBy: wenwu@digiwin.com
+        createDate: "2025-12-03 10:00:16"
+        editBy: wenwu@digiwin.com
+        editDate: "2025-12-03 10:00:16"
+        lang: {}
+        application: ${{app2_code()}}
+        objectId: 692f99b0ac35737c624f2113
+        code: $cache{EffectStateCode}
+        name: "生效"
+        groupCode: ${{app2_code()}}
+        tenantId: SYSTEM
+        dataCode: $cache{DataCode}
+        priority: 0
+        condition:
+          type: script
+          expression: ""
+        dataFeatureSets: []
+        variables: []
+        adpStatus: effect
+        adpVersion: $cache{EffectAdpVersion}
+    decision: []
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+
+# 查询数据修改历史记录
+Data_operationRecord_get_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/operationRecord/get
+  method: GET
+  detail: 查询数据修改历史记录
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    adpversion: $cache{EffectAdpVersion}
+    adpstatus: effect
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: true
+  data:
+    code: $cache{DataCode}
+    collection: dataState
+    appCode: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 删除数据描述配置
+designer_DeleteDataDescriptionByCode_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/data/deleteDataDescriptionByCode/$cache{DataCode}
+  method: GET
+  detail: 删除数据描述配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{EffectAdpVersion}
+    adpstatus: effect
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
