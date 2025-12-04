@@ -72,7 +72,7 @@ basis_CreateAuthTestApp_001:
   is_run: true
   data:
     application:
-      code: "${{TestApp_code()}}"
+      code: "$cache{TestApp_code}"
       name: "权限授权测试应用"
       description: "权限管理功能自动化测试专用应用"
       iconName: "1.png"
@@ -90,7 +90,7 @@ basis_CreateAuthTestApp_001:
           zh_CN: "权限管理功能自动化测试专用应用"
           zh_TW: "權限管理功能自動化測試專用應用"
           en_US: "Auto test application for auth management"
-    code: "${{TestApp_code()}}"
+    code: "$cache{TestApp_code}"
     name: "权限授权测试应用"
     description: "权限管理功能自动化测试专用应用"
     iconName: "1.png"
@@ -107,12 +107,6 @@ basis_CreateAuthTestApp_001:
       type: ==
       value: 0
       AssertType:
-  current_request_set_cache:
-    # request是从请求中提取内容，  response是从详情中提取需求
-    - type: request
-      jsonpath: $.code
-      # 自定义缓存名称
-      name: TestApp_code
 
 
 # 用户申请应用权限

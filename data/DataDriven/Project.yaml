@@ -50,7 +50,7 @@ project_AddProjectData_001:
   is_run: true
   data:
     dataDescription:
-      code: "${{Project_Data_Code()}}"
+      code: "$cache{Project_Data_Code}"
       application: ${{app2_code()}}
       name: "项目数据${{get_time()}}"
       tenantId: "SYSTEM"
@@ -73,7 +73,7 @@ project_AddProjectData_001:
             dataType: "STRING"
     dataFeatures: []
     dataStates:
-      - dataCode: "${{Project_Data_Code()}}"
+      - dataCode: "$cache{Project_Data_Code}"
         code: "${{random_hexcode()}}"
         name: "生效"
         condition:
@@ -84,7 +84,7 @@ project_AddProjectData_001:
         tenantId: "SYSTEM"
         variables: []
         lang: {}
-      - dataCode: "${{Project_Data_Code()}}"
+      - dataCode: "$cache{Project_Data_Code}"
         code: "${{random_hexcode()}}"
         name: "失效"
         condition:

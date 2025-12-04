@@ -71,13 +71,32 @@ def get_iam_token():
 
     }
     # 正式区就要用lcdp这个租户验证  只有这个租户能发微软正式
-    if '正式' in config.env:
-        data['tenantId'] = 'lcdp'
+    # if '正式' in config.env:
+    #     data['tenantId'] = 'lcdp'
     url = regular(str(url))
     res = requests.post(url=url, json=data, headers=headers)
     response_data = res.json()
     token = response_data["token"]
     CacheHandler.update_cache(cache_name='token', value=token)
+
+
+
+## 需要前置生成的测试数据
+@pytest.fixture(scope="session", autouse=True)
+def pretest_data():
+    testdata = {
+        "TestApp_code": "${{random_id()}}AT",
+        "Data_Code": "${{random_hexcode()}}",
+        "Project_Data_Code": "${{random_hexcode()}}"
+    }
+    for k, v in testdata.items():
+        k = regular(str(k))
+        v = regular(str(v))
+        testdata[k] = v
+        # print(testdata)
+        CacheHandler.update_cache(cache_name=k, value=v)
+        # print(CacheHandler.get_cache(k))
+
 
 
 
@@ -181,3 +200,7 @@ def pytest_terminal_summary(terminalreporter):
         INFO.logger.info("用例成功率: %.2f" % _RATE + " %")
     except ZeroDivisionError:
         INFO.logger.info("用例成功率: 0.00 %")
+
+
+if __name__ == "__main__":
+    pretest_data()

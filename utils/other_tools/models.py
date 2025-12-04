@@ -223,9 +223,10 @@ class Config(BaseModel):
     app2_code: Text
     app2_Token:Text
     env: Text
-    TestApp_code: Text
-    Data_Code: Text
-    Project_Data_Code: Text
+    tenantName: Text
+    tenantSid: Text
+    tenantId: int
+
 
 
 

@@ -198,6 +198,23 @@ class Context:
         """获取app的host"""
         return config.Project_Data_Code
 
+    @classmethod
+    def tenantId(cls) -> str:
+        from utils import config
+        """获取app的host"""
+        return config.tenantId
+
+    @classmethod
+    def tenantSid(cls) -> str:
+        from utils import config
+        """获取app的host"""
+        return config.tenantSid
+
+    @classmethod
+    def tenantName(cls) -> str:
+        from utils import config
+        """获取app的host"""
+        return config.tenantName
 
 
 

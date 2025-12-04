@@ -20,9 +20,6 @@ app_host:
 #app1_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkEyMDI0MDMxMTE3MzE1Ny1sY2RwIiwic2lkIjowfQ.H2xvViwpYE0ZDE-1stvZXJlCq_c2-zzwaWHt-uHDXeE
 #app2_code: Ae3affbb64AT
 #app2_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFlM2FmZmJiNjRBVCIsInNpZCI6MH0.Y6TOeZ1he6Qgi3F2Xuqx2b6gbWUWH3YCF5bvZ_7q7zU
-#TestApp_code: "${{random_id()}}AT"
-#Data_Code: "${{random_id()}}"
-#
 
 
 ###华为测试-设计器域名
@@ -32,14 +29,14 @@ athena_deployer_host: https://aadc-test.apps.digiwincloud.com.cn
 #iam域名
 iam_host: https://iam-test.digiwincloud.com.cn
 #用例配置
-TestApp_code: "${{random_id()}}AT"
-Data_Code: "${{random_hexcode()}}"
-Project_Data_Code: "${{random_hexcode()}}"
 app1_code: Aautotest1AT
 app1_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFhdXRvdGVzdDFBVCIsInNpZCI6MH0.x51q6SkRChvBOr1ca-iqzHU6SS_Mu2DqnrrJfFKO-7o
-app2_code: AautotestZAT
-app2_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFhdXRvdGVzdFpBVCIsInNpZCI6MH0.byJUAVBMyW_sa5ajAGqmUP97kkqqb1L-yM1ya64S8Z8
-
+app2_code: A2a1989618AT
+app2_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkEyYTE5ODk2MThBVCIsInNpZCI6MH0.hS1fWh2DVpE0TKSEI5hrJcpr3I6SvwRcnpJB2qqO8sc
+#租户信息
+tenantName: 配置测试器
+tenantId: 847600433497088
+tenantSid: athenadeveloperTest
 
 ##阿里paas-设计器域名
 #env: "阿里Paas区"
@@ -64,8 +61,8 @@ excel_report: False
 
 # 钉钉相关配置
 ding_talk:
-  webhook: https://oapi.dingtalk.com/robot/send?access_token=a59902a7e811f93ffe301d8326b07a2acc8aa2a864e7d61ee9fc076481ced2a6
-  secret: SECdea6489dfcc3b9259da943c5ae38d3530696f2fa83ac72a9ee716e9511675b9b
+  webhook:
+  secret:
 #  webhook:
 #  secret:
 # 数据库相关配置

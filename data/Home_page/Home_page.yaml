@@ -205,7 +205,7 @@ basis_CreateApp_001:
   is_run: true
   data:
     application:
-      code: "${{TestApp_code()}}"
+      code: "$cache{TestApp_code}"
       name: "自动化删除测试应用"
       description: "自动化测试专用-用于删除流程验证"
       iconName: "1.png"
@@ -223,7 +223,7 @@ basis_CreateApp_001:
           zh_CN: "自动化测试专用-用于删除流程验证"
           zh_TW: "自動化測試專用-用於刪除流程驗證"
           en_US: "Auto test for delete flow verification"
-    code: "${{TestApp_code()}}"
+    code: "$cache{TestApp_code}"
     name: "自动化删除测试应用"
     description: "自动化测试专用-用于删除流程验证"
     iconName: "1.png"
@@ -252,7 +252,7 @@ basis_AppAuthUser_001:
   requestType: json
   is_run: true
   data:
-    code: "${{TestApp_code()}}"
+    code: "$cache{TestApp_code}"
   dependence_case: False
   dependence_case_data:
   assert:
@@ -266,7 +266,7 @@ basis_AppAuthUser_001:
 # 删除应用接口
 basis_DeleteApp_001:
   host: ${{athena_designer_host()}}
-  url: /athena-designer/application/delete/v2/${{TestApp_code()}}
+  url: /athena-designer/application/delete/v2/$cache{TestApp_code}
   method: GET
   detail: 1.0应用基础功能验证_删除应用
   headers:
@@ -294,7 +294,7 @@ basis_QueryDeleteLog_001:
   requestType: json
   is_run: true
   data:
-    applicationCode: "${{TestApp_code()}}"
+    applicationCode: "$cache{TestApp_code}"
     deleteNo: $cache{compileDataCode}
   dependence_case: False
   dependence_case_data:
@@ -316,7 +316,7 @@ basis_QueryDeleteProgress_001:
   requestType: json
   is_run: true
   data:
-    applicationCode: "${{TestApp_code()}}"
+    applicationCode: "$cache{TestApp_code}"
     deleteNo: $cache{compileDataCode}
   dependence_case: False
   dependence_case_data:

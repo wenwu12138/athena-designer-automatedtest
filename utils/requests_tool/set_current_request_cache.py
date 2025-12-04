@@ -10,6 +10,7 @@
 import json
 from typing import Text
 from jsonpath import jsonpath
+from utils import regular
 from utils.other_tools.exceptions import ValueNotFoundError
 from utils.cache_process.cache_control import CacheHandler
 
@@ -37,6 +38,10 @@ class SetCurrentRequestCache:
             jsonpath_value
         )
         if _request_data is not False:
+            # 考虑到从入参内获取数据缓存  入参key本就是变量，这个时候需要转换一下
+            # _request_data[0] = CacheHandler.get_cache(_request_data[0])
+            # _request_data[0] = regular(_request_data[0])
+
             CacheHandler.update_cache(cache_name=cache_name, value=_request_data[0])
             # Cache(cache_name).set_caches(_request_data[0])
         else:
