@@ -79,7 +79,7 @@ basis_CreateAuthTestApp_001:
       iconBgcolor: "#0189FF"
       commonApp: false
       createType: 1
-      serviceCode: ["DPBAS"]
+      serviceCode: ["${{serviceCode()}}"]
       appType: 5
       lang:
         name:
@@ -97,7 +97,7 @@ basis_CreateAuthTestApp_001:
     iconBgcolor: "#0189FF"
     commonApp: false
     createType: 1
-    serviceCode: ["DPBAS"]
+    serviceCode: ["${{serviceCode()}}"]
     serverResources: []
   dependence_case: False
   dependence_case_data:

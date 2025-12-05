@@ -2,7 +2,7 @@
 学习自动化yaml用例格式，并且我会给你一些curl，帮我依照你学习的规范生成yaml用例
 
 有一些生成规范请注意一下：
-1.请求头中仅保留digi-middleware-auth-user， token，adpversion,adpstatus,locale(本身curl里面有则生成否则不生成)，并且igi-middleware-auth-user， token的value为$cache{token}
+1.请求头中仅保留digi-middleware-auth-user， token，adpversion,adpstatus,locale(本身curl里面有则生成否则不生成)，并且digi-middleware-auth-user， token的value为$cache{token}
 2.如果请求信息中存在application等应用code 替换成变量 ${{app2_code()}}
 3.如果存在新增/更新数据接口中存在name，descrition 等名称描述字段 尽量贴合用例描述 言简意赅 并且 拼接后缀${{get_time()}}。。接口数据都在data或headers下
 4.在明确结构的前提上，学会使用 current_request_set_cache 添加缓存已经缓存使用方法 当多个curl之间存在关联关系能自动将存在关联的接口使用缓存串联起来  需要根据明确结构生成缓存不可猜测 例如大部分curl是没有response的
@@ -122,3 +122,24 @@ auth_ApplyForAuth_001:
       value: 0
       AssertType:
 """
+
+import requests
+import json
+
+url = "http://iam.twintigers.com/api/iam/v2/identity/login"
+
+payload = json.dumps({
+   "userId": "default",
+   "passwordHash": "skv1PcefW8T6aX43rdbkhg==",
+   "clientEncryptPublicKey": "a/j/W/AIcXb7nWL0pDAZ27h28IiZHa8A5R2cP+WbYNE9bFZwv330c5VX/cFj23Lg1xk0bECInHxQk0gSD8NWdIFRz9SVZUWjGfhDOkmK83yhThuzYTK4wtJlcX36RemJGXldAhtE2b2tgPGoBbT+DXFMJVUjbPmqo16Lgzwi82zi1jLTkkGt+m39M+bU3sFf/deUWwNZiYyMt1oxXvH4MRgdGCJGEqnjdz3xiiWJvAQTLDHW3ox9opbJ2hUQZMZ7SH2M6XAFOWXDCFmwWRA34jAr8d4oSGN2onfJHe7smquTl5yaHQ4Niwquo5kRMruJ3wu2NSZNSD41Ney1BC/hXw==",
+   "excludeNonVisible": True
+})
+headers = {
+   'digi-middleware-auth-app': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1MzczMjY2ODk0NjEsInNpZCI6NDA3MTI4ODI1NTM0NDY0MSwiaWQiOiJEaWdpd2luQ2xvdWQifQ.XGPl3brNeNTCivWN_bIYj8TfcxqlkQ0sFV2woPOr0TY',
+   'digi-middleware-device-id': 'bYdVWJHMnxMl/wj0DPeFlkpHNWO12g/RNg9oc+CtSxRkdmQUJVyFvAp5lBcJB8ytn5SeAhsp+YDfZk50ohrJU/Rw/AcHjlIoqE2wRByylk8=',
+   'Content-Type': 'application/json'
+}
+
+response = requests.request("POST", url, headers=headers, data=payload,verify=False)
+
+print(response.text)

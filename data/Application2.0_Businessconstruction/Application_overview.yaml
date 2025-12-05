@@ -224,7 +224,7 @@ basis_UpdateApplicationV3_001:
       commonApp: false
       createType: 1
       serviceCode:
-        - DPBAS
+        - ${{serviceCode()}}
       appType: 5
       lang:
         name:
@@ -243,7 +243,7 @@ basis_UpdateApplicationV3_001:
     commonApp: false
     createType: 1
     serviceCode:
-      - DPBAS
+      - ${{serviceCode()}}
     serverResources: []
   dependence_case: false
   dependence_case_data:

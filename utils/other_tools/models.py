@@ -213,10 +213,8 @@ class Config(BaseModel):
     email: "Email"
     lark: "Webhook"
     real_time_update_test_cases: bool = False
-    host: Text
     athena_designer_host: Text
     iam_host: Text
-    app_host: Union[Text, None]
     athena_deployer_host: Text
     app1_code: Text
     app1_Token: Text
@@ -226,6 +224,9 @@ class Config(BaseModel):
     tenantName: Text
     tenantSid: Union[Text, int, None]
     tenantId: Union[Text, int, None]
+    athena_tenant_deployer_host: Text
+    serviceCode: Text
+    api_serviceCode: Text
 
 
 

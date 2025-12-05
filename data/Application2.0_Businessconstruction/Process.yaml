@@ -19,7 +19,7 @@ businessFlow_CreateProcess_001:
     code: "business_flow_test_${{random_id()}}"
     name: "业务流测试${{get_time()}}"
     description: "业务流测试${{get_time()}}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
     needCreateApi: true
     customProperties: {}
     modelType: "transaction"
@@ -59,7 +59,7 @@ businessFlow_QueryProcess_001:
   is_run: true
   data:
     code: "$cache{FlowtestModelcode}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
   dependence_case: false
   dependence_case_data:
   assert:
@@ -710,7 +710,7 @@ modelDriver_QueryModelByCodes_001:
   is_run: true
   data:
     - modelCode: $cache{FlowtestModelcode}
-      serviceCode: DPBAS
+      serviceCode: ${{serviceCode()}}
   dependence_case: false
   dependence_case_data:
   assert:
@@ -974,7 +974,7 @@ process_UpdateGeneralTriggerProcess_001:
     publishFlag: false
     # 关键：使用从 businessFlow_CreateProcess_001 缓存中获取的业务流模型编码
     businessModelCode: $cache{FlowtestModelcode}
-    businessServiceCode: DPBAS
+    businessServiceCode: ${{serviceCode()}}
     _nodeId: $cache{process_verify_id}
     _nodeType: GlobalSetting
     addSourceType: object_perspective
@@ -1218,21 +1218,21 @@ modelDriver_QueryModelByCodes_002:
   is_run: true
   data:
     - modelCode: $cache{FlowtestModelcode}
-      serviceCode: DPBAS
+      serviceCode: ${{serviceCode()}}
     - modelCode: $cache{business_flow_test_25yljb5}
-      serviceCode: DPBAS
+      serviceCode: ${{serviceCode()}}
     - modelCode: $cache{business_flow_test_rg4jock}
-      serviceCode: DPBAS
+      serviceCode: ${{serviceCode()}}
     - modelCode: $cache{business_flow_test_dcojw1vs1}
-      serviceCode: DPBAS
+      serviceCode: ${{serviceCode()}}
     - modelCode: zzzazzzazzzazzzazzza
-      serviceCode: DPBAS
+      serviceCode: ${{serviceCode()}}
     - modelCode: abcabcabc
-      serviceCode: DPBAS
+      serviceCode: ${{serviceCode()}}
     - modelCode: automatedtesting_basis
-      serviceCode: DPBAS
+      serviceCode: ${{serviceCode()}}
     - modelCode: informationzzb
-      serviceCode: DPBAS
+      serviceCode: ${{serviceCode()}}
   dependence_case: false
   dependence_case_data:
   assert:

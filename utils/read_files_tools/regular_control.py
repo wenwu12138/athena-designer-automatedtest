@@ -114,11 +114,6 @@ class Context:
         _time_after_week = (date.today() + timedelta(days=+6)).strftime("%Y-%m-%d") + " 00:00:00"
         return _time_after_week
 
-    @classmethod
-    def host(cls) -> str:
-        from utils import config
-        """ 获取接口域名 """
-        return config.host
 
     @classmethod
     def athena_designer_host(cls) -> str:
@@ -144,11 +139,7 @@ class Context:
         """ 获取设计器接口域名 """
         return config.appconfig
 
-    @classmethod
-    def app_host(cls) -> str:
-        from utils import config
-        """获取app的host"""
-        return config.app_host
+
 
     @classmethod
     def app1_code(cls) -> str:
@@ -198,6 +189,27 @@ class Context:
         from utils import config
         """获取租户名称"""
         return config.tenantName
+
+
+
+    @classmethod
+    def athena_tenant_deployer_host(cls) -> str:
+        from utils import config
+        """获取租户设计器host"""
+        return config.athena_tenant_deployer_host
+
+
+    @classmethod
+    def serviceCode(cls) -> str:
+        from utils import config
+        """获取后端服务"""
+        return config.serviceCode
+
+    @classmethod
+    def api_serviceCode(cls) -> str:
+        from utils import config
+        """获取api路径关键词"""
+        return config.api_serviceCode
 
 
 

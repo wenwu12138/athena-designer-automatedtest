@@ -18,7 +18,7 @@ event_testing_create_business_001:
     code: "event_test_biz_${{random_id()}}"
     name: "事件功能测试_业务对象${{get_time()}}"
     description: "事件驱动功能自动化测试专用业务对象${{get_time()}}"
-    serviceCode: "DPBAS"
+    serviceCode: "${{serviceCode()}}"
     needCreateApi: true
     customProperties: {}
     modelType: "transaction"
@@ -58,7 +58,7 @@ event_testing_query_business_001:
   is_run: true
   data:
     code: "$cache{event_test_biz_code}"
-    serviceCode: "DPBAS"
+    serviceCode: "${{serviceCode()}}"
   dependence_case: false
   dependence_case_data:
   assert:
@@ -91,7 +91,7 @@ event_testing_save_event_001:
     createDate: "2025-11-18 17:33:59"
     editBy: "wenwu@digiwin.com"
     editDate: "2025-11-18 17:33:59"
-    eventId: "/${{app2_code()}}/md/DPBAS/$cache{event_test_biz_code}/delete"
+    eventId: "/${{app2_code()}}/md/${{serviceCode()}}/$cache{event_test_biz_code}/delete"
     eventName: "删除事件${{get_time()}}"
     eventLevel: "application"
     eventType: "standard"
@@ -396,7 +396,7 @@ event_testing_save_event_001:
     autoGenerateFlag: true
     modelId: "$cache{event_test_biz_code}"
     isCustomDir: false
-    serviceCode: "DPBAS"
+    serviceCode: "${{serviceCode()}}"
   dependence_case: false
   dependence_case_data:
   assert:
@@ -437,7 +437,7 @@ event_testing_add_model_001:
         en_US: "EventFuncTest_AddModel${{get_time()}}"
     bizCode: "$cache{event_test_business_code}"
     modelId: "$cache{event_test_biz_code}"
-    serviceCode: "DPBAS"
+    serviceCode: "${{serviceCode()}}"
     application: "${{app2_code()}}"
   dependence_case: false
   dependence_case_data:

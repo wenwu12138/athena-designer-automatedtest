@@ -113,6 +113,8 @@ def run():
     except Exception:
         # 如有异常，相关异常发送邮件
         e = traceback.format_exc()
+        print("==========自动化执行异常=========")
+        print(e)
         send_email = SendEmail(AllureFileClean.get_case_count())
         send_email.error_mail(e)
         raise

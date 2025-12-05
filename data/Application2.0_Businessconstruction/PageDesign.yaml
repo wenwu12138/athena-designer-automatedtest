@@ -19,7 +19,7 @@ pageDesign_testing_create_business_001:
     code: "page_design_test_biz_${{random_id()}}"
     name: "界面设计功能测试_业务对象${{get_time()}}"
     description: "界面设计功能自动化测试专用业务对象${{get_time()}}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
     needCreateApi: true
     customProperties: {}
     modelType: "transaction"
@@ -59,7 +59,7 @@ pageDesign_testing_query_business_001:
   is_run: true
   data:
     code: "$cache{page_design_test_biz_code}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
   dependence_case: false
   dependence_case_data:
   assert:
@@ -89,7 +89,7 @@ pageDesign_generateQueryPlan_001:
   is_run: true
   data:
     modelId: "$cache{page_design_test_biz_code}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
     businessCode: "$cache{page_design_test_business_code}"
     application: ${{app2_code()}}
     addSourceType: "object_perspective"
@@ -130,7 +130,7 @@ pageDesign_queryDataViewByModel_001:
   is_run: true
   data:
     modelCode: "$cache{page_design_test_biz_code}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
     businessCode: "$cache{page_design_test_business_code}"
   dependence_case: false
   dependence_case_data:
@@ -165,7 +165,7 @@ pageDesign_generateFormWithQueryPlan_001:
     addSourceType: "object_perspective"
     workType: "model"
     operateType: "append"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
     businessCode: "$cache{page_design_test_business_code}"
     modelId: "$cache{page_design_test_biz_code}"
     dataViewCodes: ["$cache{page_design_data_view_code}"]
@@ -253,7 +253,7 @@ pageDesign_updatePageConfig_001:
           type: "ESP"
           actionId: "esp_modeldriven.commons.eai.dataview.get"
           serviceName: "modeldriven.commons.eai.dataview.get"
-          productName: "DPBAS"
+          productName: "${{serviceCode()}}"
           paras:
             dataViewList: []
             type: "total"
@@ -281,8 +281,8 @@ pageDesign_updatePageConfig_001:
           sequence: 0
           title: "界面设计功能测试_业务对象${{get_time()}}"
           type: "ESP"
-          actionId: "esp_dpbas.$cache{page_design_test_biz_code}.detail.get"
-          serviceName: "dpbas.$cache{page_design_test_biz_code}.detail.get"
+          actionId: "esp_${{api_serviceCode()}}.$cache{page_design_test_biz_code}.detail.get"
+          serviceName: "${{api_serviceCode()}}.$cache{page_design_test_biz_code}.detail.get"
           actionParams:
             - name: "$cache{page_design_test_biz_code}.$cache{page_design_test_biz_code}_id"
               type: "ACTIVE_ROW"
@@ -304,9 +304,9 @@ pageDesign_updatePageConfig_001:
     dependOnGroundEnd: false
     authorityPrefix: ""
     generateDslAction: true
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
     simpleModelCode: "$cache{page_design_test_biz_code}"
-    simpleModelServiceCode: "DPBAS"
+    simpleModelServiceCode: ${{serviceCode()}}
     supportNavigateFlag: false
     category: "DOUBLE-DOCUMENT-FORM"
     autoGenerateFlag: true

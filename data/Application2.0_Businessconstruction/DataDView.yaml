@@ -19,7 +19,7 @@ dataView_testing_create_business_001:
     code: "data_view_test_${{random_id()}}"
     name: "视图功能测试${{get_time()}}"
     description: "视图功能测试${{get_time()}}"
-    serviceCode: "DPBAS"
+    serviceCode: "${{serviceCode()}}"
     needCreateApi: true
     customProperties: {}
     modelType: "transaction"
@@ -59,7 +59,7 @@ dataView_testing_query_business_001:
   is_run: true
   data:
     code: "$cache{data_view_test_code}"
-    serviceCode: "DPBAS"
+    serviceCode: "${{serviceCode()}}"
   dependence_case: false
   dependence_case_data:
   assert:
@@ -86,7 +86,7 @@ dataView_testing_generate_plan_001:
   is_run: true
   data:
     modelId: "$cache{data_view_test_code}"
-    serviceCode: "DPBAS"
+    serviceCode: "${{serviceCode()}}"
     businessCode: "$cache{data_view_test_business_code}"
     application: ${{app2_code()}}
     addSourceType: "object_perspective"
@@ -174,7 +174,7 @@ dataView_query_fields_001:
   is_run: true
   data:
     modelId: "$cache{data_view_test_code}"
-    productCode: "DPBAS"
+    productCode: "${{serviceCode()}}"
   dependence_case: false
   dependence_case_data:
   assert:
@@ -239,7 +239,7 @@ tbb_check_bind_relation_001:
   data:
     type: "view"
     code: "$cache{data_view_code}"
-    serviceCode: "DPBAS"
+    serviceCode: "${{serviceCode()}}"
   dependence_case: false
   dependence_case_data:
   assert:
@@ -269,7 +269,7 @@ dataView_save_data_view_001:
     name: "全部"
     description: "全部$cache{data_view_test_code}${{get_time()}}"
     modelId: "$cache{data_view_test_code}"
-    productCode: "DPBAS"
+    productCode: "${{serviceCode()}}"
     application: ${{app2_code()}}
     lang:
       name:
@@ -361,7 +361,7 @@ dataView_save_data_view_001:
     viewShowFields:
       data_code: "$cache{data_view_code}"
       data_name: "全部"
-      service_code: "DPBAS"
+      service_code: "${{serviceCode()}}"
       lang:
         data_name:
           zh_CN: "全部"
@@ -710,7 +710,7 @@ dataView_save_data_view_001:
     viewShowFieldsMobile:
       data_code: "$cache{data_view_code}"
       data_name: "全部"
-      service_code: "DPBAS"
+      service_code: "${{serviceCode()}}"
       lang:
         data_name:
           zh_CN: "全部"
@@ -744,7 +744,7 @@ tbb_check_bind_relation_002:
   data:
     type: "view"
     code: "$cache{data_view_code}"
-    serviceCode: "DPBAS"
+    serviceCode: "${{serviceCode()}}"
   dependence_case: false
   dependence_case_data:
   assert:
@@ -823,7 +823,7 @@ modulePublish_modelSingle_publish_view_test_001:
       - tenantId: "${{tenantId()}}"
         tenantSid: ${{tenantSid()}}
         tenantName: "${{tenantName()}}"
-    serviceCode: "DPBAS"
+    serviceCode: "${{serviceCode()}}"
   dependence_case: false
   dependence_case_data:
   assert:

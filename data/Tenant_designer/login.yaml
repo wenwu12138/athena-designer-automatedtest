@@ -1,0 +1,159 @@
+case_common:
+  allureEpic: 开发平台接口
+  allureFeature: 租户设计器
+  allureStory: 登录
+
+
+
+# IAM设备ID获取（登录流程前置）
+tenant_designer_GetDeviceId_001:
+  host: ${{iam_host()}}
+  url: /api/iam/v2/device/id
+  method: GET
+  detail: 获取设备ID（登录流程前置）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    digi-middleware-auth-app: ${{app2_Token()}}
+  requestType: PARAMS
+  is_run: True
+  data: {}
+  dependence_case: False
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 200
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data
+      name: device_id
+
+
+# IAM用户salt获取
+tenant_designer_GetUserSalt_001:
+  host: ${{iam_host()}}
+  url: /api/iam/v2/user/salt
+  method: POST
+  detail: 获取用户salt值用于密码加密
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+    digi-middleware-auth-app: ${{app2_Token()}}
+  requestType: json
+  is_run: True
+  data:
+    id: wenwu@digiwin.com
+  dependence_case: False
+  dependence_case_data: []
+  assert:
+    status_code: 200
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.salt
+      name: user_salt
+
+# IAM公钥获取
+tenant_designer_GetPublicKey_001:
+  host: ${{iam_host()}}
+  url: /api/iam/v2/identity/publickey
+  method: GET
+  detail: 获取RSA公钥用于加密传输
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    digi-middleware-auth-app: ${{app2_Token()}}
+    token: $cache{token}
+    locale: zh_CN
+  requestType: PARAMS
+  is_run: True
+  data: {}
+  dependence_case: False
+  dependence_case_data: []
+  assert:
+    status_code: 200
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.publicKey
+      name: rsa_public_key
+
+
+# IAM AES密钥交换
+tenant_designer_ExchangeAesKey_001:
+  host: ${{iam_host()}}
+  url: /api/iam/v2/identity/aeskey
+  method: POST
+  detail: 交换AES对称加密密钥
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+    digi-middleware-auth-app: ${{app2_Token()}}
+  requestType: json
+  is_run: True
+  data:
+    clientEncryptPublicKey: YSyU7rQQsAsDIJ3sC7A6/O93CfrBMCAJjFXA21rdjMlsEyV6sJIMjVkh1pKpMEzNfechY+bmUsOjYwgo8v+dczDtVubsUsj0tyLd1Dhj65wEBCkMwsr0tJL0tLBa5I6pbKZ/tgy1eMc7tqSTc94h0MoUbf23U79YKioGfnGuseq8Yj7jczIm5YPg6sSUKMRgWogN7hzwQgOJq3tITW9TZ5ESus5MHPrxt2yawf3sHjm/I3i/T2SAhpkWpAoGBoobealySNnjafUdR/u4pqmCvaLFNU2B0jW2240sraB+JgJrL6C6ZmHe/xWGkmV0xozoCSZE2oFCO9ejwZuZuL4MKg==
+  dependence_case: False
+  dependence_case_data: []
+  assert:
+    status_code: 200
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.encryptAesKey
+      name: aes_key
+
+# 用户登录认证（租户设计器登录接口）
+tenant_designer_UserLogin_001:
+  host: ${{athena_tenant_deployer_host()}}
+  url: /athena-designer/user/v2/login
+  method: POST
+  detail: 用户登录租户设计器获取访问令牌
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    digi-middleware-auth-app: ${{app2_Token()}}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: True
+  data:
+    name: wenwu@digiwin.com
+    deviceId: RjuedGWWMCBoTlLrxfFaTFrih0WfmxPIVfTWK2XbPmDiKbS/sIe/KtpwLpPJSBOrO6f24Li6dByPVbWF6OIGWW6AMr4gQvsuWBJ6V9BFVEYnGH8Rzm/ZGIAmbJGOU2xU
+    identityType: query
+    passwordHash: YnVFp/Zyg+vlwSFo7JyBLg==
+    clientEncryptPublicKey: deqVR++jqRjKaH5FJdECPFt7gXrJ3VlyzErSL71AxFU13oXDrceFum+K2CGmb/UpHXkFM3OEIqoPUIZzg/M9shtJDvjX3vR+iawMqN7E3pjJzNqPPJpfGQn1p1JhRYEo3EpO/UZ3i5VOpNE4ux672a8vhUhCMDXqFBjKHV/ESIW+yFuF5UJMjvHHXikkJd+erv7mguVWjWqY/lwfp//1TbiM7q5oBviPOixgbpZAiekwGZcsKr+mesUJ+PiiordJf10bn3PEaMc7Nbw8vYO7hDfvGC3aBo7XCvmI877t0wFlGDRPSWOPJxLD/1/JG0IztkAXfo4fEdUhlSsXyuMtoQ==
+  dependence_case: False
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 查询用户租户列表（租户设计器接口）
+tenant_designer_QueryUserTenants_001:
+  host: ${{athena_tenant_deployer_host()}}
+  url: /athena-designer/tenant/queryUserTenants
+  method: GET
+  detail: 查询用户关联的租户列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    locale: zh_CN
+    digi-middleware-auth-app: ${{app2_Token()}}
+  requestType: PARAMS
+  is_run: True
+  data: {}
+  dependence_case: False
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:

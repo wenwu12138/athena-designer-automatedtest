@@ -45,7 +45,7 @@ businessDir_add_001:
     code: "automatedtesting_basis_${{random_id()}}"
     name: "自动化测试_基础档${{get_time()}}"
     description: "自动化测试_基础档${{get_time()}}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
     needCreateApi: true
     customProperties: {}
     modelType: "basic"
@@ -89,7 +89,7 @@ businessDir_add_param_001:
     code: "autotest_param_${{random_id()}}"
     name: "自动化测试_参数档${{get_time()}}"
     description: "自动化测试_参数档${{get_time()}}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
     needCreateApi: true
     customProperties: {}
     modelType: "param"
@@ -133,7 +133,7 @@ businessDir_add_transaction_001:
     code: "autotest_trans_${{random_id()}}"
     name: "自动化测试_业务档${{get_time()}}"
     description: "自动化测试_业务档${{get_time()}}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
     needCreateApi: true
     customProperties: {}
     modelType: "transaction"
@@ -391,7 +391,7 @@ pageDesignModel_QueryBindApiListConfig_001:
   is_run: true
   data:
     modelCode: "$cache{business_model_code}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
     customProperties: {}
     model:
       name: "$cache{business_model_code}"
@@ -497,7 +497,7 @@ modelDriver_queryModelByCode_001:
   is_run: true
   data:
     code: "$cache{business_model_code}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
   dependence_case: false
   dependence_case_data:
   assert:
@@ -530,7 +530,7 @@ businessDir_update_transaction_001:
   data:
     name: "自动化测试_业务档_更新${{get_time()}}"
     description: "自动化测试_业务档_更新${{get_time()}}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
     needCreateApi: true
     customProperties: {}
     modelType: "transaction"
@@ -601,7 +601,7 @@ api_GetRelateApi_001:
   requestType: PARAMS
   is_run: true
   data:
-    apiName: esp_dpbas.$cache{business_Api}.detail.get
+    apiName: esp_${{api_serviceCode()}}.$cache{business_Api}.detail.get
     serviceCode: "${{app2_code()}}"
     labelType: EspAction
   dependence_case: false
@@ -651,7 +651,7 @@ api_GetFields_001:
   requestType: PARAMS
   is_run: true
   data:
-    apiName: esp_dpbas.$cache{business_Api}.detail.get
+    apiName: esp_${{api_serviceCode()}}.$cache{business_Api}.detail.get
     relatedType: api
   dependence_case: false
   dependence_case_data:
@@ -675,7 +675,7 @@ api_GetModelRelatePreviewInfo_001:
   requestType: json
   is_run: true
   data:
-    apiName: esp_dpbas.$cache{business_Api}.detail.get
+    apiName: esp_${{api_serviceCode()}}.$cache{business_Api}.detail.get
     apiModelCode: api_modetest1
     relateColumnList: []
     apiModelName: api模型测试${{get_time()}}
@@ -706,7 +706,7 @@ api_add_001:
   requestType: json
   is_run: true
   data:
-    apiName: "esp_dpbas.$cache{business_Api}.detail.get"
+    apiName: "esp_${{api_serviceCode()}}.$cache{business_Api}.detail.get"
     apiModelCode: "automatedtesting_api_${{random_id()}}"
     apiModelName: "自动化测试_API业务对象${{get_time()}}"
     application: "${{app2_code()}}"
@@ -717,17 +717,17 @@ api_add_001:
         zh_TW: "自動化測試_API業務對象${{get_time()}}"
         en_US: "自动化测试_API业务对象${{get_time()}}"
     bindApiList:
-      - apiName: "esp_dpbas.{business_Api}.list.get"
+      - apiName: "esp_${{api_serviceCode()}}.{business_Api}.list.get"
         apiType: "list"
-      - apiName: "esp_dpbas.{business_Api}.update"
+      - apiName: "esp_${{api_serviceCode()}}.{business_Api}.update"
         apiType: "update"
-      - apiName: "esp_dpbas.{business_Api}.delete"
+      - apiName: "esp_${{api_serviceCode()}}.{business_Api}.delete"
         apiType: "delete"
-      - apiName: "esp_dpbas.{business_Api}.create"
+      - apiName: "esp_${{api_serviceCode()}}.{business_Api}.create"
         apiType: "create"
-      - apiName: "esp_dpbas.{business_Api}.valid"
+      - apiName: "esp_${{api_serviceCode()}}.{business_Api}.valid"
         apiType: "valid"
-      - apiName: "esp_dpbas.{business_Api}.invalid"
+      - apiName: "esp_${{api_serviceCode()}}.{business_Api}.invalid"
         apiType: "invalid"
     serviceCode: "${{app2_code()}}"
     relateColumnList: []
@@ -762,7 +762,7 @@ tbb_checkBindRelation_001:
   data:
     type: "table"
     code: "$cache{business_model_code}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
     entrance: "delBusinessDir"
   dependence_case: false
   dependence_case_data:
@@ -806,7 +806,7 @@ modelDriver_queryBasicModel_001:
   is_run: true
   data:
     code: "$cache{basic_model_code}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
   dependence_case: false
   dependence_case_data:
   assert:
@@ -833,7 +833,7 @@ tbb_checkBasicBindRelation_001:
   data:
     type: "table"
     code: "$cache{basic_model_code}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
     entrance: "delBusinessDir"
   dependence_case: false
   dependence_case_data:
@@ -878,7 +878,7 @@ modelDriver_queryParamModel_001:
   is_run: true
   data:
     code: "$cache{param_model_code}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
   dependence_case: false
   dependence_case_data:
   assert:
@@ -905,7 +905,7 @@ tbb_checkParamBindRelation_001:
   data:
     type: "table"
     code: "$cache{param_model_code}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
     entrance: "delBusinessDir"
   dependence_case: false
   dependence_case_data:

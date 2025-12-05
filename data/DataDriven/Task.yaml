@@ -1403,7 +1403,7 @@ process_UpdateBigTProcess_001:
         id: 1762833412858
         name: "业务流测试2025-12-03 13:56:12"
         tenantId: "${{tenantId()}}"
-        serviceCode: "DPBAS"
+        serviceCode: ${{serviceCode()}}
         subTableCounts: 0
         application: ${{app2_code()}}
         dependOnGroundEnd: false
@@ -1426,7 +1426,7 @@ process_UpdateBigTProcess_001:
         id: 1765717480163
         name: "业务流测试2025-12-02 11:53:49"
         tenantId: "${{tenantId()}}"
-        serviceCode: "DPBAS"
+        serviceCode: ${{serviceCode()}}
         subTableCounts: 0
         application: ${{app2_code()}}
         dependOnGroundEnd: false
@@ -1449,7 +1449,7 @@ process_UpdateBigTProcess_001:
         id: 1760319917100
         name: "业务方zzza"
         tenantId: "${{tenantId()}}"
-        serviceCode: "DPBAS"
+        serviceCode: ${{serviceCode()}}
         subTableCounts: 0
         application: ${{app2_code()}}
         dependOnGroundEnd: false
@@ -1472,7 +1472,7 @@ process_UpdateBigTProcess_001:
         id: 1760375573072
         name: "abc"
         tenantId: "${{tenantId()}}"
-        serviceCode: "DPBAS"
+        serviceCode: ${{serviceCode()}}
         subTableCounts: 0
         application: ${{app2_code()}}
         dependOnGroundEnd: false
@@ -1495,7 +1495,7 @@ process_UpdateBigTProcess_001:
         id: 1761994696363
         name: "自动化测试_基础档"
         tenantId: "${{tenantId()}}"
-        serviceCode: "DPBAS"
+        serviceCode: ${{serviceCode()}}
         subTableCounts: 0
         application: ${{app2_code()}}
         dependOnGroundEnd: false
@@ -1518,7 +1518,7 @@ process_UpdateBigTProcess_001:
         id: 1762105495882
         name: "信息验证z"
         tenantId: "${{tenantId()}}"
-        serviceCode: "DPBAS"
+        serviceCode: ${{serviceCode()}}
         subTableCounts: 0
         application: ${{app2_code()}}
         dependOnGroundEnd: false

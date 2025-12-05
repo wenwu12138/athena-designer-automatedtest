@@ -828,7 +828,7 @@ modulePublish_PublishMonitorRule_001:
   host: ${{athena_designer_host()}}
   url: /athena-designer/modulePublish/publish
   method: POST
-  detail: 发布侦测规则到${{tenantName()}}租户
+  detail: 单发布侦测规则
   headers:
     digi-middleware-auth-user: $cache{token}
     token: $cache{token}

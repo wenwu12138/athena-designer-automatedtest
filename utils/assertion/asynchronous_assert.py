@@ -229,7 +229,7 @@ class AsynchronousAssert:
                                          "删除应用成功\n"
                                          "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n")
                         return result
-                    elif json.loads(deleteprocess_res.response_data)["data"] == -1:
+                    elif json.loads(deleteprocess_res.response_data)["data"] == "-1":
                         result = False
                         INFO.logger.info("\n"
                                          "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n"

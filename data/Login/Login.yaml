@@ -115,7 +115,7 @@ auth_UserLogin_001:
     content-type: application/json
     branch: develop
   requestType: json
-  is_run: true
+  is_run: "'华为正式区' in '${{env()}}' or '华为测试区' in '${{env()}}'"
   data:
     name: wenwu@digiwin.com
     deviceId: $cache{device_id}

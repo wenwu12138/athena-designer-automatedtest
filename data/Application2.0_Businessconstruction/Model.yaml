@@ -20,7 +20,7 @@ model_testing_create_business_001:
     code: "model_test_biz_${{random_id()}}"
     name: "模型功能测试_业务对象${{get_time()}}"
     description: "模型驱动功能自动化测试专用业务对象${{get_time()}}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
     needCreateApi: true
     customProperties: {}
     modelType: "transaction"
@@ -60,7 +60,7 @@ model_testing_query_business_001:
   is_run: true
   data:
     code: "$cache{model_test_biz_code}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
   dependence_case: false
   dependence_case_data:
   assert:
@@ -93,7 +93,7 @@ dataView_queryDataViewContent_001:
   is_run: true
   data:
     modelCode: "$cache{model_test_biz_code}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
   dependence_case: false
   dependence_case_data:
   assert:
@@ -146,7 +146,7 @@ pageDesign_generateBlankPage_001:
     addSourceType: "object_perspective"
     workType: "model"
     operateType: "append"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
     businessCode: "$cache{model_test_business_code}"
     modelId: "$cache{model_test_biz_code}"
     lang:
@@ -179,7 +179,7 @@ dataView_generateJustQueryPlan_001:
   is_run: true
   data:
     modelId: "$cache{model_test_biz_code}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
     businessCode: "$cache{model_test_business_code}"
     application: ${{app2_code()}}
     addSourceType: "object_perspective"
@@ -261,7 +261,7 @@ dataView_coverageQueryPlan_001:
   is_run: true
   data:
     modelId: "$cache{model_test_biz_code}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
     businessCode: "$cache{model_test_business_code}"
     application: ${{app2_code()}}
     addSourceType: "object_perspective"
@@ -341,7 +341,7 @@ dataView_queryDataViewByModel_001:
   is_run: true
   data:
     modelCode: "$cache{model_test_biz_code}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
     businessCode: "$cache{model_test_business_code}"
   dependence_case: false
   dependence_case_data:
@@ -385,7 +385,7 @@ pageDesign_generateTableWithQueryPlan_001:
     addSourceType: "object_perspective"
     workType: "model"
     operateType: "append"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
     businessCode: "$cache{model_test_business_code}"
     modelId: "$cache{model_test_biz_code}"
     dataViewCodes: ["$cache{data_view_all_code}", "$cache{data_view_checked_code}", "$cache{data_view_uncheck_code}", "$cache{data_view_cancelled_code}"]
@@ -424,7 +424,7 @@ pageDesign_modelDefaultFields_001:
         zh_CN: "模型功能测试_业务对象{{get_time()}}_详情"
         zh_TW: "模型功能測試_業務對象{{get_time()}}_詳情"
     application: ${{app2_code()}}
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
     mainModelCode: "$cache{model_test_biz_code}"
   dependence_case: false
   dependence_case_data:
@@ -458,7 +458,7 @@ modelDriver_modelAssign_update_001:
     id: 1761641950409
     name: "模型功能测试_业务对象${{get_time()}}"
     tenantId: "${{tenantId()}}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
     subTableCounts: 0
     application: ${{app2_code()}}
     dependOnGroundEnd: false
@@ -585,12 +585,12 @@ modelDriver_modelAssign_update_001:
           zh_CN: "模型功能测试_业务对象${{get_time()}}"
       customProperties: {}
       bindApiListConfig:
-        - apiName: "esp_dpbas.$cache{model_test_biz_code}.list.get"
+        - apiName: "esp_${{api_serviceCode()}}.$cache{model_test_biz_code}.list.get"
           apiType: "list"
           apiDescription: "模型功能测试_业务对象${{get_time()}}"
           tableName: "$cache{model_test_biz_code}"
           apiConfig:
-            serviceName: "dpbas.$cache{model_test_biz_code}.list.get"
+            serviceName: "${{api_serviceCode()}}.$cache{model_test_biz_code}.list.get"
             response_object: []
             request_parameters: []
           isCustom: false
@@ -726,7 +726,7 @@ modulePublish_modelSingle_publish_001:
       - tenantId: "${{tenantId()}}"
         tenantSid: ${{tenantSid()}}
         tenantName: "${{tenantName()}}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
   dependence_case: false
   dependence_case_data:
   assert:
@@ -752,7 +752,7 @@ operationRecord_get_001:
     code: "$cache{model_test_biz_code}"
     collection: "pageDesignModel"
     appCode: ${{app2_code()}}
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
   dependence_case: false
   dependence_case_data:
   assert:
@@ -777,7 +777,7 @@ dataEntry_modelSqlExport_001:
   data:
     application: ${{app2_code()}}
     code: "$cache{model_test_biz_code}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
   dependence_case: false
   dependence_case_data:
   assert:
@@ -802,7 +802,7 @@ model_testing_check_bindings_001:
   data:
     type: "table"
     code: "$cache{model_test_biz_code}"
-    serviceCode: "DPBAS"
+    serviceCode: ${{serviceCode()}}
     entrance: "delBusinessDir"
   dependence_case: false
   dependence_case_data:
