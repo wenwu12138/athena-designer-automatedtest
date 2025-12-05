@@ -457,7 +457,7 @@ modelDriver_modelAssign_update_001:
     code: "$cache{model_test_biz_code}"
     id: 1761641950409
     name: "模型功能测试_业务对象${{get_time()}}"
-    tenantId: "athenadeveloperTest"
+    tenantId: "${{tenantId()}}"
     serviceCode: "DPBAS"
     subTableCounts: 0
     application: ${{app2_code()}}
@@ -723,9 +723,9 @@ modulePublish_modelSingle_publish_001:
     module: "modelDriven"
     application: ${{app2_code()}}
     tenantUsers:
-      - tenantId: "athenadeveloperTest"
-        tenantSid: 847600433497088
-        tenantName: "配置测试器"
+      - tenantId: "${{tenantId()}}"
+        tenantSid: ${{tenantSid()}}
+        tenantName: "${{tenantName()}}"
     serviceCode: "DPBAS"
   dependence_case: false
   dependence_case_data:

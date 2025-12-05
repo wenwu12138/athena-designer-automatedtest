@@ -220,7 +220,7 @@ tenant_ChangeTenant_001:
   requestType: json
   is_run: true
   data:
-    name: 配置测试器
+    name: ${{tenantName()}}
     tenantId: $cache{default_tenant_id}
     testTenant: true
     experience: false

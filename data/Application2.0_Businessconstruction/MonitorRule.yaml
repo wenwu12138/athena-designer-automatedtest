@@ -828,14 +828,14 @@ modulePublish_PublishMonitorRule_001:
   host: ${{athena_designer_host()}}
   url: /athena-designer/modulePublish/publish
   method: POST
-  detail: 发布侦测规则到配置测试器租户
+  detail: 发布侦测规则到${{tenantName()}}租户
   headers:
     digi-middleware-auth-user: $cache{token}
     token: $cache{token}
     locale: zh_CN
     content-type: application/json
     branch: develop
-    routerkey: athenadeveloperTest
+    routerkey: ${{tenantId()}}
   requestType: json
   is_run: true
   data:
@@ -843,9 +843,9 @@ modulePublish_PublishMonitorRule_001:
     module: monitorRule
     application: ${{app2_code()}}
     tenantUsers:
-      - tenantId: "athenadeveloperTest"
-        tenantSid: 847600433497088
-        tenantName: "配置测试器"
+      - tenantId: "${{tenantId()}}"
+        tenantSid: ${{tenantSid()}}
+        tenantName: "${{tenantName()}}"
   dependence_case: false
   dependence_case_data:
   assert:

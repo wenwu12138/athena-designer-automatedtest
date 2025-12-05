@@ -1402,7 +1402,7 @@ process_UpdateBigTProcess_001:
         code: "business_flow_test_ke4k2"
         id: 1762833412858
         name: "业务流测试2025-12-03 13:56:12"
-        tenantId: "athenadeveloperTest"
+        tenantId: "${{tenantId()}}"
         serviceCode: "DPBAS"
         subTableCounts: 0
         application: ${{app2_code()}}
@@ -1425,7 +1425,7 @@ process_UpdateBigTProcess_001:
         code: "business_flow_test_rg9j9ku6o"
         id: 1765717480163
         name: "业务流测试2025-12-02 11:53:49"
-        tenantId: "athenadeveloperTest"
+        tenantId: "${{tenantId()}}"
         serviceCode: "DPBAS"
         subTableCounts: 0
         application: ${{app2_code()}}
@@ -1448,7 +1448,7 @@ process_UpdateBigTProcess_001:
         code: "zzzazzzazzzazzzazzza"
         id: 1760319917100
         name: "业务方zzza"
-        tenantId: "athenadeveloperTest"
+        tenantId: "${{tenantId()}}"
         serviceCode: "DPBAS"
         subTableCounts: 0
         application: ${{app2_code()}}
@@ -1471,7 +1471,7 @@ process_UpdateBigTProcess_001:
         code: "abcabcabc"
         id: 1760375573072
         name: "abc"
-        tenantId: "athenadeveloperTest"
+        tenantId: "${{tenantId()}}"
         serviceCode: "DPBAS"
         subTableCounts: 0
         application: ${{app2_code()}}
@@ -1494,7 +1494,7 @@ process_UpdateBigTProcess_001:
         code: "automatedtesting_basis"
         id: 1761994696363
         name: "自动化测试_基础档"
-        tenantId: "athenadeveloperTest"
+        tenantId: "${{tenantId()}}"
         serviceCode: "DPBAS"
         subTableCounts: 0
         application: ${{app2_code()}}
@@ -1517,7 +1517,7 @@ process_UpdateBigTProcess_001:
         code: "informationzzb"
         id: 1762105495882
         name: "信息验证z"
-        tenantId: "athenadeveloperTest"
+        tenantId: "${{tenantId()}}"
         serviceCode: "DPBAS"
         subTableCounts: 0
         application: ${{app2_code()}}
@@ -1573,9 +1573,9 @@ bigT_PublishProcess_001:
     module: process
     application: ${{app2_code()}}
     tenantUsers:
-      - tenantId: "athenadeveloperTest"
-        tenantSid: 847600433497088
-        tenantName: "配置测试器"
+      - tenantId: "${{tenantId()}}"
+        tenantSid: ${{tenantSid()}}
+        tenantName: "${{tenantName()}}"
   dependence_case: false
   dependence_case_data:
   assert:

@@ -106,7 +106,7 @@ event_testing_save_event_001:
         zh_TW: "刪除事件${{get_time()}}"
         en_US: "Delete Event${{get_time()}}"
     eventEnable: "Y"
-    adpTenantId: "athenadeveloperTest"
+    adpTenantId: "${{tenantId()}}"
     application: "${{app2_code()}}"
     bizCode: "$cache{event_test_business_code}"
     businessName: "事件功能测试_业务对象${{get_time()}}"
@@ -429,7 +429,7 @@ event_testing_add_model_001:
     eventType: "custom"
     dataStruct: "all"
     addSourceType: "object_perspective"
-    adpTenantId: "athenadeveloperTest"
+    adpTenantId: "${{tenantId()}}"
     lang:
       eventName:
         zh_CN: "事件功能测试_新增模型${{get_time()}}"
@@ -501,9 +501,9 @@ event_testing_publish_model_001:
     module: "event"
     application: "${{app2_code()}}"
     tenantUsers:
-      - tenantId: "athenadeveloperTest"
-        tenantSid: 847600433497088
-        tenantName: "配置测试器"
+      - tenantId: "${{tenantId()}}"
+        tenantSid: ${{tenantSid()}}
+        tenantName: "${{tenantName()}}"
   dependence_case: false
   dependence_case_data:
   assert:

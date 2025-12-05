@@ -106,7 +106,7 @@ query_SwitchProcess_001:
   is_run: true
   data:
     deployNo: $cache{switchNo}
-    application: A20240311173157-lcdp
+    application: ${{app2_code()}}
   # 是否有依赖业务，为空或者false则表示没有
   dependence_case: False
   # 依赖的数据

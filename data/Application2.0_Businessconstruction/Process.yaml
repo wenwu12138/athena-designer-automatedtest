@@ -1150,9 +1150,9 @@ modulePublish_PublishSingleModel_001:
     module: process
     application: ${{app2_code()}}
     tenantUsers:
-      - tenantId: athenadeveloperTest
-        tenantSid: 847600433497088
-        tenantName: 配置测试器
+      - tenantId: ${{tenantId()}}
+        tenantSid: ${{tenantSid()}}
+        tenantName: ${{tenantName()}}
   dependence_case: false
   dependence_case_data:
   assert:

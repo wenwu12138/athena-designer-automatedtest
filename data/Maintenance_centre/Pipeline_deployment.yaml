@@ -209,7 +209,7 @@ basis_QueryTenantVersion_001:
   requestType: params
   is_run: true
   data:
-    tenantId: athenadeveloperTest
+    tenantId: ${{tenantId()}}
     envServiceId: HuaweiTest
     pageNum: 1
     pageSize: 20

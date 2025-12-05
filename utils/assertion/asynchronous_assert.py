@@ -62,7 +62,6 @@ class AsynchronousAssert:
                                          "发版成功\n"
                                          "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n")
                         return result
-                        break
                     elif json.loads(deployprocess_res.response_data)["data"] == -1 or json.loads(deploydetail_res.response_data)["data"][-1]["result"] == "fail":
                         result = False
                         INFO.logger.info("\n"
@@ -70,7 +69,6 @@ class AsynchronousAssert:
                                          "发版失败\n"
                                          "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n")
                         return result
-                        break
                     else:
                         i += 1
                         # 查询发版详情并打印
@@ -172,7 +170,6 @@ class AsynchronousAssert:
                                              "分支创建失败\n"
                                              "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n")
                             return result
-                            break
 
                     # 分支创建成功条件判断
                     if all(i.get("status") in ('已创建', None) for i in json.loads(getBranchInfo_res.response_data)["data"]):
@@ -182,7 +179,6 @@ class AsynchronousAssert:
                                          "分支创建成功\n"
                                          "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n")
                         return result
-                        break
                     else:
                         i += 1
                         # 等待三秒后执行下一次查询
@@ -233,7 +229,6 @@ class AsynchronousAssert:
                                          "删除应用成功\n"
                                          "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n")
                         return result
-                        break
                     elif json.loads(deleteprocess_res.response_data)["data"] == -1:
                         result = False
                         INFO.logger.info("\n"
@@ -241,7 +236,6 @@ class AsynchronousAssert:
                                          "删除应用失败\n"
                                          "⁽ଘ( ˊᵕˋ )ଓ⁾⁾\n")
                         return result
-                        break
                     else:
                         i += 1
                         time.sleep(15)  # 间隔15秒轮询一次

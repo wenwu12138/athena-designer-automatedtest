@@ -118,7 +118,7 @@ basis_PublishTest_001:
           code: ${{app1_code()}}
           name: 饮食管家
           description: wenwu（基础功能验证）
-          tenantId: lcdp
+          tenantId: ${{tenantId()}}
           appToken: ${{app1_Token()}}
           appType: 1
           iconName: 1.png
@@ -137,9 +137,9 @@ basis_PublishTest_001:
           assetInitFlag: { }
     tenantUsers:
       - option: 1
-        tenantId: lcdp
-        tenantSid: 501035035546176
-        tenantName: 鼎捷开发平台测试租户
+        tenantId: ${{tenantId()}}
+        tenantSid: ${{tenantSid()}}
+        tenantName: ${{tenantName()}}
         testTenant: false
     syncEsp: false
     envServiceId: HuaweiTest
@@ -186,7 +186,7 @@ basis_SwitchPlanTest_001:
           code: ${{app1_code()}}
           name: 饮食管家
           description: wenwu（基础功能验证）
-          tenantId: lcdp
+          tenantId: ${{tenantId()}}
           appToken: ${{app1_Token()}}
           appType: 1
           iconName: 1.png
@@ -204,8 +204,8 @@ basis_SwitchPlanTest_001:
           useTenantInfos: [ ]
           assetInitFlag: { }
     tenantUsers:
-      - tenantId: lcdp
-        tenantName: 鼎捷开发平台测试租户
+      - tenantId: ${{tenantId()}}
+        tenantName: ${{tenantName()}}
         testTenant: false
     switchEspAction: false
     envServiceId: HuaweiTest
@@ -253,7 +253,7 @@ basis_PublishHuaweiProd_001:
           code: ${{app1_code()}}
           name: 饮食管家
           description: wenwu（基础功能验证）
-          tenantId: lcdp
+          tenantId: ${{tenantId()}}
           appToken: ${{app1_Token()}}
           appType: 1
           iconName: 1.png
@@ -272,9 +272,9 @@ basis_PublishHuaweiProd_001:
           assetInitFlag: { }
     tenantUsers:
       - option: 1
-        tenantId: lcdp
-        tenantSid: 501035035546176
-        tenantName: 鼎捷开发平台测试租户
+        tenantId: ${{tenantId()}}
+        tenantSid: ${{tenantSid()}}
+        tenantName: ${{tenantName()}}
         testTenant: false
     syncEsp: false
     envServiceId: HuaweiProd
@@ -321,7 +321,7 @@ basis_SwitchPlanHuaweiProd_001:
           code: ${{app1_code()}}
           name: 饮食管家
           description: wenwu（基础功能验证）
-          tenantId: lcdp
+          tenantId: ${{tenantId()}}
           appToken: ${{app1_Token()}}
           appType: 1
           iconName: 1.png
@@ -339,8 +339,8 @@ basis_SwitchPlanHuaweiProd_001:
           useTenantInfos: [ ]
           assetInitFlag: { }
     tenantUsers:
-      - tenantId: lcdp
-        tenantName: 鼎捷开发平台测试租户
+      - tenantId: ${{tenantId()}}
+        tenantName: ${{tenantName()}}
         testTenant: false
     switchEspAction: false
     envServiceId: HuaweiProd
@@ -388,7 +388,7 @@ basis_PublishAzureProd_001:
           code: ${{app1_code()}}
           name: 饮食管家
           description: wenwu（基础功能验证）
-          tenantId: lcdp
+          tenantId: ${{tenantId()}}
           appToken: ${{app1_Token()}}
           appType: 1
           iconName: 1.png
@@ -407,9 +407,9 @@ basis_PublishAzureProd_001:
           assetInitFlag: { }
     tenantUsers:
       - option: 1
-        tenantId: lcdp
-        tenantSid: 501035035546176
-        tenantName: 鼎捷开发平台测试租户
+        tenantId: ${{tenantId()}}
+        tenantSid: ${{tenantSid()}}
+        tenantName: ${{tenantName()}}
         testTenant: false
     syncEsp: false
     envServiceId: AzureProd
@@ -456,7 +456,7 @@ basis_SwitchPlanAzureProd_001:
           code: ${{app1_code()}}
           name: 饮食管家
           description: wenwu（基础功能验证）
-          tenantId: lcdp
+          tenantId: ${{tenantId()}}
           appToken: ${{app1_Token()}}
           appType: 1
           iconName: 1.png
@@ -474,8 +474,8 @@ basis_SwitchPlanAzureProd_001:
           useTenantInfos: [ ]
           assetInitFlag: { }
     tenantUsers:
-      - tenantId: lcdp
-        tenantName: 鼎捷开发平台测试租户
+      - tenantId: ${{tenantId()}}
+        tenantName: ${{tenantName()}}
         testTenant: false
     switchEspAction: false
     envServiceId: AzureProd

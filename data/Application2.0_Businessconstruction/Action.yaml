@@ -108,8 +108,8 @@ action_JsonReqImportGet_001:
         maintenance_record: ""
         maintenance_personnel: ""
         staff_id: "123"
-        tenantsid: 847600433497088
-        tenant_id: "athenadeveloperTest"
+        tenantsid: ${{tenantSid()}}
+        tenant_id: "${{tenantId()}}"
         create_by: "wenwu@digiwin.com"
         create_date: "2025-02-26 16:53:19"
         modified_by: "wenwu@digiwin.com"
@@ -341,9 +341,9 @@ modulePublish_Publish_001:
     module: "action"
     application: ${{app2_code()}}
     tenantUsers:
-      - tenantId: "athenadeveloperTest"
-        tenantSid: 847600433497088
-        tenantName: "配置测试器"
+      - tenantId: "${{tenantId()}}"
+        tenantSid: ${{tenantSid()}}
+        tenantName: "${{tenantName()}}"
   dependence_case: false
   dependence_case_data:
   assert:

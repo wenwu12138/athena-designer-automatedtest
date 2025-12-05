@@ -116,7 +116,7 @@ basis_PublishTest_002:
           code: ${{app2_code()}}
           name: 通用驗證Z
           description: 通用驗證Z
-          tenantId: lcdp
+          tenantId: ${{tenantId()}}
           appToken: ${{app2_Token()}}
           appType: 5
           iconName: 1.png
@@ -133,9 +133,9 @@ basis_PublishTest_002:
           assetInitFlag: { }
     tenantUsers:
       - option: 1
-        tenantId: lcdp
-        tenantSid: 501035035546176
-        tenantName: 鼎捷开发平台测试租户
+        tenantId: ${{tenantId()}}
+        tenantSid: ${{tenantSid()}}
+        tenantName: ${{tenantName()}}
         testTenant: false
     syncEsp: false
     envServiceId: HuaweiTest
@@ -187,7 +187,7 @@ basis_SwitchPlanTest_002:
           code: ${{app2_code()}}
           name: 通用驗證Z
           description: 通用驗證Z
-          tenantId: lcdp
+          tenantId: ${{tenantId()}}
           appToken: ${{app2_Token()}}
           appType: 5
           iconName: 1.png
@@ -203,8 +203,8 @@ basis_SwitchPlanTest_002:
           useTenantInfos: [ ]
           assetInitFlag: { }
     tenantUsers:
-      - tenantId: lcdp
-        tenantName: 鼎捷开发平台测试租户
+      - tenantId: ${{tenantId()}}
+        tenantName: ${{tenantName()}}
         testTenant: false
     switchEspAction: false
     envServiceId: HuaweiTest
@@ -257,7 +257,7 @@ basis_PublishHuaweiProd_002:
           code: ${{app2_code()}}
           name: 通用驗證Z
           description: 通用驗證Z
-          tenantId: lcdp
+          tenantId: ${{tenantId()}}
           appToken: ${{app2_Token()}}
           appType: 5
           iconName: 1.png
@@ -274,9 +274,9 @@ basis_PublishHuaweiProd_002:
           assetInitFlag: { }
     tenantUsers:
       - option: 1
-        tenantId: lcdp
+        tenantId: ${{tenantId()}}
         tenantSid: 609649220293184
-        tenantName: 鼎捷开发平台测试租户
+        tenantName: ${{tenantName()}}
         testTenant: true
     syncEsp: false
     envServiceId: HuaweiProd
@@ -324,7 +324,7 @@ basis_SwitchPlanHuaweiProd_002:
           code: ${{app2_code()}}
           name: 通用驗證Z
           description: 通用驗證Z
-          tenantId: lcdp
+          tenantId: ${{tenantId()}}
           appToken: ${{app2_Token()}}
           appType: 5
           iconName: 1.png
@@ -340,8 +340,8 @@ basis_SwitchPlanHuaweiProd_002:
           useTenantInfos: [ ]
           assetInitFlag: { }
     tenantUsers:
-      - tenantId: lcdp
-        tenantName: 鼎捷开发平台测试租户
+      - tenantId: ${{tenantId()}}
+        tenantName: ${{tenantName()}}
         testTenant: true
     switchEspAction: false
     envServiceId: HuaweiProd
@@ -390,7 +390,7 @@ basis_PublishAzureProd_002:
           code: ${{app2_code()}}
           name: 通用驗證Z
           description: 通用驗證Z
-          tenantId: lcdp
+          tenantId: ${{tenantId()}}
           appToken: ${{app2_Token()}}
           appType: 5
           iconName: 1.png
@@ -407,9 +407,9 @@ basis_PublishAzureProd_002:
           assetInitFlag: { }
     tenantUsers:
       - option: 1
-        tenantId: lcdp
+        tenantId: ${{tenantId()}}
         tenantSid: 631276495094336
-        tenantName: 鼎捷开发平台测试租户
+        tenantName: ${{tenantName()}}
         testTenant: true
     syncEsp: false
     envServiceId: AzureProd
@@ -457,7 +457,7 @@ basis_SwitchPlanAzureProd_002:
           code: ${{app2_code()}}
           name: 通用驗證Z
           description: 通用驗證Z
-          tenantId: lcdp
+          tenantId: ${{tenantId()}}
           appToken: ${{app2_Token()}}
           appType: 5
           iconName: 1.png
@@ -473,8 +473,8 @@ basis_SwitchPlanAzureProd_002:
           useTenantInfos: [ ]
           assetInitFlag: { }
     tenantUsers:
-      - tenantId: lcdp
-        tenantName: 鼎捷开发平台测试租户
+      - tenantId: ${{tenantId()}}
+        tenantName: ${{tenantName()}}
         testTenant: true
     switchEspAction: false
     envServiceId: AzureProd

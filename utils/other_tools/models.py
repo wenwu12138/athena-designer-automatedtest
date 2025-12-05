@@ -224,8 +224,8 @@ class Config(BaseModel):
     app2_Token:Text
     env: Text
     tenantName: Text
-    tenantSid: Text
-    tenantId: int
+    tenantSid: Union[Text, int, None]
+    tenantId: Union[Text, int, None]
 
 
 

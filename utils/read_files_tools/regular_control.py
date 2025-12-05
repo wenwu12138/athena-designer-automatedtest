@@ -153,67 +153,50 @@ class Context:
     @classmethod
     def app1_code(cls) -> str:
         from utils import config
-        """获取app的host"""
+        """获取1.0应用Code"""
         return config.app1_code
 
     @classmethod
     def app1_Token(cls) -> str:
         from utils import config
-        """获取app的host"""
+        """获取1.0应用AppToken"""
         return config.app1_Token
 
     @classmethod
     def app2_code(cls) -> str:
         from utils import config
-        """获取app的host"""
+        """获取2.0应用Code"""
         return config.app2_code
 
     @classmethod
     def app2_Token(cls) -> str:
         from utils import config
-        """获取app的host"""
+        """获取2.0应用AppToken"""
         return config.app2_Token
 
     @classmethod
     def env(cls) -> str:
         from utils import config
-        """获取app的host"""
+        """获取运行环境"""
         return config.env
 
-    @classmethod
-    def TestApp_code(cls) -> str:
-        from utils import config
-        """获取app的host"""
-        return config.TestApp_code
-
-    @classmethod
-    def Data_Code(cls) -> str:
-        from utils import config
-        """获取app的host"""
-        return config.Data_Code
-
-    @classmethod
-    def Project_Data_Code(cls) -> str:
-        from utils import config
-        """获取app的host"""
-        return config.Project_Data_Code
 
     @classmethod
     def tenantId(cls) -> str:
         from utils import config
-        """获取app的host"""
+        """获取租户Id"""
         return config.tenantId
 
     @classmethod
     def tenantSid(cls) -> str:
         from utils import config
-        """获取app的host"""
+        """获取租户Sid"""
         return config.tenantSid
 
     @classmethod
     def tenantName(cls) -> str:
         from utils import config
-        """获取app的host"""
+        """获取租户名称"""
         return config.tenantName
 
 

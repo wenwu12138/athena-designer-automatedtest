@@ -7,7 +7,6 @@ import json
 
 
 _data = GetYamlData(ensure_path_sep("\\common\\config.yaml")).get_yaml_data()
-_data = eval(regular(str(_data)))
 config = Config(**_data)
 # 解决用例中存在 随机生成参数  并且参数在入参中存在多个路径用法
 # 1.首先用例用配置的静态文件就用了  因为这个静态文件是通用替换的

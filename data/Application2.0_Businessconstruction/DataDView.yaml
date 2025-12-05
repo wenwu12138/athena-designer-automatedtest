@@ -789,9 +789,9 @@ module_publish_data_view_001:
     module: "dataView"
     application: ${{app2_code()}}
     tenantUsers:
-      - tenantId: "athenadeveloperTest"
-        tenantSid: 847600433497088
-        tenantName: "配置测试器"
+      - tenantId: "${{tenantId()}}"
+        tenantSid: ${{tenantSid()}}
+        tenantName: "${{tenantName()}}"
   dependence_case: false
   dependence_case_data:
   assert:
@@ -820,9 +820,9 @@ modulePublish_modelSingle_publish_view_test_001:
     module: "modelDriven"
     application: ${{app2_code()}}
     tenantUsers:
-      - tenantId: "athenadeveloperTest"
-        tenantSid: 847600433497088
-        tenantName: "配置测试器"
+      - tenantId: "${{tenantId()}}"
+        tenantSid: ${{tenantSid()}}
+        tenantName: "${{tenantName()}}"
     serviceCode: "DPBAS"
   dependence_case: false
   dependence_case_data:

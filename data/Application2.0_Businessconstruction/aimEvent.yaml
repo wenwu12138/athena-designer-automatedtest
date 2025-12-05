@@ -77,7 +77,7 @@ aimEvent_CreateEvent_001:
         en_US: "Auto Test Event"
     application: ${{app2_code()}}
     adpApplication: ${{app2_code()}}
-    adpTenantId: "athenadeveloperTest"
+    adpTenantId: "${{tenantId()}}"
     eventBodyExplain: []
   dependence_case: false
   dependence_case_data:
@@ -163,7 +163,7 @@ aimEvent_EditEvent_001:
         en_US: "Updated Auto Event"
     application: ${{app2_code()}}
     adpApplication: ${{app2_code()}}
-    adpTenantId: "athenadeveloperTest"
+    adpTenantId: "${{tenantId()}}"
   dependence_case: false
   dependence_case_data:
   assert:
