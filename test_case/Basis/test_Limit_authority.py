@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time   : 2025-12-05 09:54:54
+# @Time   : 2025-12-08 11:48:00
 
 
 import allure
@@ -22,10 +22,10 @@ re_data = regular(str(TestData))
 
 
 @allure.epic("开发平台接口")
-@allure.feature("权限管理")
+@allure.feature("基础功能验证")
 class TestLimitAuthority:
 
-    @allure.story("查询普通用户")
+    @allure.story("权限相关")
     @pytest.mark.parametrize('in_data', eval(re_data), ids=[i['detail'] for i in TestData])
     def test_Limit_authority(self, in_data, case_skip):
         """

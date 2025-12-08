@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time   : 2025-12-05 09:54:54
+# @Time   : 2025-12-08 11:48:00
 
 
 import allure
@@ -16,7 +16,7 @@ import datetime
 import json
 
 
-case_id = ['basis_AddBranch_002', 'basis_Compile_002', 'basis_PublishTest_002', 'basis_SwitchPlanTest_002', 'basis_PublishHuaweiProd_002', 'basis_SwitchPlanHuaweiProd_002', 'basis_PublishAzureProd_002', 'basis_SwitchPlanAzureProd_002']
+case_id = ['basis_AddBranch_002', 'basis_Compile_002', 'basis_PublishTest_002', 'basis_SwitchPlanTest_002', 'basis_PublishHuaweiProd_002', 'basis_SwitchPlanHuaweiProd_002', 'basis_PublishAzureProd_002', 'basis_SwitchPlanAzureProd_002', 'basis_QueryTenantPipeline_local001', 'basis_PublishTest_local001', 'basis_SwitchPlanTest_local001']
 TestData = GetTestCase.case_data(case_id)
 re_data = regular(str(TestData))
 

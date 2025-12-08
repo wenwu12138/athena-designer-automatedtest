@@ -93,7 +93,7 @@ basis_PublishTest_002:
   headers:
     digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
   requestType: json
-  is_run: true
+  is_run: "'正式' in '${{env()}}' or '测试' in '${{env()}}'"
   data:
     applicationDataList:
       - application: ${{app2_code()}}
@@ -165,7 +165,7 @@ basis_SwitchPlanTest_002:
   headers:
     digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
   requestType: json
-  is_run: true
+  is_run: "'正式' in '${{env()}}' or '测试' in '${{env()}}'"
   data:
     applicationDataList:
       - application: ${{app2_code()}}
@@ -298,7 +298,7 @@ basis_SwitchPlanHuaweiProd_002:
   host: ${{athena_designer_host()}}
   url: /athena-designer/application/addSwitchPlan
   method: POST
-  detail: 2.0应用基础功能验证_切版测试区
+  detail: 2.0应用基础功能验证_切版正式
   headers:
     digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
   requestType: json
@@ -490,3 +490,184 @@ basis_SwitchPlanAzureProd_002:
       type: ==
       value: 0
       AssertType:
+
+
+##########增加判断条件如果能根据环境判断是地端就进行查询发版切板
+
+
+# 查询租户流水线信息-
+basis_QueryTenantPipeline_local001:
+  host: ${{athena_deployer_host()}}
+  url: /athenadeployer/releasePipeline/queryTenantPipeline
+  method: GET
+  detail: 查询应用租户流水线信息_地端发版查询
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: params
+  is_run: "'地端' in '${{env()}}'"
+  data:
+    application: ${{app2_code()}}
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: false
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.groups[0].node.serviceId
+      name: envServiceId
+    - type: response
+      jsonpath: $.data.groups[0].node.envs[?(@.operate=='publish')].env
+      name: publish_env
+    - type: response
+      jsonpath: $.data.groups[0].node.envs[?(@.operate=='publish')].env
+      name: switch_env
+
+
+
+#2.0应用发版地端环境
+basis_PublishTest_local001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/addDeployPlan
+  method: POST
+  detail: 2.0应用基础功能验证_发版地端环境
+  headers:
+    digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
+  requestType: json
+  is_run: "'地端' in '${{env()}}'"
+  data:
+    applicationDataList:
+      - application: ${{app2_code()}}
+        compileDataCode: $cache{compileDataCode}
+        applicationInfoDto:
+          createBy: wenwu@digiwin.com
+          createDate: '2025-05-16 00:50:37'
+          editBy: wenwu@digiwin.com
+          editDate: "'2025-05-16 00:50:37'"
+          lang:
+            name:
+              zh_CN: 通用验证Z
+              zh_TW: 通用驗證Z
+              en_US: 通用驗證Z
+            description:
+              zh_CN: 通用验证Z
+              zh_TW: 通用驗證Z
+              en_US: 通用驗證Z
+          objectId: 68261b5d42bd111dc73b7976
+          code: ${{app2_code()}}
+          name: 通用驗證Z
+          description: 通用驗證Z
+          tenantId: ${{tenantId()}}
+          appToken: ${{app2_Token()}}
+          appType: 5
+          iconName: 1.png
+          iconBgcolor: '#0189FF'
+          commonApp: false
+          latestCompileVersion: 1.0.0.2508211627_alpha
+          latestCompileDescription: 20250821162729-備份分支(備份分支2)編譯
+          deleteOrder: 0
+          appTypes:
+            - 5
+          abandon: 0
+          appStatus: success
+          useTenantInfos: [ ]
+          assetInitFlag: { }
+    tenantUsers:
+      - option: 1
+        tenantId: ${{tenantId()}}
+        tenantSid: ${{tenantSid()}}
+        tenantName: ${{tenantName()}}
+        testTenant: false
+    syncEsp: false
+    envServiceId: $cache{envServiceId}
+    env: $cache{publish_env}
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: False
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data
+      name: deployNo
+
+
+#2.0切版地端环境
+basis_SwitchPlanTest_local001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/addSwitchPlan
+  method: POST
+  detail: 2.0应用基础功能验证_切版地端环境
+  headers:
+    digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
+  requestType: json
+  is_run: "'地端' in '${{env()}}'"
+  data:
+    applicationDataList:
+      - application: ${{app2_code()}}
+        applicationInfoDto:
+          createBy: wenwu@digiwin.com
+          createDate: '2025-05-16 00:50:37'
+          editBy: wenwu@digiwin.com
+          editDate: "'2025-05-16 00:50:37'"
+          lang:
+            name:
+              zh_CN: 通用验证Z
+              zh_TW: 通用驗證Z
+              en_US: 通用驗證Z
+            description:
+              zh_CN: 通用验证Z
+              zh_TW: 通用驗證Z
+              en_US: 通用驗證Z
+          objectId: 68261b5d42bd111dc73b7976
+          code: ${{app2_code()}}
+          name: 通用驗證Z
+          description: 通用驗證Z
+          tenantId: ${{tenantId()}}
+          appToken: ${{app2_Token()}}
+          appType: 5
+          iconName: 1.png
+          iconBgcolor: '#0189FF'
+          commonApp: false
+          latestCompileVersion: 1.0.0.2508211627_alpha
+          latestCompileDescription: 20250821162729-備份分支(備份分支2)編譯
+          deleteOrder: 0
+          appTypes:
+            - 5
+          abandon: 0
+          appStatus: success
+          useTenantInfos: [ ]
+          assetInitFlag: { }
+    tenantUsers:
+      - tenantId: ${{tenantId()}}
+        tenantName: ${{tenantName()}}
+        testTenant: false
+    switchEspAction: false
+    envServiceId: $cache{envServiceId}
+    env: $cache{switch_env}
+
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: False
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.id
+      name: switchNo

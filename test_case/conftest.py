@@ -72,20 +72,20 @@ def get_iam_token():
 
     }
 
-    """
-    #  双虎地端环境
-    data = {
-    "userId": "default",
-    "passwordHash": "skv1PcefW8T6aX43rdbkhg==",
-    "clientEncryptPublicKey": "a/j/W/AIcXb7nWL0pDAZ27h28IiZHa8A5R2cP+WbYNE9bFZwv330c5VX/cFj23Lg1xk0bECInHxQk0gSD8NWdIFRz9SVZUWjGfhDOkmK83yhThuzYTK4wtJlcX36RemJGXldAhtE2b2tgPGoBbT+DXFMJVUjbPmqo16Lgzwi82zi1jLTkkGt+m39M+bU3sFf/deUWwNZiYyMt1oxXvH4MRgdGCJGEqnjdz3xiiWJvAQTLDHW3ox9opbJ2hUQZMZ7SH2M6XAFOWXDCFmwWRA34jAr8d4oSGN2onfJHe7smquTl5yaHQ4Niwquo5kRMruJ3wu2NSZNSD41Ney1BC/hXw==",
-    "excludeNonVisible": True
-}
-    headers = {
-   'digi-middleware-auth-app': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1MzczMjY2ODk0NjEsInNpZCI6NDA3MTI4ODI1NTM0NDY0MSwiaWQiOiJEaWdpd2luQ2xvdWQifQ.XGPl3brNeNTCivWN_bIYj8TfcxqlkQ0sFV2woPOr0TY',
-   'digi-middleware-device-id': 'bYdVWJHMnxMl/wj0DPeFlkpHNWO12g/RNg9oc+CtSxRkdmQUJVyFvAp5lBcJB8ytn5SeAhsp+YDfZk50ohrJU/Rw/AcHjlIoqE2wRByylk8=',
-   'Content-Type': 'application/json'
-}
-    """
+    #     #  双虎地端环境
+    #     data = {
+    #     "userId": "default",
+    #     "passwordHash": "skv1PcefW8T6aX43rdbkhg==",
+    #     "clientEncryptPublicKey": "a/j/W/AIcXb7nWL0pDAZ27h28IiZHa8A5R2cP+WbYNE9bFZwv330c5VX/cFj23Lg1xk0bECInHxQk0gSD8NWdIFRz9SVZUWjGfhDOkmK83yhThuzYTK4wtJlcX36RemJGXldAhtE2b2tgPGoBbT+DXFMJVUjbPmqo16Lgzwi82zi1jLTkkGt+m39M+bU3sFf/deUWwNZiYyMt1oxXvH4MRgdGCJGEqnjdz3xiiWJvAQTLDHW3ox9opbJ2hUQZMZ7SH2M6XAFOWXDCFmwWRA34jAr8d4oSGN2onfJHe7smquTl5yaHQ4Niwquo5kRMruJ3wu2NSZNSD41Ney1BC/hXw==",
+    #     "excludeNonVisible": True
+    # }
+    #     headers = {
+    #    'digi-middleware-auth-app': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1MzczMjY2ODk0NjEsInNpZCI6NDA3MTI4ODI1NTM0NDY0MSwiaWQiOiJEaWdpd2luQ2xvdWQifQ.XGPl3brNeNTCivWN_bIYj8TfcxqlkQ0sFV2woPOr0TY',
+    #    'digi-middleware-device-id': 'bYdVWJHMnxMl/wj0DPeFlkpHNWO12g/RNg9oc+CtSxRkdmQUJVyFvAp5lBcJB8ytn5SeAhsp+YDfZk50ohrJU/Rw/AcHjlIoqE2wRByylk8=',
+    #    'Content-Type': 'application/json'
+    # }
+
+
 
     # 正式区就要用lcdp这个租户验证  只有这个租户能发微软正式
     # if '正式' in config.env:
@@ -189,7 +189,7 @@ def pytest_terminal_summary(terminalreporter):
     """
     收集测试结果
     """
-    session_start = terminalreporter._session_start
+    session_start = terminalreporter._sessionstarttime
     session_start_timestamp = time.mktime(session_start.timetuple()) if isinstance(session_start, datetime) else 0
     #计算使用时间
     global _session_start_time

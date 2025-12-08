@@ -5,12 +5,6 @@ case_common:
   allureStory: 权限相关
 
 
-case_common:
-  allureEpic: 开发平台接口
-  allureFeature: 权限管理
-  allureStory: 查询普通用户
-
-
 # 查询应用普通用户权限列表
 auth_QueryNormalUsers_001:
   host: ${{athena_designer_host()}}
