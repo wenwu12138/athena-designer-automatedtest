@@ -63,10 +63,10 @@ pipeline {
         PROJECT_NAME = 'Athena开发平台'
         TESTER_NAME = '闻武'
 
-        // 报告路径
+        // 报告路径 - 修复：使用env变量
         ALLURE_RESULTS_DIR = 'report/tmp'
         ALLURE_REPORT_DIR = 'report/html'
-        JENKINS_REPORTS_DIR = "jenkins-reports/${BUILD_NUMBER}_${params.TEST_ENVIRONMENT}"
+        JENKINS_REPORTS_DIR = "jenkins-reports/${env.BUILD_NUMBER}_${params.TEST_ENVIRONMENT}"
 
         // 根据环境设置标签
         ENV_LABEL = "${params.TEST_ENVIRONMENT}"
@@ -88,7 +88,7 @@ pipeline {
                 ║ 测试人员: ${TESTER_NAME}                          ║
                 ║ 测试环境: ${params.TEST_ENVIRONMENT}              ║
                 ║ 测试类型: ${params.TEST_TYPE}                     ║
-                ║ 构建编号: #${BUILD_NUMBER}                        ║
+                ║ 构建编号: #${env.BUILD_NUMBER}                    ║
                 ║ 执行时间: ${new Date().format('yyyy-MM-dd HH:mm:ss')} ║
                 ╚═══════════════════════════════════════════════════╝
                 """
@@ -192,7 +192,7 @@ except ImportError as e:
 
                 script {
                     // 使用环境管理器切换环境
-                    sh '''
+                    sh """
                         echo "使用环境管理器切换环境..."
                         if [ -f "env_config_manager.py" ]; then
                             python3 env_config_manager.py switch "${params.TEST_ENVIRONMENT}"
@@ -253,7 +253,7 @@ EOF
                             python3 switch_env_temp.py "${params.TEST_ENVIRONMENT}"
                             rm -f switch_env_temp.py
                         fi
-                    '''
+                    """
 
                     // 显示当前配置
                     sh '''
@@ -276,25 +276,34 @@ EOF
 
                 script {
                     // 更新config.py中的通知配置
-                    sh '''
+                    sh """
                         echo "更新通知配置..."
                         if [ -f "config.py" ]; then
                             # 备份原配置
                             cp -f config.py config.py.backup
 
-                            # 更新通知类型
-                            NOTIFICATION_MAP = {
-                                "无通知": "0",
-                                "邮件通知": "3",
-                                "钉钉通知": "1",
-                                "企业微信通知": "2",
-                                "全部通知": "1,2,3"
-                            }
-
-                            NOTIFICATION_VALUE = "${NOTIFICATION_MAP[params.NOTIFICATION_TYPE] ?: '0'}"
+                            # 处理通知类型映射 - 直接在shell中处理
+                            NOTIFICATION_VALUE="0"
+                            case "${params.NOTIFICATION_TYPE}" in
+                                "无通知")
+                                    NOTIFICATION_VALUE="0"
+                                    ;;
+                                "邮件通知")
+                                    NOTIFICATION_VALUE="3"
+                                    ;;
+                                "钉钉通知")
+                                    NOTIFICATION_VALUE="1"
+                                    ;;
+                                "企业微信通知")
+                                    NOTIFICATION_VALUE="2"
+                                    ;;
+                                "全部通知")
+                                    NOTIFICATION_VALUE="1,2,3"
+                                    ;;
+                            esac
 
                             # 使用sed更新配置
-                            sed -i "s/notification_type =.*/notification_type = \"${NOTIFICATION_VALUE}\"/g" config.py
+                            sed -i "s/notification_type =.*/notification_type = \\"${NOTIFICATION_VALUE}\\"/g" config.py
                             sed -i "s/excel_report =.*/excel_report = ${params.GENERATE_EXCEL_REPORT}/g" config.py
 
                             echo "✅ 通知配置已更新"
@@ -303,7 +312,7 @@ EOF
                         else
                             echo "⚠️  config.py不存在，跳过配置更新"
                         fi
-                    '''
+                    """
                 }
             }
         }
@@ -314,8 +323,8 @@ EOF
                 echo "🚀 开始执行接口测试..."
 
                 script {
-                    // 创建报告目录
-                    sh '''
+                    // 创建报告目录 - 修复：使用双引号
+                    sh """
                         echo "创建报告目录..."
                         mkdir -p ${ALLURE_RESULTS_DIR}
                         mkdir -p ${ALLURE_REPORT_DIR}
@@ -325,11 +334,11 @@ EOF
                             echo "清理Allure历史数据..."
                             rm -rf ${ALLURE_RESULTS_DIR}/* 2>/dev/null || true
                         fi
-                    '''
+                    """
 
                     // 设置测试执行超时（30分钟）
                     timeout(time: 30, unit: 'MINUTES') {
-                        sh '''
+                        sh """
                             echo "开始执行测试..."
                             echo "环境: ${params.TEST_ENVIRONMENT}"
                             echo "测试类型: ${params.TEST_TYPE}"
@@ -338,9 +347,9 @@ EOF
 
                             # 设置环境变量
                             export JENKINS_BUILD="true"
-                            export BUILD_NUMBER="${BUILD_NUMBER}"
-                            export JOB_NAME="${JOB_NAME}"
-                            export BUILD_URL="${BUILD_URL}"
+                            export BUILD_NUMBER="${env.BUILD_NUMBER}"
+                            export JOB_NAME="${env.JOB_NAME}"
+                            export BUILD_URL="${env.BUILD_URL}"
                             export TEST_ENVIRONMENT="${params.TEST_ENVIRONMENT}"
 
                             # 执行run.py（你的主测试脚本）
@@ -348,12 +357,12 @@ EOF
                             python3 run.py
 
                             # 记录退出码
-                            EXIT_CODE=$?
-                            echo $EXIT_CODE > test_exit_code.txt
-                            echo "测试退出码: $EXIT_CODE"
+                            EXIT_CODE=\$?
+                            echo \$EXIT_CODE > test_exit_code.txt
+                            echo "测试退出码: \$EXIT_CODE"
 
                             # 如果run.py启动了自己的报告服务，这里可能需要处理
-                        '''
+                        """
                     }
 
                     // 检查测试结果
@@ -375,7 +384,7 @@ EOF
 
                 script {
                     // 生成Allure报告
-                    sh '''
+                    sh """
                         echo "生成Allure报告..."
                         if command -v allure &> /dev/null && [ -d "${ALLURE_RESULTS_DIR}" ]; then
                             allure generate ${ALLURE_RESULTS_DIR} -o ${ALLURE_REPORT_DIR} --clean
@@ -386,22 +395,22 @@ EOF
                         else
                             echo "⚠️  跳过Allure报告生成"
                         fi
-                    '''
+                    """
 
                     // 复制其他报告文件
-                    sh '''
+                    sh """
                         echo "收集报告文件..."
                         # 复制pytest-html报告（如果有）
                         find . -name "*.html" -type f -not -path "./venv/*" -not -path "./.venv/*" | head -5 | while read file; do
-                            cp "$file" ${JENKINS_REPORTS_DIR}/ 2>/dev/null || true
+                            cp "\$file" ${JENKINS_REPORTS_DIR}/ 2>/dev/null || true
                         done
 
                         # 复制日志文件
                         find . -name "*.log" -type f | head -3 | while read file; do
-                            cp "$file" ${JENKINS_REPORTS_DIR}/ 2>/dev/null || true
+                            cp "\$file" ${JENKINS_REPORTS_DIR}/ 2>/dev/null || true
                         done
 
-                        # 生成测试摘要
+                        # 生成测试摘要 - 修复：在双引号内正确处理变量
                         cat > ${JENKINS_REPORTS_DIR}/test_summary.md << EOF
 # Athena开发平台 - 接口自动化测试报告
 
@@ -411,30 +420,30 @@ EOF
 - **测试环境**: ${params.TEST_ENVIRONMENT}
 - **测试类型**: ${params.TEST_TYPE}
 - **测试模块**: ${params.TEST_MODULE}
-- **构建编号**: #${BUILD_NUMBER}
-- **执行时间**: $(date '+%Y-%m-%d %H:%M:%S')
+- **构建编号**: #${env.BUILD_NUMBER}
+- **执行时间**: \$(date '+%Y-%m-%d %H:%M:%S')
 - **测试时长**: ${currentBuild.durationString}
 
 ## 环境配置
-- **设计器地址**: $(grep "athena_designer_host:" common/config.yaml | cut -d' ' -f2)
-- **部署器地址**: $(grep "athena_deployer_host:" common/config.yaml | cut -d' ' -f2)
-- **租户部署器**: $(grep "athena_tenant_deployer_host:" common/config.yaml | cut -d' ' -f2)
-- **IAM地址**: $(grep "iam_host:" common/config.yaml | cut -d' ' -f2)
+- **设计器地址**: \$(grep "athena_designer_host:" common/config.yaml | cut -d' ' -f2)
+- **部署器地址**: \$(grep "athena_deployer_host:" common/config.yaml | cut -d' ' -f2)
+- **租户部署器**: \$(grep "athena_tenant_deployer_host:" common/config.yaml | cut -d' ' -f2)
+- **IAM地址**: \$(grep "iam_host:" common/config.yaml | cut -d' ' -f2)
 
 ## 测试结果
-- **退出码**: $(cat test_exit_code.txt 2>/dev/null || echo "N/A")
+- **退出码**: \$(cat test_exit_code.txt 2>/dev/null || echo "N/A")
 - **Allure报告**: ${ALLURE_REPORT_DIR}/
 - **详细日志**: 查看Jenkins控制台输出
 
 ## 生成的报告文件
-$(find ${JENKINS_REPORTS_DIR} -type f -name "*.html" -o -name "*.xml" -o -name "*.json" | xargs -I {} basename {} | sort | uniq | while read file; do echo "- $file"; done)
+\$(find ${JENKINS_REPORTS_DIR} -type f -name "*.html" -o -name "*.xml" -o -name "*.json" | xargs -I {} basename {} | sort | uniq | while read file; do echo "- \$file"; done)
 
 EOF
 
                         echo "✅ 报告处理完成"
                         echo "报告目录: ${JENKINS_REPORTS_DIR}"
                         ls -la ${JENKINS_REPORTS_DIR}/
-                    '''
+                    """
 
                     // 发布HTML报告到Jenkins
                     script {
@@ -476,24 +485,24 @@ EOF
                 echo "🌐 启动本地报告服务..."
 
                 script {
-                    sh '''
+                    sh """
                         echo "启动Allure报告Web服务..."
                         if command -v allure &> /dev/null && [ -d "${ALLURE_RESULTS_DIR}" ]; then
                             # 在后台启动服务
                             nohup allure serve ${ALLURE_RESULTS_DIR} -h 0.0.0.0 -p 9999 > allure_service.log 2>&1 &
-                            echo $! > allure_service.pid
+                            echo \$! > allure_service.pid
                             sleep 3
 
                             # 获取服务器IP
-                            SERVER_IP=$(curl -s ifconfig.me || hostname -I | awk '{print $1}')
+                            SERVER_IP=\$(curl -s ifconfig.me || hostname -I | awk '{print \$1}')
                             echo "✅ 报告服务已启动"
-                            echo "   访问地址: http://${SERVER_IP}:9999"
-                            echo "   PID: $(cat allure_service.pid)"
+                            echo "   访问地址: http://\${SERVER_IP}:9999"
+                            echo "   PID: \$(cat allure_service.pid)"
                             echo "   日志文件: allure_service.log"
                         else
                             echo "⚠️  无法启动报告服务"
                         fi
-                    '''
+                    """
                 }
             }
         }
@@ -504,8 +513,15 @@ EOF
             echo "🧹 清理工作..."
 
             script {
-                // 恢复配置文件
-                sh '''
+                // 在script块中定义变量，然后在sh中使用
+                def buildStatus = currentBuild.result
+                def buildNumber = env.BUILD_NUMBER
+                def testEnv = params.TEST_ENVIRONMENT
+                def duration = currentBuild.durationString
+                def buildUrl = env.BUILD_URL
+                def reportsDir = "jenkins-reports/${buildNumber}_${testEnv}"
+
+                sh """
                     echo "恢复配置文件..."
                     if [ -f "common/config.yaml.backup" ]; then
                         mv -f common/config.yaml.backup common/config.yaml
@@ -519,7 +535,7 @@ EOF
                     # 停止报告服务
                     if [ -f "allure_service.pid" ]; then
                         echo "停止报告服务..."
-                        kill $(cat allure_service.pid) 2>/dev/null || true
+                        kill \$(cat allure_service.pid) 2>/dev/null || true
                         rm -f allure_service.pid allure_service.log
                     fi
 
@@ -534,21 +550,21 @@ EOF
                     echo ""
                     echo "📋 测试执行完成"
                     echo "================================="
-                    echo "构建状态: ${currentBuild.result}"
-                    echo "构建编号: #${BUILD_NUMBER}"
-                    echo "测试环境: ${params.TEST_ENVIRONMENT}"
-                    echo "测试时长: ${currentBuild.durationString}"
+                    echo "构建状态: ${buildStatus}"
+                    echo "构建编号: #${buildNumber}"
+                    echo "测试环境: ${testEnv}"
+                    echo "测试时长: ${duration}"
                     echo ""
                     echo "📁 报告文件位置:"
-                    echo "   Jenkins HTML报告: ${BUILD_URL}HTML_Report/"
-                    echo "   归档文件: ${BUILD_URL}artifact/"
-                    echo "   本地目录: ${JENKINS_REPORTS_DIR}"
+                    echo "   Jenkins HTML报告: ${buildUrl}HTML_Report/"
+                    echo "   归档文件: ${buildUrl}artifact/"
+                    echo "   本地目录: ${reportsDir}"
                     echo ""
-                    if [ -f "${JENKINS_REPORTS_DIR}/test_summary.md" ]; then
+                    if [ -f "${reportsDir}/test_summary.md" ]; then
                         echo "测试摘要:"
-                        cat ${JENKINS_REPORTS_DIR}/test_summary.md | grep -E "测试环境:|测试类型:|退出码:" | head -5
+                        cat ${reportsDir}/test_summary.md | grep -E "测试环境:|测试类型:|退出码:" | head -5
                     fi
-                '''
+                """
             }
         }
 
@@ -564,7 +580,7 @@ EOF
                     if (params.NOTIFICATION_TYPE.contains('邮件') || params.NOTIFICATION_TYPE == '全部通知') {
                         emailext(
                             to: "${EMAIL_RECIPIENTS}",
-                            subject: "${EMAIL_SUBJECT_PREFIX} ✅ 测试成功 - ${params.TEST_ENVIRONMENT} - 构建 #${BUILD_NUMBER}",
+                            subject: "${EMAIL_SUBJECT_PREFIX} ✅ 测试成功 - ${params.TEST_ENVIRONMENT} - 构建 #${env.BUILD_NUMBER}",
                             body: """
                             <h2>✅ Athena开发平台接口测试成功</h2>
                             <hr>
@@ -572,7 +588,7 @@ EOF
                             <p><strong>项目名称：</strong>${PROJECT_NAME}</p>
                             <p><strong>测试环境：</strong>${params.TEST_ENVIRONMENT}</p>
                             <p><strong>测试类型：</strong>${params.TEST_TYPE}</p>
-                            <p><strong>构建编号：</strong>#${BUILD_NUMBER}</p>
+                            <p><strong>构建编号：</strong>#${env.BUILD_NUMBER}</p>
                             <p><strong>执行时间：</strong>${new Date().format('yyyy-MM-dd HH:mm:ss')}</p>
                             <p><strong>测试时长：</strong>${currentBuild.durationString}</p>
                             <p><strong>测试人员：</strong>${TESTER_NAME}</p>
@@ -582,9 +598,9 @@ EOF
                             <hr>
                             <h3>相关链接</h3>
                             <ul>
-                                <li><a href="${BUILD_URL}">构建详情</a></li>
-                                <li><a href="${BUILD_URL}HTML_Report/">查看测试报告</a></li>
-                                <li><a href="${BUILD_URL}artifact/${JENKINS_REPORTS_DIR}/">下载报告文件</a></li>
+                                <li><a href="${env.BUILD_URL}">构建详情</a></li>
+                                <li><a href="${env.BUILD_URL}HTML_Report/">查看测试报告</a></li>
+                                <li><a href="${env.BUILD_URL}artifact/${JENKINS_REPORTS_DIR}/">下载报告文件</a></li>
                             </ul>
                             <hr>
                             <p><small>此邮件由Jenkins自动发送，请勿回复。</small></p>
@@ -608,7 +624,7 @@ EOF
                     if (params.NOTIFICATION_TYPE.contains('邮件') || params.NOTIFICATION_TYPE == '全部通知') {
                         emailext(
                             to: "${EMAIL_RECIPIENTS}",
-                            subject: "${EMAIL_SUBJECT_PREFIX} ❌ 测试失败 - ${params.TEST_ENVIRONMENT} - 构建 #${BUILD_NUMBER}",
+                            subject: "${EMAIL_SUBJECT_PREFIX} ❌ 测试失败 - ${params.TEST_ENVIRONMENT} - 构建 #${env.BUILD_NUMBER}",
                             body: """
                             <h2>❌ Athena开发平台接口测试失败</h2>
                             <hr>
@@ -616,7 +632,7 @@ EOF
                             <p><strong>项目名称：</strong>${PROJECT_NAME}</p>
                             <p><strong>测试环境：</strong>${params.TEST_ENVIRONMENT}</p>
                             <p><strong>测试类型：</strong>${params.TEST_TYPE}</p>
-                            <p><strong>构建编号：</strong>#${BUILD_NUMBER}</p>
+                            <p><strong>构建编号：</strong>#${env.BUILD_NUMBER}</p>
                             <p><strong>执行时间：</strong>${new Date().format('yyyy-MM-dd HH:mm:ss')}</p>
                             <p><strong>测试时长：</strong>${currentBuild.durationString}</p>
                             <hr>
@@ -632,8 +648,8 @@ EOF
                             <hr>
                             <h3>立即处理</h3>
                             <ul>
-                                <li><a href="${BUILD_URL}console">查看控制台错误日志</a></li>
-                                <li><a href="${BUILD_URL}">进入构建详情页</a></li>
+                                <li><a href="${env.BUILD_URL}console">查看控制台错误日志</a></li>
+                                <li><a href="${env.BUILD_URL}">进入构建详情页</a></li>
                                 <li>检查测试环境: ${params.TEST_ENVIRONMENT}</li>
                             </ul>
                             <hr>
@@ -654,14 +670,14 @@ EOF
                 if (params.NOTIFICATION_TYPE != '无通知') {
                     emailext(
                         to: "${EMAIL_RECIPIENTS}",
-                        subject: "${EMAIL_SUBJECT_PREFIX} ⚠️ 测试不稳定 - ${params.TEST_ENVIRONMENT} - 构建 #${BUILD_NUMBER}",
+                        subject: "${EMAIL_SUBJECT_PREFIX} ⚠️ 测试不稳定 - ${params.TEST_ENVIRONMENT} - 构建 #${env.BUILD_NUMBER}",
                         body: """
                         <h2>⚠️ Athena开发平台接口测试有失败用例</h2>
                         <hr>
                         <p><strong>项目名称：</strong>${PROJECT_NAME}</p>
                         <p><strong>测试环境：</strong>${params.TEST_ENVIRONMENT}</p>
                         <p><strong>测试类型：</strong>${params.TEST_TYPE}</p>
-                        <p><strong>构建编号：</strong>#${BUILD_NUMBER}</p>
+                        <p><strong>构建编号：</strong>#${env.BUILD_NUMBER}</p>
                         <p><strong>执行时间：</strong>${new Date().format('yyyy-MM-dd HH:mm:ss')}</p>
                         <hr>
                         <p style="color: orange; font-weight: bold;">📋 有部分测试用例失败，请检查错误报告</p>
@@ -675,9 +691,9 @@ EOF
                         <hr>
                         <h3>相关链接</h3>
                         <ul>
-                            <li><a href="${BUILD_URL}HTML_Report/">查看详细测试报告</a></li>
-                            <li><a href="${BUILD_URL}artifact/${JENKINS_REPORTS_DIR}/">下载报告文件</a></li>
-                            <li><a href="${BUILD_URL}console">查看控制台输出</a></li>
+                            <li><a href="${env.BUILD_URL}HTML_Report/">查看详细测试报告</a></li>
+                            <li><a href="${env.BUILD_URL}artifact/${JENKINS_REPORTS_DIR}/">下载报告文件</a></li>
+                            <li><a href="${env.BUILD_URL}console">查看控制台输出</a></li>
                         </ul>
                         <hr>
                         <p><small>此邮件由Jenkins自动发送，请勿回复。</small></p>
