@@ -66,7 +66,7 @@ basis_CreateAuthTestApp_001:
   is_run: true
   data:
     application:
-      code: "$cache{TestApp_code}"
+      code: "$cache{LimitTestApp_code}"
       name: "权限授权测试应用"
       description: "权限管理功能自动化测试专用应用"
       iconName: "1.png"
@@ -84,7 +84,7 @@ basis_CreateAuthTestApp_001:
           zh_CN: "权限管理功能自动化测试专用应用"
           zh_TW: "權限管理功能自動化測試專用應用"
           en_US: "Auto test application for auth management"
-    code: "$cache{TestApp_code}"
+    code: "$cache{LimitTestApp_code}"
     name: "权限授权测试应用"
     description: "权限管理功能自动化测试专用应用"
     iconName: "1.png"
@@ -119,7 +119,7 @@ auth_ApplyForAuth_001:
     userId: yaosla@digiwin.com
     role: application:actor
     description: 我申请权限我申请权限我申请权限我申请权限我申请权限我申请权限
-    application: $cache{TestApp_code}
+    application: $cache{LimitTestApp_code}
   dependence_case: False
   dependence_case_data:
   assert:
@@ -148,7 +148,7 @@ auth_AuditAuth_001:
     userId: yaosla@digiwin.com
     role: application:actor
     status: PASSED
-    application: $cache{TestApp_code}
+    application: $cache{LimitTestApp_code}
   dependence_case: false
   dependence_case_data:
   assert:
@@ -161,7 +161,7 @@ auth_AuditAuth_001:
 # 清理权限测试应用（权限管理功能后置数据清理）
 basis_DeleteAuthTestApp_001:
   host: ${{athena_designer_host()}}
-  url: /athena-designer/application/delete/v2/$cache{TestApp_code}
+  url: /athena-designer/application/delete/v2/$cache{LimitTestApp_code}
   method: GET
   detail: 清理权限测试应用（权限管理功能后置数据清理）
   headers:

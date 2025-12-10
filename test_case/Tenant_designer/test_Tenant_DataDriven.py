@@ -16,18 +16,18 @@ import datetime
 import json
 
 
-case_id = ['model_testing_create_business_001', 'model_testing_query_business_001', 'dataView_queryDataViewContent_001', 'modelAssign_queryListV2_001', 'pageDesign_generateBlankPage_001', 'dataView_generateJustQueryPlan_001', 'dataView_coverageQueryPlan_001', 'dataView_queryDataViewByModel_001', 'pageDesign_generateTableWithQueryPlan_001', 'pageDesign_modelDefaultFields_001', 'modelDriver_modelAssign_update_001', 'resourceTree_queryRefreshList_001', 'businessDir_refreshResource_001', 'modulePublish_modelSingle_publish_001', 'operationRecord_get_001', 'dataEntry_modelSqlExport_001', 'model_testing_check_bindings_001', 'model_testing_cleanup_business_001']
+case_id = ['project_FindAppEffectAdpVersion_004', 'tenant_projectAddProjectData_001', 'tenant_codeGenerateDataOrgProjectCode_001', 'tenant_projectSaveProject_001', 'tenant_codeGenerateTrackableProjectCode_001', 'tenant_projectSaveTrackableProject_001', 'tenant_codeGenerateSubProjectCode_001', 'tenant_projectSaveSubProject_001', 'tenant_processUpsertSingleProject_001', 'tenant_basis_Compile_002', 'tenant_basis_PublishTest_002', 'tenant_basis_PublishHuaweiProd_002', 'tenant_basisPublishAzureProd_002', 'tenant_basis_QueryTenantPipeline_local001', 'tenant_basis_PublishTest_local001', 'tenant_project_QueryCombinationProjectList_001', 'add_AddTenantSingleDtd_001', 'tenant_project_QuerySinglePageTriggerProjectList_001', 'publish_PublishTenantProcessModule_001', 'tenant_WithdrawTenantSingleDtd_001', 'tenant_AddTenantDtd_001', 'tenant_QueryCombinationProject_001', 'tenant_PublishCombinationProject_001', 'tenant_WithdrawTenantDtd_001', 'tenant_RemoveTenantDtd_001', 'tenant_RemoveTenantSingleDtd_001', 'tenant_projectDeleteProjectData_001', 'tenant_projectDeleteSubProject_001', 'tenant_projectDeleteParentProject_001', 'tenant_projectDeleteTrackableProject_001', 'tenant_process_RemoveProcess_001']
 TestData = GetTestCase.case_data(case_id)
 re_data = regular(str(TestData))
 
 
 @allure.epic("开发平台接口")
-@allure.feature("2.0应用详情")
-class TestModel:
+@allure.feature("租户设计器")
+class TestTenantDatadriven:
 
-    @allure.story("业务搭建-模型")
+    @allure.story("租户级项目任务")
     @pytest.mark.parametrize('in_data', eval(re_data), ids=[i['detail'] for i in TestData])
-    def test_Model(self, in_data, case_skip):
+    def test_Tenant_DataDriven(self, in_data, case_skip):
         """
         :param :
         :return:
@@ -49,4 +49,4 @@ class TestModel:
 
 
 if __name__ == '__main__':
-    pytest.main(['test_test_Model.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])
+    pytest.main(['test_test_Tenant_DataDriven.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])

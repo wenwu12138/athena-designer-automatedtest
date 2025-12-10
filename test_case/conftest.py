@@ -104,7 +104,8 @@ def pretest_data():
     testdata = {
         "TestApp_code": "${{random_id()}}AT",
         "Data_Code": "${{random_hexcode()}}",
-        "Project_Data_Code": "${{random_hexcode()}}"
+        "Project_Data_Code": "${{random_hexcode()}}",
+        "LimitTestApp_code": "${{random_id()}}AT"
     }
     for k, v in testdata.items():
         k = regular(str(k))

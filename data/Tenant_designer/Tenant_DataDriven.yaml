@@ -1,42 +1,11 @@
-# 公共参数
 case_common:
   allureEpic: 开发平台接口
-  allureFeature: 驱动执行
-  allureStory: 单一项目
-
-
-# 项目模块 - 查询单一来源项目列表
-project_QuerySingleProjectList_001:
-  host: ${{athena_designer_host()}}
-  url: /athena-designer/project/v2/queryProjectList
-  method: POST
-  detail: 查询单一来源类型的项目列表（过滤项目来源）
-  headers:
-    digi-middleware-auth-user: $cache{token}
-    token: $cache{token}
-    locale: zh_CN
-    content-type: application/json
-  requestType: json
-  is_run: true
-  data:
-    projectFrom: single
-    triggerType: ""
-    searchValue: ""
-    pageNum: 1
-    pageSize: 10
-    application: ${{app2_code()}}
-  dependence_case: false
-  dependence_case_data: []
-  assert:
-    code:
-      jsonpath: $.code
-      type: ==
-      value: 0
-      AssertType:
+  allureFeature: 租户设计器
+  allureStory: 租户级项目任务
 
 
 # 项目模块 - 查询项目生效的ADP版本（项目部署前置检查）
-project_FindAppEffectAdpVersion_003:
+project_FindAppEffectAdpVersion_004:
   host: ${{athena_designer_host()}}
   url: /athena-designer/groupHistory/findAppEffectAdpVersion
   method: GET
@@ -62,8 +31,389 @@ project_FindAppEffectAdpVersion_003:
       jsonpath: $.data
       name: project_adp_version
 
+
+# 新增项目依赖数据配置
+tenant_projectAddProjectData_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/data/saveDataDescriptionAndState
+  method: POST
+  detail: 新增数据，数据状态（生成项目依赖）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+  requestType: json
+  is_run: true
+  data:
+    dataDescription:
+      code: "$cache{Project_Data_Code}"
+      application: ${{app2_code()}}
+      name: "项目数据${{get_time()}}"
+      tenantId: "SYSTEM"
+      uniKeys:
+        - "project_data_id"
+      dataStruct:
+        name: "项目数据${{get_time()}}"
+        key: "project_basic_data"
+        dataType: "ARRAY"
+        componentType: "OBJECT"
+        fields:
+          - name: "项目数据主键"
+            key: "project_data_id"
+            dataType: "LONG"
+          - name: "项目状态"
+            key: "project_status"
+            dataType: "STRING"
+          - name: "项目名称"
+            key: "project_name"
+            dataType: "STRING"
+    dataFeatures: []
+    dataStates:
+      - dataCode: "$cache{Project_Data_Code}"
+        code: "${{random_hexcode()}}"
+        name: "生效"
+        condition:
+          type: "script"
+          expression: ""
+        dataFeatureSets: []
+        application: ${{app2_code()}}
+        tenantId: "SYSTEM"
+        variables: []
+        lang: {}
+      - dataCode: "$cache{Project_Data_Code}"
+        code: "${{random_hexcode()}}"
+        name: "失效"
+        condition:
+          type: "script"
+          expression: ""
+        dataFeatureSets: []
+        application: ${{app2_code()}}
+        tenantId: "SYSTEM"
+        variables: []
+        lang: {}
+    decision: []
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.code
+      name: project_data_code
+
+# 生成数据整理项目code
+tenant_codeGenerateDataOrgProjectCode_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/code/generate/standard
+  method: POST
+  detail: 生成数据整理项目code
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    typeCode: default
+    paramMap:
+      abbreviationCode: PM
+      application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data
+      name: data_org_project_code
+
+
+# 新增数据整理项目配置
+tenant_projectSaveProject_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/project/saveProject
+  method: POST
+  detail: 新增数据整理项目配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+    content-type: application/json
+    Authorization: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    name: "项目数据整理${{get_time()}}"
+    description: "项目数据整理描述"
+    code: "$cache{data_org_project_code}"
+    executeType: mainline
+    init:
+      code: $cache{init_state_code}
+      dataCode: $cache{project_data_code}
+    end:
+      code: $cache{end_state_code}
+      dataCode: $cache{project_data_code}
+    projectFrom: combination
+    type: BUSINESS
+    tenantId: SYSTEM
+    manualAble: false
+    authorityPrefix: ""
+    subTasks: []
+    lang:
+      name:
+        zh_CN: "项目数据整理${{get_time()}}"
+        zh_TW: "項目數據整理${{get_time()}}"
+        en_US: "Project Data Organization${{get_time()}}"
+      description:
+        zh_CN: "项目数据整理描述"
+        zh_TW: "項目數據整理描述"
+        en_US: "Project data organization description"
+    application: ${{app2_code()}}
+    groupCode: ${{app2_code()}}
+    engine: coze
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 生成可追踪项目code
+tenant_codeGenerateTrackableProjectCode_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/code/generate/standard
+  method: POST
+  detail: 生成可追踪项目code
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    typeCode: default
+    paramMap:
+      abbreviationCode: PU
+      application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data
+      name: trackable_project_gen_code
+
+# 新增可追踪项目配置
+tenant_projectSaveTrackableProject_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/project/saveProject
+  method: POST
+  detail: 新增可追踪项目配置
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+    content-type: application/json
+    Authorization: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    name: "可追踪项目${{get_time()}}"
+    description: "可追踪项目描述"
+    code: "$cache{trackable_project_gen_code}"
+    executeType: user
+    init:
+      code: $cache{init_state_code}
+      dataCode: $cache{project_data_code}
+    end:
+      code: $cache{end_state_code}
+      dataCode: $cache{project_data_code}
+    executor:
+      type: default
+      personnel: []
+      source: personnel
+    projectFrom: combination
+    type: BUSINESS
+    tenantId: SYSTEM
+    manualAble: false
+    authorityPrefix: ""
+    subTasks: []
+    lang:
+      name:
+        zh_CN: "可追踪项目${{get_time()}}"
+        zh_TW: "可追蹤項目${{get_time()}}"
+        en_US: "Trackable Project${{get_time()}}"
+      description:
+        zh_CN: "可追踪项目描述"
+        zh_TW: "可追蹤項目描述"
+        en_US: "Trackable project description"
+    application: ${{app2_code()}}
+    groupCode: ${{app2_code()}}
+    engine: coze
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 生成子项目code
+tenant_codeGenerateSubProjectCode_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/code/generate/standard
+  method: POST
+  detail: 生成子项目code
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    typeCode: default
+    paramMap:
+      abbreviationCode: PU
+      application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data
+      name: generated_sub_project_code
+
+#### 新增子项目
+# 保存组合子项目
+tenant_projectSaveSubProject_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/project/saveProject
+  method: POST
+  detail: 新增组合子项目
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+    content-type: application/json
+    Authorization: $cache{token}
+  requestType: json
+  is_run: true
+  data:
+    code: "$cache{generated_sub_project_code}"
+    name: "全流程验证项目${{get_time()}}"
+    description: "全流程验证项目描述"
+    init:
+      code: $cache{init_state_code}
+      dataCode: $cache{project_data_code}
+    end:
+      code: $cache{end_state_code}
+      dataCode: $cache{project_data_code}
+    executeType: user
+    type: BUSINESS
+    groupCode: ${{app2_code()}}
+    tenantId: SYSTEM
+    daemon: null
+    sourceName: "来源名称"
+    sourceEntityName: "来源实体名称"
+    dueDateName: "99"
+    mergeFields: null
+    assignAble: false
+    merge: false
+    pattern: null
+    manualAble: null
+    allowInteractiveFlag: null
+    interactiveAbleConfig:
+      responsibilityAble: null
+    primaryProjectCode: $cache{data_org_project_code}
+    lang:
+      name:
+        en_US: "Full process verification project${{get_time()}}"
+        zh_CN: "全流程验证项目${{get_time()}}"
+        zh_TW: "全流程驗證項目${{get_time()}}"
+      description:
+        en_US: "Full process verification project description"
+        zh_CN: "全流程验证项目描述"
+        zh_TW: "全流程驗證項目描述"
+      sourceName:
+        zh_CN: "来源名称"
+        zh_TW: "來源名稱"
+        en_US: "Source name"
+      dueDateName:
+        zh_CN: "99"
+        zh_TW: "99"
+        en_US: "99"
+    target:
+      name: ""
+      code: ""
+      lang:
+        name:
+          zh_CN: ""
+          zh_TW: ""
+          en_US: ""
+    dueDateTimeDistance: null
+    milestone: false
+    phases: []
+    application: ${{app2_code()}}
+    atmcDatas:
+      - proVarKey: sourceIds
+        athenaKey: sourceIds
+        errorKeys: []
+      - proVarKey: dueDate
+        athenaKey: dueDate
+        errorKeys: []
+    executor:
+      type: default
+      source: personnel
+      variable: []
+      personnel: []
+    presetVariables: []
+    assignConfig:
+      assignAble: false
+    projectFrom: combination
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
 # 创建通用触发单一项目
-process_UpsertSingleProject_001:
+tenant_processUpsertSingleProject_001:
   host: ${{athena_designer_host()}}
   url: /athena-designer/process/upsertSingleProject
   method: POST
@@ -448,12 +798,371 @@ process_UpsertSingleProject_001:
       name: single_project_code
 
 
-# 复制单一通用触发项目
-process_CopySingleProject_001:
+
+
+###---------------发版
+# 2.0应用根据备份分支编译
+tenant_basis_Compile_002:
   host: ${{athena_designer_host()}}
-  url: /athena-designer/process/copySingleProject
+  url: /athena-designer/application/compile
   method: POST
-  detail: 复制单一通用触发项目
+  detail: 2.0应用基础功能验证_编译备份分支
+  headers:
+    digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
+  requestType: json
+  is_run: true
+  data:
+    application: ${{app2_code()}}
+    description: ${{get_time()}}-備份分支(備份分支2)編譯
+    branch: develop
+    versionNum:
+      - "1"
+      - "0"
+      - "0"
+      - "${{get_time()}}"
+    versionLetter: alpha
+    version: 1.0.0.${{get_time()}}_alpha
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: False
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    # type 指定获取缓存路径及方式
+    - type: response
+      jsonpath: $.data
+      # 自定义缓存名称
+      name: compileDataCode
+
+#2.0应用发版测试区
+tenant_basis_PublishTest_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/addDeployPlan
+  method: POST
+  detail: 2.0应用基础功能验证_发版测试区
+  headers:
+    digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
+  requestType: json
+  is_run: "'正式' in '${{env()}}' or '测试' in '${{env()}}'"
+  data:
+    applicationDataList:
+      - application: ${{app2_code()}}
+        compileDataCode: $cache{compileDataCode}
+        applicationInfoDto:
+          createBy: wenwu@digiwin.com
+          createDate: '2025-05-16 00:50:37'
+          editBy: wenwu@digiwin.com
+          editDate: "'2025-05-16 00:50:37'"
+          lang:
+            name:
+              zh_CN: 通用验证Z
+              zh_TW: 通用驗證Z
+              en_US: 通用驗證Z
+            description:
+              zh_CN: 通用验证Z
+              zh_TW: 通用驗證Z
+              en_US: 通用驗證Z
+          objectId: 68261b5d42bd111dc73b7976
+          code: ${{app2_code()}}
+          name: 通用驗證Z
+          description: 通用驗證Z
+          tenantId: ${{tenantId()}}
+          appToken: ${{app2_Token()}}
+          appType: 5
+          iconName: 1.png
+          iconBgcolor: '#0189FF'
+          commonApp: false
+          latestCompileVersion: 1.0.0.2508211627_alpha
+          latestCompileDescription: 20250821162729-備份分支(備份分支2)編譯
+          deleteOrder: 0
+          appTypes:
+            - 5
+          abandon: 0
+          appStatus: success
+          useTenantInfos: [ ]
+          assetInitFlag: { }
+    tenantUsers:
+      - option: 1
+        tenantId: ${{tenantId()}}
+        tenantSid: ${{tenantSid()}}
+        tenantName: ${{tenantName()}}
+        testTenant: false
+    syncEsp: false
+    envServiceId: HuaweiTest
+    env: HuaweiTest-TEST
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: False
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data
+      name: deployNo
+
+#2.0发版华为正式
+tenant_basis_PublishHuaweiProd_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/addDeployPlan
+  method: POST
+  detail: 2.0应用基础功能验证_发版华为正式区
+  headers:
+    digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
+  requestType: json
+  is_run: "'正式' in '${{env()}}'"
+  data:
+    applicationDataList:
+      - application: ${{app2_code()}}
+        compileDataCode: $cache{compileDataCode}
+        applicationInfoDto:
+          createBy: wenwu@digiwin.com
+          createDate: '2025-05-16 00:50:37'
+          editBy: wenwu@digiwin.com
+          editDate: '2025-05-16 00:50:37'
+          lang:
+            name:
+              zh_CN: 通用验证Z
+              zh_TW: 通用驗證Z
+              en_US: 通用驗證Z
+            description:
+              zh_CN: 通用验证Z
+              zh_TW: 通用驗證Z
+              en_US: 通用驗證Z
+          objectId: 68261b5d42bd111dc73b7976
+          code: ${{app2_code()}}
+          name: 通用驗證Z
+          description: 通用驗證Z
+          tenantId: ${{tenantId()}}
+          appToken: ${{app2_Token()}}
+          appType: 5
+          iconName: 1.png
+          iconBgcolor: '#0189FF'
+          commonApp: false
+          latestCompileVersion: 1.0.0.2508211627_alpha
+          latestCompileDescription: 20250821162729-備份分支(備份分支2)編譯
+          deleteOrder: 0
+          appTypes:
+            - 5
+          abandon: 0
+          appStatus: success
+          useTenantInfos: [ ]
+          assetInitFlag: { }
+    tenantUsers:
+      - option: 1
+        tenantId: ${{tenantId()}}
+        tenantSid: 609649220293184
+        tenantName: ${{tenantName()}}
+        testTenant: true
+    syncEsp: false
+    envServiceId: HuaweiProd
+    env: HuaweiProd-TEST
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: False
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+#2.0发版微软正式
+tenant_basisPublishAzureProd_002:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/addDeployPlan
+  method: POST
+  detail: 2.0应用基础功能验证_发版微软正式
+  headers:
+    digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
+  requestType: json
+  is_run: "'正式' in '${{env()}}'"
+  data:
+    applicationDataList:
+      - application: ${{app2_code()}}
+        compileDataCode: $cache{compileDataCode}
+        applicationInfoDto:
+          createBy: wenwu@digiwin.com
+          createDate: '2025-05-16 00:50:37'
+          editBy: wenwu@digiwin.com
+          editDate: '2025-05-16 00:50:37'
+          lang:
+            name:
+              zh_CN: 通用验证Z
+              zh_TW: 通用驗證Z
+              en_US: 通用驗證Z
+            description:
+              zh_CN: 通用验证Z
+              zh_TW: 通用驗證Z
+              en_US: 通用驗證Z
+          objectId: 68261b5d42bd111dc73b7976
+          code: ${{app2_code()}}
+          name: 通用驗證Z
+          description: 通用驗證Z
+          tenantId: ${{tenantId()}}
+          appToken: ${{app2_Token()}}
+          appType: 5
+          iconName: 1.png
+          iconBgcolor: '#0189FF'
+          commonApp: false
+          latestCompileVersion: 1.0.0.2508211627_alpha
+          latestCompileDescription: 20250821162729-備份分支(備份分支2)編譯
+          deleteOrder: 0
+          appTypes:
+            - 5
+          abandon: 0
+          appStatus: success
+          useTenantInfos: [ ]
+          assetInitFlag: { }
+    tenantUsers:
+      - option: 1
+        tenantId: ${{tenantId()}}
+        tenantSid: 631276495094336
+        tenantName: ${{tenantName()}}
+        testTenant: true
+    syncEsp: false
+    envServiceId: AzureProd
+    env: AzureProd-TEST
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: False
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+#查看流水线_地端发布
+tenant_basis_QueryTenantPipeline_local001:
+  host: ${{athena_deployer_host()}}
+  url: /athenadeployer/releasePipeline/queryTenantPipeline
+  method: GET
+  detail: 查询应用租户流水线信息_地端发版查询
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+  requestType: params
+  is_run: "'地端' in '${{env()}}'"
+  data:
+    application: ${{app2_code()}}
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: false
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.groups[0].node.serviceId
+      name: envServiceId
+    - type: response
+      jsonpath: $.data.groups[0].node.envs[?(@.operate=='publish')].env
+      name: publish_env
+    - type: response
+      jsonpath: $.data.groups[0].node.envs[?(@.operate=='publish')].env
+      name: switch_env
+
+
+
+#2.0应用发版地端环境
+tenant_basis_PublishTest_local001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/application/addDeployPlan
+  method: POST
+  detail: 2.0应用基础功能验证_发版地端环境
+  headers:
+    digi-middleware-auth-user: $cache{token}    #cookie: $cache{login_cookie}
+  requestType: json
+  is_run: "'地端' in '${{env()}}'"
+  data:
+    applicationDataList:
+      - application: ${{app2_code()}}
+        compileDataCode: $cache{compileDataCode}
+        applicationInfoDto:
+          createBy: wenwu@digiwin.com
+          createDate: '2025-05-16 00:50:37'
+          editBy: wenwu@digiwin.com
+          editDate: "'2025-05-16 00:50:37'"
+          lang:
+            name:
+              zh_CN: 通用验证Z
+              zh_TW: 通用驗證Z
+              en_US: 通用驗證Z
+            description:
+              zh_CN: 通用验证Z
+              zh_TW: 通用驗證Z
+              en_US: 通用驗證Z
+          objectId: 68261b5d42bd111dc73b7976
+          code: ${{app2_code()}}
+          name: 通用驗證Z
+          description: 通用驗證Z
+          tenantId: ${{tenantId()}}
+          appToken: ${{app2_Token()}}
+          appType: 5
+          iconName: 1.png
+          iconBgcolor: '#0189FF'
+          commonApp: false
+          latestCompileVersion: 1.0.0.2508211627_alpha
+          latestCompileDescription: 20250821162729-備份分支(備份分支2)編譯
+          deleteOrder: 0
+          appTypes:
+            - 5
+          abandon: 0
+          appStatus: success
+          useTenantInfos: [ ]
+          assetInitFlag: { }
+    tenantUsers:
+      - option: 1
+        tenantId: ${{tenantId()}}
+        tenantSid: ${{tenantSid()}}
+        tenantName: ${{tenantName()}}
+        testTenant: false
+    syncEsp: false
+    envServiceId: $cache{envServiceId}
+    env: $cache{publish_env}
+  # 是否有依赖业务，为空或者false则表示没有
+  dependence_case: False
+  # 依赖的数据
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data
+      name: deployNo
+
+
+
+
+
+
+# 项目模块 - 查询组合来源项目列表
+tenant_project_QueryCombinationProjectList_001:
+  host: ${{athena_tenant_deployer_host()}}
+  url: /athena-designer/tenant/project/queryCombinationProject
+  method: POST
+  detail: 查询组合来源类型的项目列表（过滤项目来源）
   headers:
     digi-middleware-auth-user: $cache{token}
     token: $cache{token}
@@ -462,20 +1171,80 @@ process_CopySingleProject_001:
   requestType: json
   is_run: true
   data:
-    processId: $cache{single_project_code}
-    processName: "通用触发单一项目副本${{get_time()}}"
-    projectName: "通用触发单一项目副本${{get_time()}}"
-    projectCode: "PC_${{random_hexcode()}}"
+    projectFrom: combination
+    triggerType: ""
+    searchValue: ""
+    pageNum: 1
+    pageSize: 10
+    application: ${{app2_code()}}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+#新增租户级单一项目
+# 新增租户级通用触发单一项目
+add_AddTenantSingleDtd_001:
+  host: ${{athena_tenant_deployer_host()}}
+  url: /athena-designer/tenant/project/addTenantSingleDtd
+  method: POST
+  detail: 新增租户级通用触发单一项目
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+  requestType: json
+  is_run: True
+  data:
+    application: ${{app2_code()}}
+    code:  $cache{single_project_code}
+    name: 租户级通用触发自动化${{get_time()}}
+    description: 自动化测试新增触发规则描述${{get_time()}}
+    projectFrom: single
     lang:
-      processName:
-        zh_CN: "通用触发单一项目副本${{get_time()}}"
-        zh_TW: "通用觸發單一專案副本${{get_time()}}"
-        en_US: "Universal triggering single project copy${{get_time()}}"
-      projectName:
-        zh_CN: "通用触发单一项目副本${{get_time()}}"
-        zh_TW: "通用觸發單一專案副本${{get_time()}}"
-        en_US: "Universal triggering single project copy${{get_time()}}"
-    triggerType: page
+      name:
+        zh_CN: 租户级通用触发自动化${{get_time()}}
+        zh_TW: 租戶級通用觸發自動化${{get_time()}}
+        en_US: Tenant Single DTD Auto${{get_time()}}
+      description:
+        en_US: Auto test add DTD description${{get_time()}}
+        zh_CN: 自动化测试新增触发规则描述${{get_time()}}
+        zh_TW: 自動化測試新增觸發規則描述${{get_time()}}
+  dependence_case: False
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+#查询租户设计器单一项目列表
+tenant_project_QuerySinglePageTriggerProjectList_001:
+  host: ${{athena_tenant_deployer_host()}}
+  url: /athena-designer/tenant/project/queryProjectList
+  method: POST
+  detail: 查询单一项目通用触发类型的项目列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    content-type: application/json
+  requestType: json
+  is_run: true
+  data:
+    projectFrom: single
+    triggerType: all
+    searchValue: ""
+    pageNum: 1
+    pageSize: 10
     application: ${{app2_code()}}
   dependence_case: false
   dependence_case_data: []
@@ -487,12 +1256,404 @@ process_CopySingleProject_001:
       AssertType:
   current_request_set_cache:
     - type: response
-      jsonpath: $.data.processId
-      name: copied_single_project_code
+      jsonpath: $.data.data[0].tenantProjectList[0].atdpUniqueId
+      name: atdpUniqueId
+    - type: response
+      jsonpath: $.data.data[0].tenantProjectList[0].code
+      name: ProcessCode
+    - type: response
+      jsonpath: $.data.data[0].tenantProjectList[0].adpVersion
+      name: TenantProcess_adpVersion
+
+
+# 发布租户流程单一模块
+publish_PublishTenantProcessModule_001:
+  host: ${{athena_tenant_deployer_host()}}
+  url: /athena-designer/modulePublish/modelSingle/publish
+  method: POST
+  detail: 发布租户流程单一模块
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    locale: zh_CN
+    atdpUniqueId: $cache{atdpUniqueId}
+    routerKey: ${{tenantId()}}
+    adpversion: $cache{TenantProcess_adpVersion}
+    adpstatus: effect
+    level: tenant
+  requestType: json
+  is_run: True
+  data:
+    eocControl: false
+    eocInfoIdPath: nullW
+    pkValue: $cache{ProcessCode}
+    module: tenant_process
+    application: ${{app2_code()}}
+    tenantUsers:
+      - tenantId: ${{tenantId()}}
+        tenantSid: ${{tenantSid()}}
+        tenantName: ${{tenantName()}}
+    atdpUniqueId: $cache{atdpUniqueId}
+    eocInfoVersion: null
+    eocInfoNamePath: null
+  dependence_case: False
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+
+# 撤回单一流程租户级数据
+tenant_WithdrawTenantSingleDtd_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/tenant/project/withdrawTenantSingleDtd
+  method: POST
+  detail: 撤回单一流程租户级数据
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    adpversion: $cache{TenantProcess_adpVersion}
+    adpstatus: effect
+    locale: zh_CN
+    content-type: application/json
+    level: tenant
+  requestType: json
+  is_run: True
+  data:
+    code: $cache{ProcessCode}
+  dependence_case: False
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 新增租户级租户项目
+tenant_AddTenantDtd_001:
+  host: ${{athena_tenant_deployer_host()}}
+  url: /athena-designer/tenant/project/addTenantDtd
+  method: POST
+  detail: 新增租户级租户项目
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+    locale: zh_CN
+    content-type: application/json
+    level: develop
+  requestType: json
+  is_run: True
+  data:
+    application: ${{app2_code()}}
+    name: 组合租户项目${{get_time()}}
+    description: 自动化测试组合租户项目
+    projectFrom: combination
+    lang:
+      name:
+        zh_CN: 组合租户项目${{get_time()}}
+        zh_TW: 組合租戶專案${{get_time()}}
+        en_US: Combination Tenant Project${{get_time()}}
+      description:
+        en_US: Automated test combination tenant project
+        zh_CN: 自动化测试组合租户项目
+        zh_TW: 自動化測試組合租戶專案
+  dependence_case: False
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 查询租户级组合项目列表
+tenant_QueryCombinationProject_001:
+  host: ${{athena_tenant_deployer_host()}}
+  url: /athena-designer/tenant/project/queryCombinationProject
+  method: POST
+  detail: 查询租户级组合项目列表
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+    locale: zh_CN
+    content-type: application/json
+    level: tenant
+  requestType: json
+  is_run: True
+  data:
+    projectFrom: combination
+    application: ${{app2_code()}}
+    name: 2.0全流程验证__自动化${{get_time()}}
+    lang:
+      name:
+        zh_CN: 2.0全流程验证__自动化${{get_time()}}
+        zh_TW: 2.0全流程驗證__自動化${{get_time()}}
+        en_US: 2.0 Full Process Verification__Auto${{get_time()}}
+      description:
+        zh_CN: 全流程验证全流程验证__自动化
+        zh_TW: 全流程驗證全流程驗證__自動化
+        en_US: Full Process Verification__Auto
+  dependence_case: False
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+  current_request_set_cache:
+    - type: response
+      jsonpath: $.data.data[0].tenantProjectList[0].atdpUniqueId
+      name: combination_atdpUniqueId
+    - type: response
+      jsonpath: $.data.data[0].tenantProjectList[0].code
+      name: combination_ProcessCode
+    - type: response
+      jsonpath: $.data.data[0].tenantProjectList[0].adpVersion
+      name: combination_TenantProcess_adpVersion
+
+
+
+# 发布租户级组合项目
+tenant_PublishCombinationProject_001:
+  host: ${{athena_tenant_deployer_host()}}
+  url: /athena-designer/modulePublish/modelSingle/publish
+  method: POST
+  detail: 发布租户级组合项目到租户端
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    adpversion: $cache{combination_TenantProcess_adpVersion}
+    adpstatus: effect
+    locale: zh_CN
+    content-type: application/json
+    level: tenant
+    atdpUniqueId: $cache{combination_atdpUniqueId}
+    routerKey: ${{tenantId()}}
+  requestType: json
+  is_run: True
+  data:
+    eocControl: false
+    eocInfoIdPath: null
+    module: tenant_dtd
+    application: ${{app2_code()}}
+    tenantUsers:
+      - tenantId: ${{tenantId()}}
+        tenantSid: ${{tenantSid()}}
+        tenantName: ${{tenantName()}}
+    atdpUniqueId: $cache{combination_atdpUniqueId}
+    eocInfoVersion: null
+    eocInfoNamePath: null
+  dependence_case: False
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 撤回租户级组合项目
+tenant_WithdrawTenantDtd_001:
+  host: ${{athena_tenant_deployer_host()}}
+  url: /athena-designer/tenant/project/withdrawTenantDtd
+  method: POST
+  detail: 撤回租户级组合项目
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    adpversion: $cache{combination_TenantProcess_adpVersion}
+    adpstatus: effect
+    locale: zh_CN
+    content-type: application/json
+    level: tenant
+    atdpUniqueId: $cache{combination_atdpUniqueId}
+    routerKey: ${{tenantId()}}
+  requestType: json
+  is_run: True
+  data:
+    code: ${{app2_code()}}
+    projectFrom: combination
+  dependence_case: False
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+tenant_RemoveTenantDtd_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/tenant/project/removeTenantDtd
+  method: POST
+  detail: 删除租户级组合项目
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    adpversion: $cache{combination_TenantProcess_adpVersion}
+    adpstatus: effect
+    locale: zh_CN
+    content-type: application/json
+    level: tenant
+    atdpUniqueId: $cache{combination_atdpUniqueId}
+    routerKey: ${{tenantId()}}
+  requestType: json
+  is_run: True
+  data:
+    application: ${{app2_code()}}
+    projectFrom: combination
+  dependence_case: False
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+#----清除依赖
+
+# 删除租户单张数据表设计
+tenant_RemoveTenantSingleDtd_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/tenant/project/removeTenantSingleDtd
+  method: POST
+  detail: 删除租户单张数据表设计
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    adpversion: $cache{TenantProcess_adpVersion}
+    adpstatus: effect
+    locale: zh_CN
+    content-type: application/json
+    level: tenant
+  requestType: json
+  is_run: True
+  data:
+    code: $cache{ProcessCode}
+    application: ${{app2_code()}}
+    projectFrom: single
+  dependence_case: False
+  dependence_case_data:
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 删除项目依赖数据配置
+tenant_projectDeleteProjectData_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/data/deleteDataDescriptionByCode/$cache{project_data_code}
+  method: GET
+  detail: 删除项目依赖数据配置（删除数据状态）
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+
+# 删除子项目
+tenant_projectDeleteSubProject_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/project/deleteProject/$cache{generated_sub_project_code}
+  method: GET
+  detail: 删除子项目
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 删除父项目（数据整理项目）
+tenant_projectDeleteParentProject_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/project/deleteProject/$cache{data_org_project_code}
+  method: GET
+  detail: 删除父项目
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
+
+# 删除可追踪项目
+tenant_projectDeleteTrackableProject_001:
+  host: ${{athena_designer_host()}}
+  url: /athena-designer/project/deleteProject/$cache{trackable_project_gen_code}
+  method: GET
+  detail: 删除可追踪项目
+  headers:
+    digi-middleware-auth-user: $cache{token}
+    token: $cache{token}
+    locale: zh_CN
+    adpversion: $cache{project_adp_version}
+    adpstatus: effect
+  requestType: PARAMS
+  is_run: true
+  data: {}
+  dependence_case: false
+  dependence_case_data: []
+  assert:
+    code:
+      jsonpath: $.code
+      type: ==
+      value: 0
+      AssertType:
 
 
 # 删除通用触发项目
-process_RemoveProcess_001:
+tenant_process_RemoveProcess_001:
   host: ${{athena_designer_host()}}
   url: /athena-designer/process/removeProcess
   method: POST
@@ -506,30 +1667,6 @@ process_RemoveProcess_001:
   is_run: true
   data:
     processId: $cache{single_project_code}
-  dependence_case: false
-  dependence_case_data: []
-  assert:
-    code:
-      jsonpath: $.code
-      type: ==
-      value: 0
-      AssertType:
-
-# 删除复制通用触发项目
-process_RemoveCopiedProcess_001:
-  host: ${{athena_designer_host()}}
-  url: /athena-designer/process/removeProcess
-  method: POST
-  detail: 删除复制通用触发项目
-  headers:
-    digi-middleware-auth-user: $cache{token}
-    token: $cache{token}
-    locale: zh_CN
-    content-type: application/json
-  requestType: json
-  is_run: true
-  data:
-    processId: $cache{copied_single_project_code}
   dependence_case: false
   dependence_case_data: []
   assert:

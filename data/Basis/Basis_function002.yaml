@@ -358,7 +358,7 @@ basis_SwitchPlanHuaweiProd_002:
       value: 0
       AssertType:
 
-#1.0发版微软正式
+#2.0发版微软正式
 basis_PublishAzureProd_002:
   host: ${{athena_designer_host()}}
   url: /athena-designer/application/addDeployPlan

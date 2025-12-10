@@ -407,7 +407,7 @@ customConfig_AddCustomConfig_001:
         en_US: 定制弹窗组件
     application: ${{app2_code()}}
     customControl:
-      - type: a
+      - type: ${{random_id()}}
         title: b
         icon: iconwenbenkuang
         lang:
@@ -509,7 +509,7 @@ customConfig_UpdateCustomConfig_001:
     adpCode: $cache{adpCode}
     customControl:
       - references: []
-        type: a
+        type: ${{random_id()}}
         title: b
         icon: iconwenbenkuang
         properties: []

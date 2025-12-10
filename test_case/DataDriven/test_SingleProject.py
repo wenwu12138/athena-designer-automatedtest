@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time   : 2025-12-08 11:48:00
+# @Time   : 2025-12-09 14:45:05
 
 
 import allure
@@ -16,7 +16,7 @@ import datetime
 import json
 
 
-case_id = ['project_QuerySingleProjectList_001', 'process_UpsertSingleProject_001', 'process_CopySingleProject_001', 'process_RemoveProcess_001', 'process_RemoveCopiedProcess_001']
+case_id = ['project_QuerySingleProjectList_001', 'project_FindAppEffectAdpVersion_003', 'process_UpsertSingleProject_001', 'process_CopySingleProject_001', 'process_RemoveProcess_001', 'process_RemoveCopiedProcess_001']
 TestData = GetTestCase.case_data(case_id)
 re_data = regular(str(TestData))
 

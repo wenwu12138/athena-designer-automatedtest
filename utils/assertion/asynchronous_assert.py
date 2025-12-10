@@ -194,7 +194,7 @@ class AsynchronousAssert:
                     deleteprocess_indata = GetTestCase.case_data(['basis_QueryDeleteProgress_001'])
 
                     # 组装查询参数（从删除接口响应中获取应用标识）
-                    deleteprocess_indata[0]['data']['application'] = self.in_data['url'].split('/')[-1]
+                    deleteprocess_indata[0]['data']['applicationCode'] = self.in_data['url'].split('/')[-1]
                     deleteprocess_indata[0]['data']['deleteNo'] = json.loads(self.in_data_res.response_data)['data']
                     deleteprocess_indata[0]['is_run'] = True
 
@@ -207,7 +207,7 @@ class AsynchronousAssert:
 
                     # 查询删除详情
                     deletedetail_indata = GetTestCase.case_data(['basis_QueryDeleteLog_001'])
-                    deletedetail_indata[0]['data']['application'] = self.in_data['url'].split('/')[-1]
+                    deletedetail_indata[0]['data']['applicationCode'] = self.in_data['url'].split('/')[-1]
                     deletedetail_indata[0]['data']['deleteNo'] = json.loads(self.in_data_res.response_data)['data']
                     deletedetail_indata[0]['is_run'] = True
 
