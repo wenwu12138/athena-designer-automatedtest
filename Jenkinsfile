@@ -122,7 +122,7 @@ pipeline {
                     branches: [[name: '*/develop']],
                     extensions: [],
                     userRemoteConfigs: [[
-                        url: 'https://gitee.com/wen-wu-2/athena-designer-automatedtest.git',
+                        url: 'https://github.com/wenwu12138/athena-designer-automatedtest.git',
                         credentialsId: ''  // 如果是私有仓库需要配置
                     ]]
                 ])
