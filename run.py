@@ -73,22 +73,46 @@ def run():
         # 判断现有的测试用例，如果未生成测试代码，则自动生成
         # TestCaseAutomaticGeneration().get_case_automatic()
 
-        # 1. 保存原有 sys.argv（避免影响其他逻辑）
-        original_argv = sys.argv.copy()
-        # 2. 构造 pytest 命令行参数（第一个参数是脚本名，后续是 pytest 参数）
-        sys.argv = [
-            __file__,  # 固定：代表当前脚本（模拟命令行执行 `python run.py -s ...`）
-            '-s',
-            '-W', 'ignore:Module already imported:pytest.PytestWarning',
-            '--alluredir', './report/tmp',
-            "--clean-alluredir"
-        ]
-        # 3. 调用 console_main（无参数！）
-        exit_code = pytest.console_main()
-        print(f"pytest 执行完成，退出码：{exit_code}")  # 0=成功，非0=失败
+        print("=== 开始执行 pytest ===")
+        sys.stdout.flush()  # 强制刷新缓冲区
 
-        # 4. 恢复原有 sys.argv（关键：避免影响后续逻辑）
-        sys.argv = original_argv
+        # 使用 subprocess 运行 pytest
+        pytest_cmd = [
+            'pytest',
+            '-s',  # 显示输出
+            '-v',  # 显示详细信息
+            '--tb=short',  # 简化错误回溯
+            '--disable-warnings',  # 禁用警告
+            '--alluredir', './report/tmp',
+            '--clean-alluredir'
+        ]
+
+        print(f"执行命令: {' '.join(pytest_cmd)}")
+        sys.stdout.flush()
+
+        # 关键：设置超时和实时输出
+        process = subprocess.Popen(
+            pytest_cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1,  # 行缓冲
+            universal_newlines=True
+        )
+
+        # 实时输出 pytest 的输出
+        print("\n=== pytest 实时输出 ===\n")
+        while True:
+            output = process.stdout.readline()
+            if output == '' and process.poll() is not None:
+                break
+            if output:
+                print(output.strip())
+                sys.stdout.flush()
+
+        # 获取退出码
+        exit_code = process.poll()
+        print(f"\n=== pytest 执行完成，退出码: {exit_code} ===\n")
 
         """
                    --reruns: 失败重跑次数
