@@ -89,46 +89,7 @@ def run():
                    """
 
         #------------生成allure报告文件
-        # 1. 定义核心路径（简洁易维护）
-        tmp_dir = "./report/tmp"
-        html_dir = "./report/html"
-        summary_json = f"{html_dir}/widgets/summary.json"
-
-        # 2. 清空旧报告（避免残留）
-        if os.path.exists(html_dir):
-            shutil.rmtree(html_dir)
-        os.makedirs(html_dir, exist_ok=True)
-
-        # 3. 静默执行 Allure 生成（核心命令，带超时+静默）
-        print("开始生成 Allure 测试报告...")
-        try:
-            # 替代 os.system，静默执行+3分钟超时（避免卡顿）
-            subprocess.run(
-                ["allure", "generate", tmp_dir, "-o", html_dir, "--clean", "-q"],
-                stdout=subprocess.DEVNULL,  # 屏蔽所有输出
-                stderr=subprocess.DEVNULL,
-                timeout=180,  # 超时控制：3分钟
-                check=False
-            )
-        except Exception:
-            # 执行失败不报错，直接走兜底逻辑
-            pass
-
-        # 4. 兜底：自动创建 summary.json（解决文件缺失问题）
-        os.makedirs(f"{html_dir}/widgets", exist_ok=True)
-        if not os.path.exists(summary_json):
-            # 生成默认统计数据（保证程序不崩溃）
-            default_data = {"total": 0, "passed": 0, "failed": 0, "broken": 0, "skipped": 0}
-            # 尝试统计 tmp 目录用例数（更精准）
-            if os.path.exists(tmp_dir):
-                default_data["total"] = len([f for f in os.listdir(tmp_dir) if "result.json" in f])
-            # 写入默认文件
-            with open(summary_json, "w", encoding="utf-8") as f:
-                json.dump(default_data, f)
-            print(f"提示：Allure 报告未正常生成，已创建默认 {summary_json}")
-        else:
-            print(f"Allure 报告生成成功：{summary_json}")
-
+        os.system(r"allure generate ./report/tmp -o ./report/html --clean")
 
 
         allure_data = AllureFileClean().get_case_count()
