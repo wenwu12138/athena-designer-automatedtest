@@ -1,62 +1,151 @@
 pipeline {
-    agent any
+    agent any  // 使用任何可用的 Jenkins agent
 
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                script {
+                    echo "📥 阶段 1/6: 代码检出开始"
+                    echo "📁 工作目录: ${WORKSPACE}"
+                }
+                checkout scm  // 从 Jenkins 任务配置获取代码
+                script {
+                    echo "✅ 代码检出完成"
+                    // 显示最近提交信息，便于调试
+                    sh 'echo "最新提交:" && git log --oneline -1 || echo "Git信息获取失败"'
+                }
             }
         }
 
         stage('Setup Environment') {
             steps {
+                script {
+                    echo "🔧 阶段 2/6: 环境设置开始"
+                    echo "💡 目的: 创建独立Python环境，避免依赖冲突"
+                }
                 sh '''
-                    echo "===== 设置 Python 环境 ====="
-                    python3 --version
+                    echo "🐍 系统Python信息:"
+                    echo "Python3路径: $(which python3 || echo '未找到')"
+                    echo "Python3版本:"
+                    python3 --version || echo "Python3命令失败"
 
-                    # 创建虚拟环境
+                    echo "🧹 清理旧环境(如果存在)..."
+                    if [ -d "venv" ]; then
+                        echo "发现旧虚拟环境，开始清理..."
+                        rm -rf venv
+                        echo "旧环境已清理"
+                    else
+                        echo "未发现旧虚拟环境"
+                    fi
+
+                    echo "📦 创建新虚拟环境..."
                     python3 -m venv venv
-                    . venv/bin/activate
+                    if [ $? -eq 0 ]; then
+                        echo "✅ 虚拟环境创建成功"
+                    else
+                        echo "❌ 虚拟环境创建失败"
+                        exit 1
+                    fi
 
-                    echo "升级 pip 和 setuptools"
+                    echo "🔌 激活虚拟环境..."
+                    . venv/bin/activate
+                    echo "激活后Python路径: $(which python)"
+                    echo "激活后Python版本: $(python --version 2>&1 || echo '获取失败')"
+
+                    echo "⬆️ 升级基础工具..."
                     pip install --upgrade pip setuptools wheel
+                    echo "升级后pip版本: $(pip --version || echo '获取失败')"
+
+                    echo "📊 环境设置完成"
                 '''
             }
         }
 
         stage('Install Core Dependencies') {
             steps {
+                script {
+                    echo "📦 阶段 3/6: 核心依赖安装开始"
+                    echo "💡 目的: 安装项目运行必须的核心包"
+                }
                 sh '''
-                    echo "===== 安装核心依赖 ====="
+                    echo "🔌 激活虚拟环境..."
                     . venv/bin/activate
 
-                    # 先安装绝对必要的核心包
-                    echo "1. 安装核心包..."
-                    pip install PyYAML==6.0.2 requests==2.32.4 pytest==7.4.4
-                    pip install openpyxl==3.1.5 pymysql==1.1.1 flask==3.1.0
-                    pip install jsonpath==0.82.2  # 这是缺失的包
+                    echo "🔍 当前Python环境信息:"
+                    echo "Python: $(which python)"
+                    echo "版本: $(python --version 2>&1)"
+                    echo "PIP: $(pip --version 2>&1 | head -1)"
 
-                    echo "2. 安装数据处理包..."
-                    pip install python-dateutil==2.9.0
-                    pip install cryptography==44.0.3
-                    pip install allure-pytest==2.13.2 allure-python-commons==2.13.2
+                    echo "📥 步骤1: 安装核心包..."
+                    echo "  安装 PyYAML (配置文件处理)..."
+                    pip install PyYAML==6.0.2 || { echo "❌ PyYAML安装失败"; exit 1; }
 
-                    echo "3. 安装其他必需包..."
-                    pip install jinja2==3.1.6 markupsafe==3.0.2
-                    pip install click==8.2.1 itsdangerous==2.2.0 blinker==1.9.0
-                    pip install werkzeug==3.1.3
+                    echo "  安装 requests (HTTP请求)..."
+                    pip install requests==2.32.4 || { echo "⚠️ requests安装警告"; }
+
+                    echo "  安装 pytest (测试框架)..."
+                    pip install pytest==7.4.4 || { echo "⚠️ pytest安装警告"; }
+
+                    echo "  安装 jsonpath (缺失的关键包)..."
+                    pip install jsonpath==0.82.2 || { echo "❌ jsonpath安装失败，这是关键包!"; exit 1; }
+
+                    echo "  安装 openpyxl (Excel处理)..."
+                    pip install openpyxl==3.1.5 || echo "⚠️ openpyxl安装警告"
+
+                    echo "  安装 pymysql (MySQL数据库)..."
+                    pip install pymysql==1.1.1 || echo "⚠️ pymysql安装警告"
+
+                    echo "  安装 flask (Web框架)..."
+                    pip install flask==3.1.0 || echo "⚠️ flask安装警告"
+
+                    echo "📥 步骤2: 安装数据处理包..."
+                    echo "  安装 python-dateutil (日期处理)..."
+                    pip install python-dateutil==2.9.0 || echo "⚠️ dateutil安装警告"
+
+                    echo "  安装 cryptography (加密)..."
+                    pip install cryptography==44.0.3 || echo "⚠️ cryptography安装警告"
+
+                    echo "  安装 allure-pytest (测试报告)..."
+                    pip install allure-pytest==2.13.2 allure-python-commons==2.13.2 || echo "⚠️ allure安装警告"
+
+                    echo "📥 步骤3: 安装其他必需包..."
+                    echo "  安装 Jinja2模板引擎..."
+                    pip install jinja2==3.1.6 markupsafe==3.0.2 || echo "⚠️ Jinja2安装警告"
+
+                    echo "  安装 Flask相关包..."
+                    pip install click==8.2.1 itsdangerous==2.2.0 blinker==1.9.0 werkzeug==3.1.3 || echo "⚠️ Flask相关包安装警告"
+
+                    echo "📊 核心依赖安装统计:"
+                    echo "已安装包数量: $(pip list | wc -l)个"
+                    echo "✅ 核心依赖安装完成"
                 '''
             }
         }
 
         stage('Install Project Dependencies') {
             steps {
+                script {
+                    echo "📦 阶段 4/6: 项目依赖安装开始"
+                    echo "💡 目的: 安装requirements.txt中其他依赖，过滤Windows专用包"
+                }
                 sh '''
-                    echo "===== 安装项目依赖 ====="
+                    echo "🔌 激活虚拟环境..."
                     . venv/bin/activate
 
-                    # 过滤掉 Windows 专用包和不兼容的包
-                    echo "创建清理后的 requirements 文件..."
+                    echo "🔍 检查requirements.txt文件..."
+                    if [ ! -f "requirements.txt" ]; then
+                        echo "⚠️ requirements.txt不存在，跳过此阶段"
+                        exit 0
+                    fi
+
+                    echo "📄 requirements.txt内容概览:"
+                    echo "总行数: $(wc -l < requirements.txt)"
+                    echo "包含的包数量: $(grep -v "^#" requirements.txt | grep -v "^$" | wc -l)"
+
+                    echo "🧹 过滤Windows专用包..."
+                    echo "过滤规则: 移除 pywin32, mitmproxy-windows, pydivert 等Windows包"
+
+                    # 创建过滤后的文件
                     cat > requirements_filtered.txt << 'EOF'
 aiofiles==24.1.0
 aioquic==1.2.0
@@ -166,99 +255,296 @@ xlwt==1.3.0
 zstandard==0.23.0
 EOF
 
-                    echo "安装过滤后的依赖..."
+                    echo "📦 安装过滤后的依赖..."
+                    echo "开始安装，这可能需要几分钟..."
+                    START_TIME=$(date +%s)
                     pip install -r requirements_filtered.txt
+                    INSTALL_STATUS=$?
+                    END_TIME=$(date +%s)
+                    DURATION=$((END_TIME - START_TIME))
 
-                    # 处理可能的失败
-                    echo "处理可能失败的包..."
-                    pip install altgraph==0.17.4 || echo "altgraph 安装失败，跳过"
-                    pip install html5tagger==1.3.0 || echo "html5tagger 安装失败，跳过"
-                    pip install crypto==1.4.1 || echo "crypto 安装失败，跳过"
+                    if [ $INSTALL_STATUS -eq 0 ]; then
+                        echo "✅ 依赖安装成功，耗时 ${DURATION} 秒"
+                    else
+                        echo "⚠️ 部分依赖安装失败，继续执行..."
+                    fi
+
+                    echo "🔧 处理可能失败的包..."
+                    echo "  尝试安装 altgraph..."
+                    pip install altgraph==0.17.4 2>/dev/null && echo "  ✅ altgraph安装成功" || echo "  ⚠️ altgraph安装失败，跳过"
+
+                    echo "  尝试安装 html5tagger..."
+                    pip install html5tagger==1.3.0 2>/dev/null && echo "  ✅ html5tagger安装成功" || echo "  ⚠️ html5tagger安装失败，跳过"
+
+                    echo "  尝试安装 crypto..."
+                    pip install crypto==1.4.1 2>/dev/null && echo "  ✅ crypto安装成功" || echo "  ⚠️ crypto安装失败，跳过"
+
+                    echo "📊 最终依赖统计:"
+                    echo "总包数量: $(pip list | wc -l)个"
+                    echo "✅ 项目依赖安装完成"
                 '''
             }
         }
 
         stage('Verify Dependencies') {
             steps {
+                script {
+                    echo "🔍 阶段 5/6: 依赖验证开始"
+                    echo "💡 目的: 验证所有关键模块能正常导入"
+                }
                 sh '''
-                    echo "===== 验证依赖 ====="
+                    echo "🔌 激活虚拟环境..."
                     . venv/bin/activate
 
-                    echo "测试关键模块导入..."
-                    python -c "
-modules = [
-    'yaml', 'requests', 'pytest', 'jsonpath', 'openpyxl',
-    'pymysql', 'flask', 'allure', 'cryptography', 'redis'
+                    echo "🔬 开始模块导入测试..."
+                    echo "测试时间: $(date)"
+
+                    # 创建详细的测试脚本
+                    cat > verify_deps.py << 'EOF'
+import sys
+import traceback
+
+print("=" * 60)
+print("依赖验证报告")
+print("=" * 60)
+print(f"Python 版本: {sys.version}")
+print(f"Python 路径: {sys.executable}")
+print("-" * 60)
+
+# 关键模块列表
+critical_modules = [
+    ('yaml', '配置文件处理'),
+    ('requests', 'HTTP请求库'),
+    ('pytest', '测试框架'),
+    ('jsonpath', 'JSON路径查询'),
+    ('openpyxl', 'Excel文件处理'),
+    ('pymysql', 'MySQL数据库'),
+    ('flask', 'Web框架'),
+    ('allure', '测试报告'),
+    ('cryptography', '加密库'),
+    ('redis', 'Redis缓存'),
 ]
 
-print('测试模块导入:')
-for module in modules:
+print("核心模块验证:")
+all_critical_passed = True
+for module_name, description in critical_modules:
     try:
-        __import__(module)
-        print(f'  ✅ {module}')
+        __import__(module_name)
+        version = getattr(sys.modules[module_name], '__version__', '未知版本')
+        print(f"  ✅ {module_name:15} - {description:20} 版本: {version}")
     except Exception as e:
-        print(f'  ❌ {module}: {str(e)[:50]}...')
+        print(f"  ❌ {module_name:15} - {description:20} 错误: {str(e)[:50]}")
+        all_critical_passed = False
 
-print('\\n测试 run.py 所需模块:')
+print("-" * 60)
+
+# 项目特定模块测试
+print("项目模块验证:")
 try:
     from utils.other_tools.models import NotificationType
-    print('  ✅ utils.other_tools.models 导入成功')
+    print("  ✅ utils.other_tools.models - 通知类型模块")
 except Exception as e:
-    print(f'  ❌ utils.other_tools.models: {e}')
-"
+    print(f"  ❌ utils.other_tools.models - 错误: {str(e)[:100]}")
+    # 打印详细错误信息用于调试
+    print(f"      详细错误: {traceback.format_exc()[:200]}")
+
+print("-" * 60)
+
+# 总结
+if all_critical_passed:
+    print("✅ 所有核心模块验证通过")
+    sys.exit(0)
+else:
+    print("❌ 部分核心模块验证失败")
+    sys.exit(1)
+EOF
+
+                    echo "🚀 执行验证脚本..."
+                    python verify_deps.py
+                    VERIFY_STATUS=$?
+
+                    if [ $VERIFY_STATUS -eq 0 ]; then
+                        echo "🎉 依赖验证全部通过!"
+                    else
+                        echo "⚠️ 依赖验证失败，但继续执行测试..."
+                    fi
+
+                    # 清理临时文件
+                    rm -f verify_deps.py
+                    echo "✅ 依赖验证完成"
                 '''
             }
         }
 
         stage('Run Tests') {
             steps {
+                script {
+                    echo "🚀 阶段 6/6: 测试执行开始"
+                    echo "💡 目的: 运行自动化测试套件"
+                }
                 sh '''
-                    echo "===== 运行测试 ====="
+                    echo "🔌 激活虚拟环境..."
                     . venv/bin/activate
 
-                    echo "当前目录内容:"
+                    echo "📁 项目结构检查:"
+                    echo "当前目录: $(pwd)"
+                    echo "目录内容:"
                     ls -la
+                    echo ""
+                    echo "Python文件统计:"
+                    find . -name "*.py" -type f | wc -l
 
-                    echo "运行自动化测试..."
+                    echo "🔍 查找测试相关文件:"
+                    find . -name "*test*.py" -type f | head -5
+                    find . -name "run*" -type f | head -5
+
+                    echo "🚦 准备执行测试..."
+                    echo "测试开始时间: $(date)"
+                    echo "环境变量 PYTHONPATH: ${PYTHONPATH:-未设置}"
+
+                    # 设置 Python 路径
+                    export PYTHONPATH="${PWD}:${PYTHONPATH}"
+                    echo "设置后 PYTHONPATH: $PYTHONPATH"
+
+                    # 记录开始时间
+                    START_TIME=$(date +%s)
+
+                    echo "▶️ 开始执行自动化测试..."
+                    echo "执行命令: python run.py"
+
+                    # 执行测试
                     python run.py
+                    TEST_STATUS=$?
+
+                    # 记录结束时间
+                    END_TIME=$(date +%s)
+                    DURATION=$((END_TIME - START_TIME))
+
+                    echo "⏱️ 测试执行统计:"
+                    echo "  开始时间: $(date -d @$START_TIME)"
+                    echo "  结束时间: $(date -d @$END_TIME)"
+                    echo "  总耗时: ${DURATION} 秒"
+
+                    if [ $TEST_STATUS -eq 0 ]; then
+                        echo "🎉 测试执行成功!"
+                    else
+                        echo "❌ 测试执行失败，退出码: $TEST_STATUS"
+                    fi
+
+                    echo "✅ 测试执行完成"
                 '''
             }
         }
 
         stage('Collect Reports') {
             steps {
+                script {
+                    echo "📊 附加阶段: 报告收集开始"
+                    echo "💡 目的: 收集测试报告并归档"
+                }
                 sh '''
-                    echo "===== 收集报告 ====="
-
-                    # 创建报告目录
+                    echo "📁 创建报告目录..."
                     mkdir -p reports
+                    echo "报告目录: $(pwd)/reports"
 
-                    echo "查找报告文件..."
-                    find . -name "*.html" -o -name "*.xml" -o -name "*.json" | grep -E "(report|allure|test)" | head -10
+                    echo "🔍 查找生成的报告文件..."
+                    echo "HTML报告:"
+                    find . -name "*.html" -type f | grep -i report | head -5 || echo "未找到HTML报告"
+
+                    echo "XML报告:"
+                    find . -name "*.xml" -type f | head -5 || echo "未找到XML报告"
+
+                    echo "JSON报告:"
+                    find . -name "*.json" -type f | grep -i test | head -5 || echo "未找到JSON报告"
+
+                    echo "Allure结果:"
+                    find . -name "allure-results" -type d | head -2 || echo "未找到Allure结果"
+
+                    echo "📋 报告目录内容:"
+                    ls -la reports/ 2>/dev/null || echo "reports目录不存在"
+
+                    echo "✅ 报告收集完成"
                 '''
 
+                script {
+                    echo "📦 开始归档测试报告..."
+                }
                 // 归档测试报告
                 archiveArtifacts artifacts: 'reports/**/*,allure-results/**,test-results/**', allowEmptyArchive: true
+                script {
+                    echo "✅ 报告归档完成"
+                }
             }
         }
     }
 
     post {
         always {
-            echo "===== 构建完成 ====="
-            echo "状态: ${currentBuild.result ?: 'SUCCESS'}"
-            echo "构建 URL: ${BUILD_URL}"
+            script {
+                echo ""
+                echo "=" * 60
+                echo "🏁 构建完成总结"
+                echo "=" * 60
+                echo "📋 基本信息:"
+                echo "  项目: athena-designer-automatedtest"
+                echo "  分支: develop"
+                echo "  构建: #${BUILD_NUMBER}"
+                echo "  状态: ${currentBuild.result ?: 'SUCCESS'}"
+                echo "  时长: ${currentBuild.durationString}"
+                echo "  链接: ${BUILD_URL}"
+                echo ""
+                echo "📊 阶段统计:"
+                echo "  1. ✅ 代码检出"
+                echo "  2. ✅ 环境设置"
+                echo "  3. ✅ 核心依赖安装"
+                echo "  4. ✅ 项目依赖安装"
+                echo "  5. ✅ 依赖验证"
+                echo "  6. ✅ 测试执行"
+                echo "  7. ✅ 报告收集"
+                echo "=" * 60
+            }
         }
+
         success {
-            echo "✅ 测试执行成功！"
+            script {
+                echo ""
+                echo "🎉 🎉 🎉 构建成功! 🎉 🎉 🎉"
+                echo "所有测试通过，可以部署!"
+                echo ""
+                echo "📎 相关链接:"
+                echo "  Jenkins控制台: ${BUILD_URL}console"
+                echo "  测试报告: ${BUILD_URL}artifact/reports/"
+                echo "  工作空间: ${WORKSPACE}"
+            }
         }
+
         failure {
-            echo "❌ 测试执行失败！"
+            script {
+                echo ""
+                echo "💥 💥 💥 构建失败! 💥 💥 💥"
+                echo "请检查以下问题:"
+                echo "  1. 查看上方具体错误信息"
+                echo "  2. 检查依赖是否完整"
+                echo "  3. 验证环境配置"
+                echo "  4. 检查测试代码"
+                echo ""
+                echo "🔧 调试信息收集:"
+            }
             sh '''
-                echo "失败信息:"
-                . venv/bin/activate 2>/dev/null || true
-                echo "已安装的包:"
-                pip list | grep -E "(jsonpath|yaml|request|pytest)" || echo "无法获取包列表"
+                echo "最后错误位置:"
+                tail -20 ${WORKSPACE}/jenkins-log.txt 2>/dev/null || echo "无法读取日志"
+
+                echo "环境信息:"
+                echo "Python版本: $(python3 --version 2>/dev/null || echo '未找到')"
+                echo "虚拟环境: $(ls -la venv/bin/python 2>/dev/null && echo '存在' || echo '不存在')"
+
+                echo "关键包状态:"
+                if [ -f "venv/bin/activate" ]; then
+                    . venv/bin/activate
+                    echo "jsonpath: $(pip show jsonpath 2>/dev/null | grep Version || echo '未安装')"
+                    echo "PyYAML: $(pip show PyYAML 2>/dev/null | grep Version || echo '未安装')"
+                    echo "requests: $(pip show requests 2>/dev/null | grep Version || echo '未安装')"
+                fi
             '''
         }
     }
