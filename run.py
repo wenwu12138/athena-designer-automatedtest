@@ -74,46 +74,14 @@ def run():
         # TestCaseAutomaticGeneration().get_case_automatic()
 
         print("=== 开始执行 pytest ===")
-        sys.stdout.flush()  # 强制刷新缓冲区
+        # 直接使用 os.system
+        cmd = "pytest -s -v --tb=short --disable-warnings --alluredir ./report/tmp --clean-alluredir 2>&1"
+        print(f"执行命令: {cmd}")
 
-        # 使用 subprocess 运行 pytest
-        pytest_cmd = [
-            'pytest',
-            '-s',  # 显示输出
-            '-v',  # 显示详细信息
-            '--tb=short',  # 简化错误回溯
-            '--disable-warnings',  # 禁用警告
-            '--alluredir', './report/tmp',
-            '--clean-alluredir'
-        ]
-
-        print(f"执行命令: {' '.join(pytest_cmd)}")
-        sys.stdout.flush()
-
-        # 关键：设置超时和实时输出
-        process = subprocess.Popen(
-            pytest_cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1,  # 行缓冲
-            universal_newlines=True
-        )
-
-        # 实时输出 pytest 的输出
-        print("\n=== pytest 实时输出 ===\n")
-        while True:
-            output = process.stdout.readline()
-            if output == '' and process.poll() is not None:
-                break
-            if output:
-                print(output.strip())
-                sys.stdout.flush()
-
-        # 获取退出码
-        exit_code = process.poll()
-        print(f"\n=== pytest 执行完成，退出码: {exit_code} ===\n")
-
+        # os.system 返回的是退出码左移8位后的值
+        return_code = os.system(cmd)
+        exit_code = return_code >> 8  # 转换为实际的退出码
+        print(f"\npytest 执行完成，退出码: {exit_code}")
         """
                    --reruns: 失败重跑次数
                    --count: 重复执行次数
