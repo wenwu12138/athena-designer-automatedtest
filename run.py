@@ -85,30 +85,46 @@ def run():
                     "--reruns=3", "--reruns-delay=2"
                    """
 
-        # 1. 执行 allure generate 并打印执行结果（替代原有的 os.system 一行）
-        allure_cmd = "allure generate ./report/tmp -o ./report/html --clean"
-        print(f"执行命令：{allure_cmd}")
-        # 执行命令并获取退出码（0=成功，非0=失败）
-        cmd_exit_code = os.system(allure_cmd)
-        print(f"allure generate 执行退出码：{cmd_exit_code}")  # 打印退出码，看是否失败
+        # 1. 先打印当前工作目录（确认 Jenkins 路径）
+        current_dir = os.getcwd()
+        print(f"当前工作目录：{current_dir}")
 
-        # 2. 定义 summary.json 的绝对路径（和报错路径一致）
-        summary_json_path = "/var/jenkins_home/workspace/athena-designer-api-tests/report/html/widgets/summary.json"
-        # 3. 检查文件是否存在，不存在则直接报错并终止，避免执行 get_case_count()
+        # 2. 执行 allure generate 并打印详细信息
+        allure_cmd = "allure generate ./report/tmp -o ./report/html --clean"
+        print(f"\n=== 执行 Allure 命令 ===")
+        print(f"命令内容：{allure_cmd}")
+        # 执行命令并获取退出码
+        cmd_exit_code = os.system(allure_cmd)
+        print(f"命令退出码：{cmd_exit_code}（0=成功，非0=失败）")
+
+        # 3. 检查 tmp 目录（pytest 生成的原始数据）
+        print(f"\n=== 检查 ./report/tmp 目录 ===")
+        tmp_dir = os.path.join(current_dir, "report", "tmp")
+        if os.path.exists(tmp_dir):
+            print(f"tmp 目录存在：{tmp_dir}")
+            # 列出 tmp 目录下所有文件
+            tmp_files = os.listdir(tmp_dir)
+            print(f"tmp 目录下的文件：{tmp_files}")
+            if not tmp_files:
+                print(f"⚠️  tmp 目录为空！pytest 未生成 Allure 原始数据")
+        else:
+            print(f"❌ tmp 目录不存在：{tmp_dir}（pytest 执行失败）")
+
+        # 4. 检查 html 目录和 summary.json
+        print(f"\n=== 检查 ./report/html 目录 ===")
+        summary_json_path = os.path.join(current_dir, "report", "html", "widgets", "summary.json")
+        html_dir = os.path.dirname(os.path.dirname(summary_json_path))
+        if os.path.exists(html_dir):
+            print(f"html 目录存在：{html_dir}")
+            # 列出 html 目录下的文件（看是否生成了内容）
+            html_files = os.listdir(html_dir)
+            print(f"html 目录下的文件：{html_files}")
+        else:
+            print(f"❌ html 目录不存在：{html_dir}（allure generate 执行失败）")
+
+        # 5. 检查 summary.json 并终止程序
         if not os.path.exists(summary_json_path):
-            # 打印关键信息，帮助定位
-            print(f"错误：{summary_json_path} 文件不存在！")
-            # 检查 ./report/tmp 是否存在，以及是否有数据
-            tmp_dir = "./report/tmp"
-            if not os.path.exists(tmp_dir):
-                print(f"原因1：{tmp_dir} 目录不存在（pytest 未生成 Allure 原始数据）")
-            else:
-                import glob
-                tmp_files = glob.glob(f"{tmp_dir}/*")
-                print(f"原因2：{tmp_dir} 目录下的文件：{tmp_files}")
-                if not tmp_files:
-                    print(f"  → pytest 执行后，tmp 目录为空，allure 无法生成报告")
-            # 终止程序，避免执行后续的 get_case_count()
+            print(f"\n❌ 最终错误：summary.json 不存在 → {summary_json_path}")
             raise RuntimeError("Allure 报告生成失败，summary.json 不存在")
 
         allure_data = AllureFileClean().get_case_count()
