@@ -73,27 +73,9 @@ def run():
         # 判断现有的测试用例，如果未生成测试代码，则自动生成
         # TestCaseAutomaticGeneration().get_case_automatic()
 
-        print("=== 开始执行 pytest ===")
+        pytest.main(['-s', '-W', 'ignore:Module already imported:pytest.PytestWarning',
+                     '--alluredir', './report/tmp', "--clean-alluredir"])
 
-        # 使用 subprocess.run
-        result = subprocess.run([
-            'pytest',
-            '-s',
-            '-v',
-            '--tb=short',
-            '--disable-warnings',
-            '--alluredir', './report/tmp',
-            '--clean-alluredir'
-        ],
-            capture_output=True,
-            text=True,
-            timeout=3600)
-
-        # 输出结果
-        print(f"退出码: {result.returncode}")
-        print(f"输出:\n{result.stdout}")
-        if result.stderr:
-            print(f"错误:\n{result.stderr}")
         """
                    --reruns: 失败重跑次数
                    --count: 重复执行次数
