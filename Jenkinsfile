@@ -385,7 +385,18 @@ EOF
                 sh '''
                     echo "🔌 激活虚拟环境..."
                     . venv/bin/activate
-
+                    # ========== 新增：安装 Allure 命令行工具 ==========
+                    echo "📥 安装 Allure 命令行工具..."
+                    # 下载 Allure 2.27.0（兼容所有环境）
+                    ALLURE_VERSION="2.27.0"
+                    ALLURE_URL="https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.zip"
+                    # 下载并解压
+                    wget -q ${ALLURE_URL} -O /tmp/allure.zip || { echo "❌ Allure 下载失败"; exit 1; }
+                    unzip -q /tmp/allure.zip -d /opt/ || { echo "❌ Allure 解压失败"; exit 1; }
+                    # 配置环境变量（临时生效）
+                    export PATH="/opt/allure-${ALLURE_VERSION}/bin:${PATH}"
+                    # 验证 Allure 命令
+                    allure --version && echo "✅ Allure 命令行工具安装成功" || { echo "❌ Allure 验证失败"; exit 1; }
                     echo "📁 项目结构检查:"
                     echo "当前目录: $(pwd)"
                     echo "目录内容:"
