@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         PROJECT_NAME = 'athena-designer-automatedtest'
-        PYTHON_VERSION = '3.9'  # 建议使用 3.9，兼容性更好
+        PYTHON_VERSION = '3.9'
     }
 
     stages {
