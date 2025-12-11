@@ -56,6 +56,28 @@ pipeline {
             defaultValue: true,
             description: '是否清理Allure历史数据'
         )
+
+        // 新增参数：是否自动安装系统依赖
+        booleanParam(
+            name: 'INSTALL_SYSTEM_DEPS',
+            defaultValue: true,
+            description: '是否自动安装系统依赖（Python、pip等）'
+        )
+
+        // 新增参数：Python版本选择
+        choice(
+            name: 'PYTHON_VERSION',
+            choices: ['python3', 'python3.9', 'python3.8', 'python3.7', 'python'],
+            defaultValue: 'python3',
+            description: '选择Python版本'
+        )
+
+        // 新增参数：是否使用虚拟环境
+        booleanParam(
+            name: 'USE_VENV',
+            defaultValue: true,
+            description: '是否使用Python虚拟环境'
+        )
     }
 
     environment {
@@ -63,7 +85,7 @@ pipeline {
         PROJECT_NAME = 'Athena开发平台'
         TESTER_NAME = '闻武'
 
-        // 报告路径 - 修复：使用env变量
+        // 报告路径
         ALLURE_RESULTS_DIR = 'report/tmp'
         ALLURE_REPORT_DIR = 'report/html'
         JENKINS_REPORTS_DIR = "jenkins-reports/${env.BUILD_NUMBER}_${params.TEST_ENVIRONMENT}"
@@ -71,9 +93,14 @@ pipeline {
         // 根据环境设置标签
         ENV_LABEL = "${params.TEST_ENVIRONMENT}"
 
-        // 邮件通知配置（需要在Jenkins系统设置中配置）
+        // 邮件通知配置
         EMAIL_RECIPIENTS = '742611390@qq.com, your-team@example.com'
         EMAIL_SUBJECT_PREFIX = '[Athena自动化测试]'
+
+        // 系统依赖配置
+        PYTHON_CMD = "${params.PYTHON_VERSION}"
+        VENV_DIR = 'venv'
+        PIP_MIRROR = 'https://pypi.tuna.tsinghua.edu.cn/simple'
     }
 
     stages {
@@ -90,29 +117,215 @@ pipeline {
                 ║ 测试类型: ${params.TEST_TYPE}                     ║
                 ║ 构建编号: #${env.BUILD_NUMBER}                    ║
                 ║ 执行时间: ${new Date().format('yyyy-MM-dd HH:mm:ss')} ║
+                ║ Python版本: ${params.PYTHON_VERSION}              ║
+                ║ 使用虚拟环境: ${params.USE_VENV}                  ║
                 ╚═══════════════════════════════════════════════════╝
                 """
 
                 script {
-                    // 显示当前目录结构
+                    // 显示系统信息
                     sh '''
-                        echo "📁 项目目录结构:"
+                        echo "🖥️ 系统信息:"
                         echo "================================="
-                        ls -la
+                        uname -a
                         echo ""
-                        echo "🧪 测试用例目录:"
-                        echo "================================="
-                        ls -la test_case/
+                        echo "💾 磁盘空间:"
+                        df -h .
                         echo ""
-                        echo "📊 数据驱动目录:"
-                        echo "================================="
-                        ls -la data/
+                        echo "🧠 内存信息:"
+                        free -h || true
                     '''
                 }
             }
         }
 
-        // 阶段2：拉取代码
+        // 阶段2：检查并安装系统依赖
+        stage('检查系统依赖') {
+            when {
+                expression { params.INSTALL_SYSTEM_DEPS.toBoolean() }
+            }
+            steps {
+                echo "🔧 检查并安装系统依赖..."
+
+                script {
+                    sh '''
+                        set +e  # 允许命令失败，继续执行
+
+                        echo "=== 检测操作系统和包管理器 ==="
+                        # 更可靠的OS检测
+                        if [ -f /etc/os-release ]; then
+                            . /etc/os-release
+                            OS_NAME="$ID"
+                            OS_VERSION="$VERSION_ID"
+                            echo "✅ 检测到系统: $OS_NAME $OS_VERSION"
+                        elif [ -f /etc/redhat-release ]; then
+                            OS_NAME="centos"
+                            OS_VERSION=$(cat /etc/redhat-release | sed 's/.*release //' | sed 's/ .*//')
+                            echo "✅ 检测到系统: CentOS $OS_VERSION"
+                        elif [ -f /etc/alpine-release ]; then
+                            OS_NAME="alpine"
+                            OS_VERSION=$(cat /etc/alpine-release)
+                            echo "✅ 检测到系统: Alpine Linux $OS_VERSION"
+                        else
+                            OS_NAME=$(uname -s | tr '[:upper:]' '[:lower:]')
+                            OS_VERSION=$(uname -r)
+                            echo "⚠️  无法识别的系统: $OS_NAME $OS_VERSION"
+                        fi
+
+                        # 检测包管理器
+                        if command -v apt-get > /dev/null 2>&1; then
+                            PKG_MANAGER="apt"
+                            UPDATE_CMD="apt-get update -y"
+                            INSTALL_CMD="apt-get install -y"
+                            echo "✅ 使用apt包管理器"
+                        elif command -v yum > /dev/null 2>&1; then
+                            PKG_MANAGER="yum"
+                            UPDATE_CMD="yum makecache fast"
+                            INSTALL_CMD="yum install -y"
+                            echo "✅ 使用yum包管理器"
+                        elif command -v apk > /dev/null 2>&1; then
+                            PKG_MANAGER="apk"
+                            UPDATE_CMD="apk update"
+                            INSTALL_CMD="apk add"
+                            echo "✅ 使用apk包管理器"
+                        elif command -v dnf > /dev/null 2>&1; then
+                            PKG_MANAGER="dnf"
+                            UPDATE_CMD="dnf makecache"
+                            INSTALL_CMD="dnf install -y"
+                            echo "✅ 使用dnf包管理器"
+                        else
+                            echo "⚠️  未检测到标准包管理器，尝试继续"
+                            PKG_MANAGER="unknown"
+                        fi
+
+                        echo ""
+                        echo "=== 检查Python环境 ==="
+
+                        # 查找Python命令
+                        PYTHON_CMD=""
+                        for cmd in "${params.PYTHON_VERSION}" python3 python3.9 python3.8 python3.7 python; do
+                            if command -v "$cmd" > /dev/null 2>&1; then
+                                PYTHON_CMD="$cmd"
+                                echo "✅ 找到Python: $($cmd --version 2>&1)"
+                                break
+                            fi
+                        done
+
+                        if [ -z "$PYTHON_CMD" ]; then
+                            echo "❌ Python未安装，开始安装..."
+
+                            case "$PKG_MANAGER" in
+                                "apt")
+                                    $UPDATE_CMD
+                                    $INSTALL_CMD python3 python3-pip python3-dev python3-venv
+                                    ;;
+                                "yum"|"dnf")
+                                    $UPDATE_CMD
+                                    $INSTALL_CMD python3 python3-pip python3-devel
+                                    ;;
+                                "apk")
+                                    $UPDATE_CMD
+                                    $INSTALL_CMD python3 py3-pip python3-dev
+                                    ;;
+                                *)
+                                    echo "⚠️  无法自动安装Python，请手动安装"
+                                    exit 1
+                                    ;;
+                            esac
+
+                            # 重新查找Python
+                            for cmd in python3 python; do
+                                if command -v "$cmd" > /dev/null 2>&1; then
+                                    PYTHON_CMD="$cmd"
+                                    break
+                                fi
+                            done
+
+                            if [ -z "$PYTHON_CMD" ]; then
+                                echo "❌ Python安装失败"
+                                exit 1
+                            fi
+                        fi
+
+                        echo ""
+                        echo "=== 检查pip ==="
+
+                        # 尝试不同的pip命令
+                        PIP_CMD=""
+                        for cmd in pip3 pip; do
+                            if command -v "$cmd" > /dev/null 2>&1; then
+                                PIP_CMD="$cmd"
+                                echo "✅ 找到pip: $($cmd --version 2>&1)"
+                                break
+                            fi
+                        done
+
+                        if [ -z "$PIP_CMD" ]; then
+                            echo "❌ pip未安装，尝试安装..."
+
+                            # 使用ensurepip
+                            if $PYTHON_CMD -m ensurepip --help > /dev/null 2>&1; then
+                                $PYTHON_CMD -m ensurepip --upgrade
+                            else
+                                # 下载get-pip.py
+                                curl -sS https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+                                $PYTHON_CMD get-pip.py --no-warn-script-location
+                                rm -f get-pip.py
+                            fi
+
+                            # 重新查找pip
+                            for cmd in pip3 pip; do
+                                if command -v "$cmd" > /dev/null 2>&1; then
+                                    PIP_CMD="$cmd"
+                                    break
+                                fi
+                            done
+                        fi
+
+                        if [ -z "$PIP_CMD" ]; then
+                            echo "⚠️  pip安装失败，尝试直接使用python -m pip"
+                            PIP_CMD="$PYTHON_CMD -m pip"
+                        fi
+
+                        echo ""
+                        echo "=== 安装编译依赖 ==="
+
+                        case "$PKG_MANAGER" in
+                            "apt")
+                                $INSTALL_CMD build-essential libssl-dev libffi-dev \
+                                    python3-dev gcc g++ make curl wget git
+                                ;;
+                            "yum"|"dnf")
+                                $INSTALL_CMD gcc gcc-c++ make openssl-devel \
+                                    libffi-devel python3-devel curl wget git
+                                ;;
+                            "apk")
+                                $INSTALL_CMD build-base libffi-dev openssl-dev \
+                                    python3-dev curl wget git
+                                ;;
+                        esac
+
+                        echo ""
+                        echo "=== 环境验证 ==="
+                        echo "Python命令: $PYTHON_CMD"
+                        echo "Python版本: $($PYTHON_CMD --version 2>&1)"
+                        echo "Python路径: $(which $PYTHON_CMD 2>/dev/null || echo '未找到')"
+
+                        if [ "$PIP_CMD" != "$PYTHON_CMD -m pip" ]; then
+                            echo "pip命令: $PIP_CMD"
+                            echo "pip版本: $($PIP_CMD --version 2>&1)"
+                            echo "pip路径: $(which $(echo $PIP_CMD | cut -d' ' -f1) 2>/dev/null || echo '未找到')"
+                        else
+                            echo "使用: $PYTHON_CMD -m pip"
+                        fi
+
+                        set -e  # 恢复错误检查
+                    '''
+                }
+            }
+        }
+
+        // 阶段3：拉取代码
         stage('拉取代码') {
             steps {
                 echo "📥 拉取最新代码..."
@@ -129,240 +342,446 @@ pipeline {
 
                 sh '''
                     echo "✅ 代码拉取完成"
-                    echo "当前分支: $(git branch --show-current)"
-                    echo "最新提交: $(git log -1 --oneline --pretty=format:"%h - %s [%an]")"
-                    echo "提交时间: $(git log -1 --pretty=format:"%cd" --date=format:"%Y-%m-%d %H:%M:%S")"
+                    echo "当前分支: $(git branch --show-current 2>/dev/null || echo '无法获取')"
+                    echo "最新提交: $(git log -1 --oneline --pretty=format:"%h - %s [%an]" 2>/dev/null || echo '无法获取')"
                 '''
             }
         }
 
-        // 阶段3：Python环境准备
-        stage('准备Python环境') {
-            steps {
-                echo "🐍 准备Python测试环境..."
-
-                sh '''
-                    echo "检查Python环境..."
-                    python3 --version || python --version
-                    pip3 --version || pip --version
-
-                    echo "安装依赖包..."
-                    if [ -f "requirements.txt" ]; then
-                        echo "使用requirements.txt安装依赖"
-                        pip3 install -r requirements.txt -i http://mirrors.aliyun.com/pypi/simple/
-                    else
-                        echo "⚠️  requirements.txt不存在，安装基础包"
-                        pip3 install pytest allure-pytest pytest-html requests pyyaml -i http://mirrors.aliyun.com/pypi/simple/
-                    fi
-
-                    echo "验证关键包:"
-                    python3 -c "
-try:
-    import pytest
-    import requests
-    import yaml
-    import allure
-    print('✅ pytest:', pytest.__version__)
-    print('✅ requests:', requests.__version__)
-    print('✅ PyYAML: 已安装')
-    print('✅ allure-pytest: 已安装')
-except ImportError as e:
-    print('❌ 导入错误:', e)
-                    "
-
-                    # 检查Allure命令行工具
-                    if command -v allure &> /dev/null; then
-                        echo "✅ Allure命令行: $(allure --version)"
-                    else
-                        echo "⚠️  Allure命令行工具未安装，HTML报告可能无法生成"
-                        echo "   安装命令:"
-                        echo "   wget https://github.com/allure-framework/allure2/releases/download/2.24.0/allure-2.24.0.tgz"
-                        echo "   tar -zxvf allure-2.24.0.tgz"
-                        echo "   sudo mv allure-2.24.0 /opt/allure"
-                        echo "   sudo ln -s /opt/allure/bin/allure /usr/bin/allure"
-                    fi
-                '''
+        // 阶段4：创建Python虚拟环境
+        stage('设置Python环境') {
+            when {
+                expression { params.USE_VENV.toBoolean() }
             }
-        }
-
-        // 阶段4：切换测试环境
-        stage('切换测试环境') {
             steps {
-                echo "🔄 切换到测试环境: ${params.TEST_ENVIRONMENT}"
+                echo "🐍 创建Python虚拟环境..."
 
                 script {
-                    // 使用环境管理器切换环境
-                    sh """
-                        echo "使用环境管理器切换环境..."
-                        if [ -f "env_config_manager.py" ]; then
-                            python3 env_config_manager.py switch "${params.TEST_ENVIRONMENT}"
-                        else
-                            echo "⚠️  env_config_manager.py不存在，手动更新配置"
-                            echo "创建临时脚本切换环境..."
-
-                            # 创建临时切换脚本
-                            cat > switch_env_temp.py << 'EOF'
-import yaml
-import sys
-
-env_name = sys.argv[1]
-env_configs = {
-    "阿里Paas区": {
-        "athena_designer_host": "https://adp-paas.apps.digiwincloud.com.cn",
-        "athena_deployer_host": "https://aadc-paas.apps.digiwincloud.com.cn",
-        "athena_tenant_deployer_host": "https://atdp-paas.apps.digiwincloud.com.cn",
-        "iam_host": "https://iam-test.digiwincloud.com.cn"
-    },
-    "华为测试区": {
-        "athena_designer_host": "https://adp-test.apps.digiwincloud.com.cn",
-        "athena_deployer_host": "https://aadc-test.apps.digiwincloud.com.cn",
-        "athena_tenant_deployer_host": "https://atdp-test.apps.digiwincloud.com.cn",
-        "iam_host": "https://iam-test.digiwincloud.com.cn"
-    },
-    "华为正式区": {
-        "athena_designer_host": "https://adp.apps.digiwincloud.com.cn",
-        "athena_deployer_host": "https://aadc.apps.digiwincloud.com.cn",
-        "athena_tenant_deployer_host": "https://atdp.apps.digiwincloud.com.cn",
-        "iam_host": "https://iam.digiwincloud.com.cn"
-    },
-    "地端双虎环境": {
-        "athena_designer_host": "https://adp.twintigers.com",
-        "athena_deployer_host": "https://aadc.twintigers.com",
-        "athena_tenant_deployer_host": "https://atdp.twintigers.com",
-        "iam_host": "http://iam.twintigers.com"
-    }
-}
-
-if env_name not in env_configs:
-    print(f"❌ 环境 '{env_name}' 不存在")
-    sys.exit(1)
-
-with open("common/config.yaml", "r") as f:
-    config = yaml.safe_load(f)
-
-config.update(env_configs[env_name])
-config["env"] = env_name
-
-with open("common/config.yaml", "w") as f:
-    yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
-
-print(f"✅ 已切换到环境: {env_name}")
-print(f"   设计器: {env_configs[env_name]['athena_designer_host']}")
-EOF
-
-                            python3 switch_env_temp.py "${params.TEST_ENVIRONMENT}"
-                            rm -f switch_env_temp.py
-                        fi
-                    """
-
-                    // 显示当前配置
                     sh '''
-                        echo "当前环境配置:"
-                        echo "================================="
-                        if [ -f "common/config.yaml" ]; then
-                            grep -E "env:|athena_.*_host:|iam_host:" common/config.yaml || echo "无法读取配置"
+                        echo "检查Python虚拟环境..."
+
+                        # 查找Python命令
+                        PYTHON_CMD=""
+                        for cmd in "${params.PYTHON_VERSION}" python3 python; do
+                            if command -v "$cmd" > /dev/null 2>&1; then
+                                PYTHON_CMD="$cmd"
+                                break
+                            fi
+                        done
+
+                        if [ -z "$PYTHON_CMD" ]; then
+                            echo "❌ 未找到Python命令"
+                            exit 1
+                        fi
+
+                        echo "使用Python: $($PYTHON_CMD --version 2>&1)"
+
+                        # 检查是否支持venv
+                        if $PYTHON_CMD -c "import venv" 2>/dev/null; then
+                            echo "✅ Python支持venv模块"
                         else
-                            echo "❌ common/config.yaml不存在"
+                            echo "⚠️  Python不支持venv，尝试安装python3-venv"
+
+                            # 尝试安装venv
+                            if command -v apt-get > /dev/null 2>&1; then
+                                apt-get update && apt-get install -y python3-venv || true
+                            elif command -v yum > /dev/null 2>&1; then
+                                yum install -y python3-virtualenv || true
+                            fi
+                        fi
+
+                        # 创建虚拟环境
+                        if [ ! -d "${VENV_DIR}" ]; then
+                            echo "创建虚拟环境..."
+                            $PYTHON_CMD -m venv "${VENV_DIR}" || {
+                                echo "⚠️  venv创建失败，尝试virtualenv"
+                                if command -v virtualenv > /dev/null 2>&1; then
+                                    virtualenv "${VENV_DIR}" -p $PYTHON_CMD
+                                else
+                                    echo "❌ 无法创建虚拟环境"
+                                    exit 1
+                                fi
+                            }
+                        fi
+
+                        # 激活虚拟环境
+                        if [ -f "${VENV_DIR}/bin/activate" ]; then
+                            echo "✅ 虚拟环境创建成功"
+                            echo "虚拟环境路径: $(pwd)/${VENV_DIR}"
+
+                            # 检查虚拟环境中的Python
+                            if [ -f "${VENV_DIR}/bin/python" ]; then
+                                echo "虚拟环境Python: $(${VENV_DIR}/bin/python --version 2>&1)"
+                            fi
+                        else
+                            echo "⚠️  虚拟环境文件不存在，跳过虚拟环境使用"
                         fi
                     '''
                 }
             }
         }
 
-        // 阶段5：更新测试配置
-        stage('更新测试配置') {
+        // 阶段5：安装Python依赖
+        stage('安装Python依赖') {
             steps {
-                echo "⚙️ 更新测试配置..."
+                echo "📦 安装Python依赖包..."
 
                 script {
-                    // 更新config.py中的通知配置
-                    sh """
-                        echo "更新通知配置..."
-                        if [ -f "config.py" ]; then
-                            # 备份原配置
-                            cp -f config.py config.py.backup
+                    sh '''
+                        set +e  # 允许命令失败
 
-                            # 处理通知类型映射 - 直接在shell中处理
-                            NOTIFICATION_VALUE="0"
-                            case "${params.NOTIFICATION_TYPE}" in
-                                "无通知")
-                                    NOTIFICATION_VALUE="0"
-                                    ;;
-                                "邮件通知")
-                                    NOTIFICATION_VALUE="3"
-                                    ;;
-                                "钉钉通知")
-                                    NOTIFICATION_VALUE="1"
-                                    ;;
-                                "企业微信通知")
-                                    NOTIFICATION_VALUE="2"
-                                    ;;
-                                "全部通知")
-                                    NOTIFICATION_VALUE="1,2,3"
-                                    ;;
-                            esac
-
-                            # 使用sed更新配置
-                            sed -i "s/notification_type =.*/notification_type = \\"${NOTIFICATION_VALUE}\\"/g" config.py
-                            sed -i "s/excel_report =.*/excel_report = ${params.GENERATE_EXCEL_REPORT}/g" config.py
-
-                            echo "✅ 通知配置已更新"
-                            echo "   通知类型: ${params.NOTIFICATION_TYPE} -> ${NOTIFICATION_VALUE}"
-                            echo "   Excel报告: ${params.GENERATE_EXCEL_REPORT}"
+                        # 确定使用的pip命令
+                        if [ "${params.USE_VENV}" = "true" ] && [ -f "${VENV_DIR}/bin/pip" ]; then
+                            PIP_CMD="${VENV_DIR}/bin/pip"
+                            PYTHON_CMD="${VENV_DIR}/bin/python"
+                            echo "✅ 使用虚拟环境中的pip"
                         else
-                            echo "⚠️  config.py不存在，跳过配置更新"
+                            # 查找系统pip
+                            PIP_CMD=""
+                            for cmd in pip3 pip; do
+                                if command -v "$cmd" > /dev/null 2>&1; then
+                                    PIP_CMD="$cmd"
+                                    break
+                                fi
+                            done
+
+                            if [ -z "$PIP_CMD" ]; then
+                                PIP_CMD="python -m pip"
+                            fi
                         fi
-                    """
+
+                        echo "使用的pip命令: $PIP_CMD"
+                        echo "pip版本: $($PIP_CMD --version 2>&1 || echo '无法获取版本')"
+
+                        echo ""
+                        echo "=== 配置pip镜像源 ==="
+
+                        # 国内镜像源列表（按优先级排序）
+                        MIRRORS=(
+                            "https://pypi.tuna.tsinghua.edu.cn/simple"
+                            "https://mirrors.aliyun.com/pypi/simple/"
+                            "https://pypi.douban.com/simple/"
+                            "https://mirrors.cloud.tencent.com/pypi/simple"
+                        )
+
+                        # 尝试升级pip（使用默认源）
+                        echo "升级pip..."
+                        $PIP_CMD install --upgrade pip --retries 3 --timeout 30 || \
+                            echo "⚠️  pip升级失败，继续执行"
+
+                        # 尝试不同的镜像源安装依赖
+                        INSTALLED=false
+                        for MIRROR in "${MIRRORS[@]}"; do
+                            echo ""
+                            echo "尝试使用镜像源: $MIRROR"
+
+                            # 提取域名用于--trusted-host
+                            DOMAIN=$(echo $MIRROR | sed 's|https://||' | cut -d'/' -f1)
+
+                            if [ -f "requirements.txt" ]; then
+                                echo "从requirements.txt安装依赖..."
+                                if $PIP_CMD install -r requirements.txt \
+                                    -i "$MIRROR" \
+                                    --trusted-host "$DOMAIN" \
+                                    --retries 3 \
+                                    --timeout 60; then
+                                    INSTALLED=true
+                                    echo "✅ 依赖安装成功"
+                                    break
+                                else
+                                    echo "⚠️  镜像源 $MIRROR 安装失败"
+                                fi
+                            else
+                                echo "requirements.txt不存在，安装基础包..."
+                                if $PIP_CMD install pytest allure-pytest pytest-html requests pyyaml openpyxl pymysql redis \
+                                    -i "$MIRROR" \
+                                    --trusted-host "$DOMAIN" \
+                                    --retries 3 \
+                                    --timeout 60; then
+                                    INSTALLED=true
+                                    echo "✅ 基础包安装成功"
+                                    break
+                                else
+                                    echo "⚠️  镜像源 $MIRROR 安装失败"
+                                fi
+                            fi
+                        done
+
+                        # 如果所有镜像源都失败，尝试官方源
+                        if [ "$INSTALLED" = "false" ]; then
+                            echo ""
+                            echo "⚠️ 所有镜像源失败，尝试官方源..."
+
+                            if [ -f "requirements.txt" ]; then
+                                $PIP_CMD install -r requirements.txt --retries 3 --timeout 120 || {
+                                    echo "❌ 官方源安装失败"
+                                    echo "尝试离线安装或检查网络连接"
+                                }
+                            else
+                                $PIP_CMD install pytest allure-pytest pytest-html requests pyyaml openpyxl pymysql redis --retries 3 --timeout 120 || {
+                                    echo "❌ 基础包安装失败"
+                                }
+                            fi
+                        fi
+
+                        echo ""
+                        echo "=== 验证安装 ==="
+
+                        # 检查关键包
+                        $PYTHON_CMD -c "
+import sys
+print('Python版本:', sys.version)
+print('')
+packages = [
+    ('pytest', 'pytest'),
+    ('requests', 'requests'),
+    ('yaml', 'yaml'),
+    ('allure', 'allure'),
+    ('openpyxl', 'openpyxl'),
+    ('pymysql', 'pymysql'),
+    ('redis', 'redis')
+]
+
+for import_name, display_name in packages:
+    try:
+        if import_name == 'yaml':
+            import yaml
+            version = getattr(yaml, '__version__', '已安装')
+        else:
+            module = __import__(import_name)
+            version = getattr(module, '__version__', '已安装')
+        print(f'✅ {display_name}: {version}')
+    except ImportError as e:
+        print(f'❌ {display_name}: 未安装')
+                        " || echo "Python包检查失败"
+
+                        echo ""
+                        echo "已安装的包:"
+                        $PIP_CMD list --format=columns 2>/dev/null | head -15 || true
+
+                        set -e  # 恢复错误检查
+                    '''
                 }
             }
         }
 
-        // 阶段6：执行测试
+        // 阶段6：安装Allure命令行工具
+        stage('安装Allure工具') {
+            steps {
+                echo "📊 安装Allure报告工具..."
+
+                script {
+                    sh '''
+                        set +e
+
+                        # 检查是否已安装Allure
+                        if command -v allure > /dev/null 2>&1; then
+                            echo "✅ Allure已安装: $(allure --version 2>&1 | head -1)"
+                            exit 0
+                        fi
+
+                        echo "📥 下载并安装Allure..."
+
+                        # 检测系统架构
+                        OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+                        ARCH=$(uname -m)
+
+                        echo "系统: $OS, 架构: $ARCH"
+
+                        # 选择适合的版本
+                        ALLURE_VERSION="2.24.0"
+
+                        # 检查是否已经下载
+                        if [ -d "/opt/allure" ] && [ -f "/opt/allure/bin/allure" ]; then
+                            echo "✅ Allure已存在于/opt/allure"
+                            sudo ln -sf /opt/allure/bin/allure /usr/local/bin/allure 2>/dev/null || true
+                            exit 0
+                        fi
+
+                        # 根据系统下载
+                        if [ "$OS" = "linux" ]; then
+                            if [ "$ARCH" = "x86_64" ]; then
+                                echo "下载Linux x86_64版本..."
+                                wget -q --show-progress https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz
+
+                                if [ -f "allure-${ALLURE_VERSION}.tgz" ]; then
+                                    tar -xzf allure-${ALLURE_VERSION}.tgz
+                                    sudo mkdir -p /opt
+                                    sudo mv allure-${ALLURE_VERSION} /opt/allure
+                                    sudo ln -sf /opt/allure/bin/allure /usr/local/bin/allure
+                                    rm -f allure-${ALLURE_VERSION}.tgz
+                                    echo "✅ Allure安装完成"
+                                else
+                                    echo "⚠️  Allure下载失败"
+                                fi
+                            elif [ "$ARCH" = "aarch64" ]; then
+                                echo "⚠️  ARM架构，尝试其他安装方式..."
+                                # 对于ARM，可能需要其他方式安装
+                                sudo apt-get install -y default-jre 2>/dev/null || true
+                                echo "提示: ARM架构可能需要手动安装Allure"
+                            fi
+                        elif [ "$OS" = "darwin" ]; then
+                            echo "下载macOS版本..."
+                            wget -q https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.zip
+                            unzip -q allure-${ALLURE_VERSION}.zip
+                            sudo mv allure-${ALLURE_VERSION} /opt/allure
+                            sudo ln -sf /opt/allure/bin/allure /usr/local/bin/allure
+                            rm -f allure-${ALLURE_VERSION}.zip
+                            echo "✅ Allure安装完成"
+                        else
+                            echo "⚠️  不支持的系统: $OS"
+                        fi
+
+                        # 验证安装
+                        if command -v allure > /dev/null 2>&1; then
+                            echo "✅ Allure安装成功: $(allure --version 2>&1)"
+                        else
+                            echo "⚠️  Allure安装失败或路径未配置"
+                            echo "可以手动执行: export PATH=/opt/allure/bin:\$PATH"
+                        fi
+
+                        set -e
+                    '''
+                }
+            }
+        }
+
+        // 阶段7：切换测试环境
+        stage('切换测试环境') {
+            steps {
+                echo "🔄 切换到测试环境: ${params.TEST_ENVIRONMENT}"
+
+                script {
+                    sh '''
+                        # 检查配置文件目录
+                        if [ ! -d "common" ]; then
+                            mkdir -p common
+                            echo "创建common目录"
+                        fi
+
+                        echo "切换到环境: ${params.TEST_ENVIRONMENT}"
+
+                        # 定义环境配置
+                        cat > common/config.yaml << EOF
+# Athena自动化测试环境配置
+# 自动生成 - 构建号: ${BUILD_NUMBER}
+env: "${params.TEST_ENVIRONMENT}"
+EOF
+
+                        # 根据环境添加配置
+                        case "${params.TEST_ENVIRONMENT}" in
+                            "阿里Paas区")
+                                cat >> common/config.yaml << EOF
+athena_designer_host: "https://adp-paas.apps.digiwincloud.com.cn"
+athena_deployer_host: "https://aadc-paas.apps.digiwincloud.com.cn"
+athena_tenant_deployer_host: "https://atdp-paas.apps.digiwincloud.com.cn"
+iam_host: "https://iam-test.digiwincloud.com.cn"
+EOF
+                                ;;
+                            "华为测试区")
+                                cat >> common/config.yaml << EOF
+athena_designer_host: "https://adp-test.apps.digiwincloud.com.cn"
+athena_deployer_host: "https://aadc-test.apps.digiwincloud.com.cn"
+athena_tenant_deployer_host: "https://atdp-test.apps.digiwincloud.com.cn"
+iam_host: "https://iam-test.digiwincloud.com.cn"
+EOF
+                                ;;
+                            "华为正式区")
+                                cat >> common/config.yaml << EOF
+athena_designer_host: "https://adp.apps.digiwincloud.com.cn"
+athena_deployer_host: "https://aadc.apps.digiwincloud.com.cn"
+athena_tenant_deployer_host: "https://atdp.apps.digiwincloud.com.cn"
+iam_host: "https://iam.digiwincloud.com.cn"
+EOF
+                                ;;
+                            "地端双虎环境")
+                                cat >> common/config.yaml << EOF
+athena_designer_host: "https://adp.twintigers.com"
+athena_deployer_host: "https://aadc.twintigers.com"
+athena_tenant_deployer_host: "https://atdp.twintigers.com"
+iam_host: "http://iam.twintigers.com"
+EOF
+                                ;;
+                        esac
+
+                        echo "✅ 环境配置已生成"
+                        echo ""
+                        echo "当前环境配置:"
+                        echo "================================="
+                        cat common/config.yaml
+                    '''
+                }
+            }
+        }
+
+        // 阶段8：执行测试
         stage('执行接口测试') {
             steps {
                 echo "🚀 开始执行接口测试..."
 
                 script {
-                    // 创建报告目录 - 修复：使用双引号
+                    // 创建报告目录
                     sh """
                         echo "创建报告目录..."
-                        mkdir -p ${ALLURE_RESULTS_DIR}
-                        mkdir -p ${ALLURE_REPORT_DIR}
-                        mkdir -p ${JENKINS_REPORTS_DIR}
+                        mkdir -p "${ALLURE_RESULTS_DIR}"
+                        mkdir -p "${ALLURE_REPORT_DIR}"
+                        mkdir -p "${JENKINS_REPORTS_DIR}"
 
                         if ${params.CLEAN_ALLURE_HISTORY}; then
                             echo "清理Allure历史数据..."
-                            rm -rf ${ALLURE_RESULTS_DIR}/* 2>/dev/null || true
+                            rm -rf "${ALLURE_RESULTS_DIR}"/* 2>/dev/null || true
                         fi
                     """
 
                     // 设置测试执行超时（30分钟）
                     timeout(time: 30, unit: 'MINUTES') {
-                        sh """
-                            echo "开始执行测试..."
-                            echo "环境: ${params.TEST_ENVIRONMENT}"
-                            echo "测试类型: ${params.TEST_TYPE}"
-                            echo "测试模块: ${params.TEST_MODULE}"
-                            echo "并行执行: ${params.PARALLEL_EXECUTION}"
+                        script {
+                            // 确定Python命令
+                            def pythonCmd = "python3"
+                            if (params.USE_VENV.toBoolean()) {
+                                pythonCmd = "${VENV_DIR}/bin/python"
+                            }
 
-                            # 设置环境变量
-                            export JENKINS_BUILD="true"
-                            export BUILD_NUMBER="${env.BUILD_NUMBER}"
-                            export JOB_NAME="${env.JOB_NAME}"
-                            export BUILD_URL="${env.BUILD_URL}"
-                            export TEST_ENVIRONMENT="${params.TEST_ENVIRONMENT}"
+                            sh """
+                                echo "开始执行测试..."
+                                echo "环境: ${params.TEST_ENVIRONMENT}"
+                                echo "测试类型: ${params.TEST_TYPE}"
+                                echo "测试模块: ${params.TEST_MODULE}"
+                                echo "并行执行: ${params.PARALLEL_EXECUTION}"
+                                echo "Python命令: ${pythonCmd}"
 
-                            # 执行run.py（你的主测试脚本）
-                            echo "执行命令: python3 run.py"
-                            python3 run.py
+                                # 设置环境变量
+                                export JENKINS_BUILD="true"
+                                export BUILD_NUMBER="${env.BUILD_NUMBER}"
+                                export JOB_NAME="${env.JOB_NAME}"
+                                export BUILD_URL="${env.BUILD_URL}"
+                                export TEST_ENVIRONMENT="${params.TEST_ENVIRONMENT}"
 
-                            # 记录退出码
-                            EXIT_CODE=\$?
-                            echo \$EXIT_CODE > test_exit_code.txt
-                            echo "测试退出码: \$EXIT_CODE"
+                                # 检查run.py是否存在
+                                if [ ! -f "run.py" ]; then
+                                    echo "❌ run.py不存在"
+                                    echo "尝试查找其他测试入口..."
 
-                            # 如果run.py启动了自己的报告服务，这里可能需要处理
-                        """
+                                    # 查找可能的测试入口
+                                    TEST_FILES=\$(find . -name "test_*.py" -o -name "*test.py" | head -5)
+                                    if [ -n "\$TEST_FILES" ]; then
+                                        echo "找到测试文件:"
+                                        echo "\$TEST_FILES"
+                                        echo "请更新配置使用正确的测试入口"
+                                    fi
+                                    exit 1
+                                fi
+
+                                # 执行run.py
+                                echo "执行命令: ${pythonCmd} run.py"
+                                ${pythonCmd} run.py
+
+                                # 记录退出码
+                                EXIT_CODE=\$?
+                                echo \$EXIT_CODE > test_exit_code.txt
+                                echo "测试退出码: \$EXIT_CODE"
+                            """
+                        }
                     }
 
                     // 检查测试结果
@@ -370,14 +789,15 @@ EOF
 
                     if (exitCode != 0) {
                         echo "⚠️ 测试执行异常，退出码: ${exitCode}"
-                        // 不立即失败，继续生成报告
                         currentBuild.result = 'UNSTABLE'
+                    } else {
+                        echo "✅ 测试执行完成"
                     }
                 }
             }
         }
 
-        // 阶段7：处理测试报告
+        // 阶段9：处理测试报告
         stage('处理测试报告') {
             steps {
                 echo "📊 处理测试报告..."
@@ -385,33 +805,45 @@ EOF
                 script {
                     // 生成Allure报告
                     sh """
+                        set +e
+
                         echo "生成Allure报告..."
-                        if command -v allure &> /dev/null && [ -d "${ALLURE_RESULTS_DIR}" ]; then
-                            allure generate ${ALLURE_RESULTS_DIR} -o ${ALLURE_REPORT_DIR} --clean
-                            echo "✅ Allure报告生成完成"
+                        if command -v allure > /dev/null 2>&1 && [ -d "${ALLURE_RESULTS_DIR}" ]; then
+                            echo "使用Allure生成报告..."
+                            allure generate "${ALLURE_RESULTS_DIR}" -o "${ALLURE_REPORT_DIR}" --clean
 
-                            # 复制Allure报告到Jenkins目录
-                            cp -r ${ALLURE_REPORT_DIR}/* ${JENKINS_REPORTS_DIR}/ 2>/dev/null || true
+                            if [ -f "${ALLURE_REPORT_DIR}/index.html" ]; then
+                                echo "✅ Allure报告生成完成"
+                            else
+                                echo "⚠️  Allure报告生成可能失败"
+                            fi
                         else
-                            echo "⚠️  跳过Allure报告生成"
+                            echo "⚠️  Allure未安装或结果目录不存在"
                         fi
-                    """
 
-                    // 复制其他报告文件
-                    sh """
+                        # 复制报告文件
                         echo "收集报告文件..."
-                        # 复制pytest-html报告（如果有）
-                        find . -name "*.html" -type f -not -path "./venv/*" -not -path "./.venv/*" | head -5 | while read file; do
-                            cp "\$file" ${JENKINS_REPORTS_DIR}/ 2>/dev/null || true
+                        mkdir -p "${JENKINS_REPORTS_DIR}"
+
+                        # 复制Allure报告
+                        if [ -d "${ALLURE_REPORT_DIR}" ]; then
+                            cp -r "${ALLURE_REPORT_DIR}"/* "${JENKINS_REPORTS_DIR}"/ 2>/dev/null || true
+                        fi
+
+                        # 查找并复制HTML报告
+                        find . -name "*.html" -type f -not -path "./venv/*" -not -path "./.venv/*" -not -path "./report/*" | head -10 | while read file; do
+                            cp "\$file" "${JENKINS_REPORTS_DIR}"/ 2>/dev/null || true
                         done
 
                         # 复制日志文件
-                        find . -name "*.log" -type f | head -3 | while read file; do
-                            cp "\$file" ${JENKINS_REPORTS_DIR}/ 2>/dev/null || true
+                        find . -name "*.log" -type f | head -5 | while read file; do
+                            cp "\$file" "${JENKINS_REPORTS_DIR}"/ 2>/dev/null || true
                         done
 
-                        # 生成测试摘要 - 修复：在双引号内正确处理变量
-                        cat > ${JENKINS_REPORTS_DIR}/test_summary.md << EOF
+                        # 生成测试摘要
+                        EXIT_CODE=\$(cat test_exit_code.txt 2>/dev/null || echo "0")
+
+                        cat > "${JENKINS_REPORTS_DIR}/test_summary.md" << EOF
 # Athena开发平台 - 接口自动化测试报告
 
 ## 测试信息
@@ -423,86 +855,71 @@ EOF
 - **构建编号**: #${env.BUILD_NUMBER}
 - **执行时间**: \$(date '+%Y-%m-%d %H:%M:%S')
 - **测试时长**: ${currentBuild.durationString}
+- **Python版本**: \$(python3 --version 2>/dev/null || echo 'N/A')
+- **退出码**: \$EXIT_CODE
 
 ## 环境配置
-- **设计器地址**: \$(grep "athena_designer_host:" common/config.yaml | cut -d' ' -f2)
-- **部署器地址**: \$(grep "athena_deployer_host:" common/config.yaml | cut -d' ' -f2)
-- **租户部署器**: \$(grep "athena_tenant_deployer_host:" common/config.yaml | cut -d' ' -f2)
-- **IAM地址**: \$(grep "iam_host:" common/config.yaml | cut -d' ' -f2)
+\`\`\`yaml
+\$(cat common/config.yaml 2>/dev/null || echo '配置文件不存在')
+\`\`\`
 
-## 测试结果
-- **退出码**: \$(cat test_exit_code.txt 2>/dev/null || echo "N/A")
-- **Allure报告**: ${ALLURE_REPORT_DIR}/
-- **详细日志**: 查看Jenkins控制台输出
+## 系统信息
+\$(uname -a)
 
-## 生成的报告文件
-\$(find ${JENKINS_REPORTS_DIR} -type f -name "*.html" -o -name "*.xml" -o -name "*.json" | xargs -I {} basename {} | sort | uniq | while read file; do echo "- \$file"; done)
+## 报告文件
+- Allure报告: \${ALLURE_REPORT_DIR}/index.html
+- Jenkins报告目录: \${JENKINS_REPORTS_DIR}
 
+\$(ls -la "\${JENKINS_REPORTS_DIR}" 2>/dev/null | tail -n +2)
 EOF
 
                         echo "✅ 报告处理完成"
                         echo "报告目录: ${JENKINS_REPORTS_DIR}"
-                        ls -la ${JENKINS_REPORTS_DIR}/
+                        ls -la "${JENKINS_REPORTS_DIR}"/ 2>/dev/null || echo "报告目录为空"
+
+                        set -e
                     """
 
                     // 发布HTML报告到Jenkins
                     script {
-                        def htmlFiles = findFiles(glob: "${JENKINS_REPORTS_DIR}/*.html")
-                        if (!htmlFiles.isEmpty()) {
-                            publishHTML([
-                                allowMissing: false,
-                                alwaysLinkToLastBuild: true,
-                                keepAll: true,
-                                reportDir: JENKINS_REPORTS_DIR,
-                                reportFiles: htmlFiles[0].name,
-                                reportName: "Athena测试报告-${params.TEST_ENVIRONMENT}"
-                            ])
-                        } else if (fileExists("${ALLURE_REPORT_DIR}/index.html")) {
-                            publishHTML([
-                                allowMissing: false,
-                                alwaysLinkToLastBuild: true,
-                                keepAll: true,
-                                reportDir: ALLURE_REPORT_DIR,
-                                reportFiles: 'index.html',
-                                reportName: "Athena测试报告-${params.TEST_ENVIRONMENT}"
-                            ])
+                        def reportDir = new File("${JENKINS_REPORTS_DIR}")
+                        if (reportDir.exists()) {
+                            def htmlFiles = findFiles(glob: "${JENKINS_REPORTS_DIR}/*.html")
+                            if (!htmlFiles.isEmpty()) {
+                                // 找到第一个HTML文件
+                                def reportFile = htmlFiles[0].name
+                                publishHTML([
+                                    allowMissing: false,
+                                    alwaysLinkToLastBuild: true,
+                                    keepAll: true,
+                                    reportDir: JENKINS_REPORTS_DIR,
+                                    reportFiles: reportFile,
+                                    reportName: "Athena测试报告-${params.TEST_ENVIRONMENT}"
+                                ])
+                                echo "✅ HTML报告已发布: ${reportFile}"
+                            } else if (fileExists("${ALLURE_REPORT_DIR}/index.html")) {
+                                publishHTML([
+                                    allowMissing: false,
+                                    alwaysLinkToLastBuild: true,
+                                    keepAll: true,
+                                    reportDir: ALLURE_REPORT_DIR,
+                                    reportFiles: 'index.html',
+                                    reportName: "Athena Allure报告-${params.TEST_ENVIRONMENT}"
+                                ])
+                                echo "✅ Allure报告已发布"
+                            } else {
+                                echo "⚠️  未找到可发布的HTML报告"
+                            }
+                        } else {
+                            echo "⚠️  报告目录不存在"
                         }
                     }
 
                     // 归档报告文件
-                    archiveArtifacts artifacts: "${JENKINS_REPORTS_DIR}/**/*", fingerprint: true
-                    archiveArtifacts artifacts: "${ALLURE_REPORT_DIR}/**/*", fingerprint: true
-                }
-            }
-        }
-
-        // 阶段8：启动本地报告服务（可选）
-        stage('启动报告服务') {
-            when {
-                expression { params.START_LOCAL_REPORT.toBoolean() }
-            }
-            steps {
-                echo "🌐 启动本地报告服务..."
-
-                script {
-                    sh """
-                        echo "启动Allure报告Web服务..."
-                        if command -v allure &> /dev/null && [ -d "${ALLURE_RESULTS_DIR}" ]; then
-                            # 在后台启动服务
-                            nohup allure serve ${ALLURE_RESULTS_DIR} -h 0.0.0.0 -p 9999 > allure_service.log 2>&1 &
-                            echo \$! > allure_service.pid
-                            sleep 3
-
-                            # 获取服务器IP
-                            SERVER_IP=\$(curl -s ifconfig.me || hostname -I | awk '{print \$1}')
-                            echo "✅ 报告服务已启动"
-                            echo "   访问地址: http://\${SERVER_IP}:9999"
-                            echo "   PID: \$(cat allure_service.pid)"
-                            echo "   日志文件: allure_service.log"
-                        else
-                            echo "⚠️  无法启动报告服务"
-                        fi
-                    """
+                    archiveArtifacts artifacts: "${JENKINS_REPORTS_DIR}/**/*", fingerprint: true, allowEmptyArchive: true
+                    if (fileExists("${ALLURE_REPORT_DIR}")) {
+                        archiveArtifacts artifacts: "${ALLURE_REPORT_DIR}/**/*", fingerprint: true, allowEmptyArchive: true
+                    }
                 }
             }
         }
@@ -513,194 +930,51 @@ EOF
             echo "🧹 清理工作..."
 
             script {
-                // 在script块中定义变量，然后在sh中使用
-                def buildStatus = currentBuild.result
-                def buildNumber = env.BUILD_NUMBER
-                def testEnv = params.TEST_ENVIRONMENT
-                def duration = currentBuild.durationString
-                def buildUrl = env.BUILD_URL
-                def reportsDir = "jenkins-reports/${buildNumber}_${testEnv}"
+                sh '''
+                    set +e
 
-                sh """
-                    echo "恢复配置文件..."
-                    if [ -f "common/config.yaml.backup" ]; then
-                        mv -f common/config.yaml.backup common/config.yaml
-                        echo "✅ 恢复common/config.yaml"
-                    fi
-                    if [ -f "config.py.backup" ]; then
-                        mv -f config.py.backup config.py
-                        echo "✅ 恢复config.py"
-                    fi
-
-                    # 停止报告服务
-                    if [ -f "allure_service.pid" ]; then
-                        echo "停止报告服务..."
-                        kill \$(cat allure_service.pid) 2>/dev/null || true
-                        rm -f allure_service.pid allure_service.log
-                    fi
+                    echo "清理临时文件..."
 
                     # 清理Python缓存
-                    echo "清理Python缓存..."
                     find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
                     find . -name "*.pyc" -delete 2>/dev/null || true
                     find . -name ".pytest_cache" -type d -exec rm -rf {} + 2>/dev/null || true
-                    find . -name ".coverage" -delete 2>/dev/null || true
 
-                    # 显示报告信息
+                    # 清理临时文件
+                    rm -f test_exit_code.txt 2>/dev/null || true
+                    rm -f get-pip.py 2>/dev/null || true
+                    rm -f switch_env_temp.py 2>/dev/null || true
+
                     echo ""
                     echo "📋 测试执行完成"
                     echo "================================="
-                    echo "构建状态: ${buildStatus}"
-                    echo "构建编号: #${buildNumber}"
-                    echo "测试环境: ${testEnv}"
-                    echo "测试时长: ${duration}"
-                    echo ""
-                    echo "📁 报告文件位置:"
-                    echo "   Jenkins HTML报告: ${buildUrl}HTML_Report/"
-                    echo "   归档文件: ${buildUrl}artifact/"
-                    echo "   本地目录: ${reportsDir}"
-                    echo ""
-                    if [ -f "${reportsDir}/test_summary.md" ]; then
-                        echo "测试摘要:"
-                        cat ${reportsDir}/test_summary.md | grep -E "测试环境:|测试类型:|退出码:" | head -5
-                    fi
-                """
+                    echo "构建结果: ${currentBuild.result}"
+                    echo "构建时长: ${currentBuild.durationString}"
+                    echo "构建URL: ${env.BUILD_URL}"
+
+                    set -e
+                '''
             }
         }
 
         success {
-            echo "🎉 Athena接口自动化测试成功！"
-
+            echo "✅ 测试执行成功！"
             script {
-                // 成功通知
-                if (params.NOTIFICATION_TYPE != '无通知') {
-                    echo "发送成功通知..."
-
-                    // 邮件通知
-                    if (params.NOTIFICATION_TYPE.contains('邮件') || params.NOTIFICATION_TYPE == '全部通知') {
-                        emailext(
-                            to: "${EMAIL_RECIPIENTS}",
-                            subject: "${EMAIL_SUBJECT_PREFIX} ✅ 测试成功 - ${params.TEST_ENVIRONMENT} - 构建 #${env.BUILD_NUMBER}",
-                            body: """
-                            <h2>✅ Athena开发平台接口测试成功</h2>
-                            <hr>
-                            <h3>测试信息</h3>
-                            <p><strong>项目名称：</strong>${PROJECT_NAME}</p>
-                            <p><strong>测试环境：</strong>${params.TEST_ENVIRONMENT}</p>
-                            <p><strong>测试类型：</strong>${params.TEST_TYPE}</p>
-                            <p><strong>构建编号：</strong>#${env.BUILD_NUMBER}</p>
-                            <p><strong>执行时间：</strong>${new Date().format('yyyy-MM-dd HH:mm:ss')}</p>
-                            <p><strong>测试时长：</strong>${currentBuild.durationString}</p>
-                            <p><strong>测试人员：</strong>${TESTER_NAME}</p>
-                            <hr>
-                            <h3>测试结果</h3>
-                            <p style="color: green; font-weight: bold;">✅ 所有接口测试通过，系统运行正常！</p>
-                            <hr>
-                            <h3>相关链接</h3>
-                            <ul>
-                                <li><a href="${env.BUILD_URL}">构建详情</a></li>
-                                <li><a href="${env.BUILD_URL}HTML_Report/">查看测试报告</a></li>
-                                <li><a href="${env.BUILD_URL}artifact/${JENKINS_REPORTS_DIR}/">下载报告文件</a></li>
-                            </ul>
-                            <hr>
-                            <p><small>此邮件由Jenkins自动发送，请勿回复。</small></p>
-                            """,
-                            mimeType: 'text/html'
-                        )
-                    }
-                }
+                // 可以根据需要添加成功通知
             }
         }
 
         failure {
-            echo "❌ Athena接口自动化测试失败！"
-
+            echo "❌ 测试执行失败！"
             script {
-                // 失败通知
-                if (params.NOTIFICATION_TYPE != '无通知') {
-                    echo "发送失败通知..."
-
-                    // 邮件通知
-                    if (params.NOTIFICATION_TYPE.contains('邮件') || params.NOTIFICATION_TYPE == '全部通知') {
-                        emailext(
-                            to: "${EMAIL_RECIPIENTS}",
-                            subject: "${EMAIL_SUBJECT_PREFIX} ❌ 测试失败 - ${params.TEST_ENVIRONMENT} - 构建 #${env.BUILD_NUMBER}",
-                            body: """
-                            <h2>❌ Athena开发平台接口测试失败</h2>
-                            <hr>
-                            <h3>测试信息</h3>
-                            <p><strong>项目名称：</strong>${PROJECT_NAME}</p>
-                            <p><strong>测试环境：</strong>${params.TEST_ENVIRONMENT}</p>
-                            <p><strong>测试类型：</strong>${params.TEST_TYPE}</p>
-                            <p><strong>构建编号：</strong>#${env.BUILD_NUMBER}</p>
-                            <p><strong>执行时间：</strong>${new Date().format('yyyy-MM-dd HH:mm:ss')}</p>
-                            <p><strong>测试时长：</strong>${currentBuild.durationString}</p>
-                            <hr>
-                            <h3>错误信息</h3>
-                            <p style="color: red; font-weight: bold;">⚠️ 测试执行失败，请立即检查！</p>
-                            <p>可能的原因：</p>
-                            <ul>
-                                <li>测试环境服务不可用</li>
-                                <li>配置文件错误或权限问题</li>
-                                <li>依赖包安装失败</li>
-                                <li>测试用例执行异常</li>
-                            </ul>
-                            <hr>
-                            <h3>立即处理</h3>
-                            <ul>
-                                <li><a href="${env.BUILD_URL}console">查看控制台错误日志</a></li>
-                                <li><a href="${env.BUILD_URL}">进入构建详情页</a></li>
-                                <li>检查测试环境: ${params.TEST_ENVIRONMENT}</li>
-                            </ul>
-                            <hr>
-                            <p><small>此邮件由Jenkins自动发送，请勿回复。</small></p>
-                            """,
-                            mimeType: 'text/html'
-                        )
-                    }
-                }
+                // 可以根据需要添加失败通知
             }
         }
 
         unstable {
-            echo "⚠️ 测试结果不稳定（有失败的用例）"
-
+            echo "⚠️  测试执行不稳定！"
             script {
-                // 不稳定通知
-                if (params.NOTIFICATION_TYPE != '无通知') {
-                    emailext(
-                        to: "${EMAIL_RECIPIENTS}",
-                        subject: "${EMAIL_SUBJECT_PREFIX} ⚠️ 测试不稳定 - ${params.TEST_ENVIRONMENT} - 构建 #${env.BUILD_NUMBER}",
-                        body: """
-                        <h2>⚠️ Athena开发平台接口测试有失败用例</h2>
-                        <hr>
-                        <p><strong>项目名称：</strong>${PROJECT_NAME}</p>
-                        <p><strong>测试环境：</strong>${params.TEST_ENVIRONMENT}</p>
-                        <p><strong>测试类型：</strong>${params.TEST_TYPE}</p>
-                        <p><strong>构建编号：</strong>#${env.BUILD_NUMBER}</p>
-                        <p><strong>执行时间：</strong>${new Date().format('yyyy-MM-dd HH:mm:ss')}</p>
-                        <hr>
-                        <p style="color: orange; font-weight: bold;">📋 有部分测试用例失败，请检查错误报告</p>
-                        <p>建议操作：</p>
-                        <ol>
-                            <li>查看测试报告中的失败用例</li>
-                            <li>检查测试环境是否正常</li>
-                            <li>验证测试数据是否正确</li>
-                            <li>如有Excel报告，查看详细错误信息</li>
-                        </ol>
-                        <hr>
-                        <h3>相关链接</h3>
-                        <ul>
-                            <li><a href="${env.BUILD_URL}HTML_Report/">查看详细测试报告</a></li>
-                            <li><a href="${env.BUILD_URL}artifact/${JENKINS_REPORTS_DIR}/">下载报告文件</a></li>
-                            <li><a href="${env.BUILD_URL}console">查看控制台输出</a></li>
-                        </ul>
-                        <hr>
-                        <p><small>此邮件由Jenkins自动发送，请勿回复。</small></p>
-                        """,
-                        mimeType: 'text/html'
-                    )
-                }
+                // 可以根据需要添加不稳定通知
             }
         }
     }
