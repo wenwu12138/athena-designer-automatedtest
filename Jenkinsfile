@@ -492,18 +492,19 @@ EOF
     post {
         always {
             // 存档报告文件
-            archiveArtifacts artifacts: 'report/html/**', fingerprint: true
+        archiveArtifacts artifacts: 'report/html/**', fingerprint: true
 
-            // 生成访问链接
-            script {
-                def jobUrl = env.JOB_URL ?: ''
-                def buildNumber = env.BUILD_NUMBER ?: ''
+        // 生成访问链接
+        script {
+            def jobUrl = env.JOB_URL ?: ''
+            def buildNumber = env.BUILD_NUMBER ?: ''
 
-                if (jobUrl && buildNumber) {
-                    echo "📊 报告存档信息:"
-                    echo "   存档链接: ${jobUrl}${buildNumber}/artifact/"
-                    echo "   直接下载: ${jobUrl}${buildNumber}/artifact/report/html/index.html"
-                }
+            if (jobUrl && buildNumber) {
+                echo "📊 报告存档信息:"
+                echo "   存档链接: ${jobUrl}${buildNumber}/artifact/"
+                echo "   直接下载: ${jobUrl}${buildNumber}/artifact/report/html/index.html"
+            }
+            }
 
 
 
