@@ -87,10 +87,10 @@ def run():
                    --maxfail: 设置最大失败次数，当超出这个阈值时，则不会在执行测试用例
                     "--reruns=3", "--reruns-delay=2"
                    """
-
+        print("开始生成allure文件")
         #------------生成allure报告文件
         os.system(r"allure generate ./report/tmp -o ./report/html --clean")
-
+        print("完成allure文件生成")
 
         allure_data = AllureFileClean().get_case_count()
         notification_mapping = {
