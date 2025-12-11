@@ -74,14 +74,26 @@ def run():
         # TestCaseAutomaticGeneration().get_case_automatic()
 
         print("=== 开始执行 pytest ===")
-        # 直接使用 os.system
-        cmd = "pytest -s -v --tb=short --disable-warnings --alluredir ./report/tmp --clean-alluredir 2>&1"
-        print(f"执行命令: {cmd}")
 
-        # os.system 返回的是退出码左移8位后的值
-        return_code = os.system(cmd)
-        exit_code = return_code >> 8  # 转换为实际的退出码
-        print(f"\npytest 执行完成，退出码: {exit_code}")
+        # 使用 subprocess.run
+        result = subprocess.run([
+            'pytest',
+            '-s',
+            '-v',
+            '--tb=short',
+            '--disable-warnings',
+            '--alluredir', './report/tmp',
+            '--clean-alluredir'
+        ],
+            capture_output=True,
+            text=True,
+            timeout=3600)
+
+        # 输出结果
+        print(f"退出码: {result.returncode}")
+        print(f"输出:\n{result.stdout}")
+        if result.stderr:
+            print(f"错误:\n{result.stderr}")
         """
                    --reruns: 失败重跑次数
                    --count: 重复执行次数
