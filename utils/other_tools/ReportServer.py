@@ -17,7 +17,7 @@ import signal
 
 
 class ReportServer:
-    def __init__(self, report_path, port=9999, host='0.0.0.0'):
+    def __init__(self, report_path, port=9999, host='0.0.0.0', auto_serve=True):
         """
         初始化报告服务器
 
@@ -25,11 +25,35 @@ class ReportServer:
             report_path: 报告目录路径
             port: 端口号，默认9999
             host: 绑定地址，默认'0.0.0.0'（所有网络接口）
+            auto_serve: 是否自动判断是否需要启动服务
         """
         self.report_path = report_path
         self.port = port
-        self.host = host  # 新增host参数
+        self.host = host
+        self.auto_serve = auto_serve  # 修复：保存参数
         self.server = None
+        self.is_jenkins = self._is_jenkins_environment()  # 修复：初始化时检查
+
+    def _is_jenkins_environment(self):
+        """检查是否为 Jenkins 环境"""
+        jenkins_env_vars = ['JENKINS_URL', 'BUILD_NUMBER', 'BUILD_ID', 'BUILD_URL']
+        return any(os.environ.get(var) for var in jenkins_env_vars)
+
+    def should_serve_report(self):
+        """
+        判断是否应该启动报告服务
+        返回: (should_serve, reason)
+        """
+        if not self.auto_serve:
+            return False, "auto_serve 设置为 False"
+
+        if not os.path.exists(self.report_path):
+            return False, f"报告目录不存在: {self.report_path}"
+
+        if self.is_jenkins:
+            return False, "检测到 Jenkins 环境，建议使用 Allure 插件查看报告"
+
+        return True, "本地环境，可以启动报告服务"
 
     def is_port_in_use(self, port, host='localhost'):
         """检查端口是否被占用"""
@@ -122,61 +146,66 @@ class ReportServer:
 
         return ips
 
+    def print_report_info(self):
+        """打印报告访问信息"""
+        local_ip = self.get_local_ip()
+        all_ips = self.get_all_network_ips()
+
+        print(f"\n{'=' * 60}")
+        print(f"📊 测试报告信息")
+        print(f"{'=' * 60}")
+
+        if self.is_jenkins:
+            print("🔧 检测到 Jenkins 环境")
+            print(f"📍 报告路径: {self.report_path}")
+            print(f"🌐 请通过 Jenkins Allure 插件查看报告")
+
+            # 在 Jenkins 中，尝试生成可访问的路径
+            workspace = os.environ.get('WORKSPACE', os.getcwd())
+            report_relative = os.path.relpath(self.report_path, workspace)
+            print(f"📁 相对工作区路径: {report_relative}")
+
+            # 检查是否存在 index.html
+            index_path = os.path.join(self.report_path, 'index.html')
+            if os.path.exists(index_path):
+                print(f"✅ 报告文件已生成: {index_path}")
+        else:
+            print("🔧 本地环境")
+            print(f"📍 本地访问:")
+            print(f"   http://localhost:{self.port}")
+            print(f"   http://127.0.0.1:{self.port}")
+
+            print(f"\n🌐 网络访问:")
+            if local_ip != "无法获取局域网IP":
+                print(f"   http://{local_ip}:{self.port}  ← 推荐")
+
+            # 显示所有找到的IP地址
+            for ip in all_ips:
+                if ip != local_ip and ip != '127.0.0.1':
+                    print(f"   http://{ip}:{self.port}")
+
+            print(f"\n🔧 详细信息:")
+            print(f"   报告目录: {self.report_path}")
+            print(f"   是否 Jenkins: {'是' if self.is_jenkins else '否'}")
+
+        print(f"{'=' * 60}")
+
     def start_server(self):
-        """启动本地服务器"""
-        # 确保报告目录存在
-        if not os.path.exists(self.report_path):
-            print(f"报告目录不存在: {self.report_path}")
-            return False
-
-        # 检查端口是否被占用
-        if self.is_port_in_use(self.port):
-            print(f"端口 {self.port} 被占用，尝试清理...")
-            self.kill_process_by_port(self.port)
-            time.sleep(2)
-
-            # 再次检查
-            if self.is_port_in_use(self.port):
-                print(f"端口 {self.port} 仍然被占用，请手动关闭相关进程")
-                return False
-
+        """启动 HTTP 服务器 - 将 start_http_server 重命名为 start_server"""
         try:
             # 切换到报告目录
-            original_dir = os.getcwd()  # 保存原始目录
+            original_dir = os.getcwd()
             os.chdir(self.report_path)
 
-            # 启动HTTP服务器 - 关键修改：使用 self.host 而不是 'localhost'
+            # 启动HTTP服务器
             self.server = HTTPServer((self.host, self.port), SimpleHTTPRequestHandler)
-
-            # 获取所有网络IP
-            local_ip = self.get_local_ip()
-            all_ips = self.get_all_network_ips()
 
             # 在新线程中运行服务器
             def run_server():
-                print(f"\n{'=' * 60}")
-                print(f"📊 测试报告服务已启动!")
-                print(f"{'=' * 60}")
-                print(f"📍 本地访问:")
-                print(f"   http://localhost:{self.port}")
-                print(f"   http://127.0.0.1:{self.port}")
-
-                print(f"\n🌐 网络访问:")
-                if local_ip != "无法获取局域网IP":
-                    print(f"   http://{local_ip}:{self.port}  ← 推荐")
-
-                # 显示所有找到的IP地址
-                for ip in all_ips:
-                    if ip != local_ip and ip != '127.0.0.1':
-                        print(f"   http://{ip}:{self.port}")
-
-                print(f"\n🔧 服务器信息:")
+                print(f"\n🚀 启动报告服务...")
                 print(f"   绑定地址: {self.host}")
                 print(f"   端口: {self.port}")
-                print(f"   目录: {self.report_path}")
-                print(f"{'=' * 60}")
-                print("按 Ctrl+C 退出服务器\n")
-
+                print("   按 Ctrl+C 退出服务器\n")
                 self.server.serve_forever()
 
             server_thread = threading.Thread(target=run_server)
@@ -186,9 +215,46 @@ class ReportServer:
             # 等待服务器启动
             time.sleep(2)
 
-            # 自动打开浏览器（使用localhost）
-            webbrowser.open(f'http://localhost:{self.port}')
+            # 自动打开浏览器
+            try:
+                webbrowser.open(f'http://localhost:{self.port}')
+            except:
+                pass
 
+            # 恢复原始目录
+            os.chdir(original_dir)
+            return True
+
+        except Exception as e:
+            print(f"启动 HTTP 服务器时出错: {e}")
+            return False
+
+    def start(self):
+        """
+        智能启动方法
+        根据环境自动决定是否启动服务
+        """
+        should_serve, reason = self.should_serve_report()
+
+        self.print_report_info()
+
+        if not should_serve:
+            print(f"\nℹ️  不启动报告服务: {reason}")
+            return False
+
+        # 检查端口是否被占用
+        if self.is_port_in_use(self.port):
+            print(f"⚠️  端口 {self.port} 被占用，尝试清理...")
+            self.kill_process_by_port(self.port)
+            time.sleep(2)
+
+            # 再次检查
+            if self.is_port_in_use(self.port):
+                print(f"❌ 端口 {self.port} 仍然被占用，请手动关闭相关进程")
+                return False
+
+        # 启动服务
+        if self.start_server():
             # 保持主线程运行
             try:
                 while True:
@@ -196,15 +262,17 @@ class ReportServer:
             except KeyboardInterrupt:
                 print("\n正在关闭服务器...")
                 self.shutdown_server()
+            return True
+        return False
 
-            # 恢复原始目录
-            os.chdir(original_dir)
-
-        except Exception as e:
-            print(f"启动服务器时出错: {e}")
-            return False
-
-        return True
+    def serve_only(self):
+        """
+        只启动报告服务（用于查看已有报告）
+        忽略环境检测，强制启动服务
+        """
+        print("🔧 强制启动报告服务模式")
+        self.auto_serve = True
+        return self.start()
 
     def shutdown_server(self):
         """关闭服务器"""
@@ -214,14 +282,36 @@ class ReportServer:
 
 
 if __name__ == "__main__":
-    # 配置报告路径和端口
-    report_path = r"D:\sort\athena-designer-automatedtest\report\html"
-    port = 9999
+    import argparse
 
-    # 关键修改：使用 '0.0.0.0' 而不是 'localhost'
-    host = '0.0.0.0'  # 绑定到所有网络接口
-    print("测试本地ip"+ReportServer.get_local_ip())
+    parser = argparse.ArgumentParser(description='测试报告服务器')
+    parser.add_argument('--path', '-p', type=str,
+                        default=r"./report/html",
+                        help='报告目录路径')
+    parser.add_argument('--port', '-P', type=int,
+                        default=9999,
+                        help='服务器端口')
+    parser.add_argument('--host', '-H', type=str,
+                        default='0.0.0.0',
+                        help='绑定地址')
+    parser.add_argument('--serve-only', action='store_true',
+                        help='强制启动服务，忽略环境检测')
+    parser.add_argument('--no-auto', action='store_true',
+                        help='禁用自动判断，手动控制')
 
-    # 启动服务器
-    server = ReportServer(report_path, port, host)
-    server.start_server()
+    args = parser.parse_args()
+
+    # 创建服务器实例
+    server = ReportServer(
+        report_path=args.path,
+        port=args.port,
+        host=args.host,
+        auto_serve=not args.no_auto
+    )
+
+    if args.serve_only:
+        # 强制启动服务模式
+        server.serve_only()
+    else:
+        # 智能启动模式
+        server.start()

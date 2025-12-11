@@ -111,9 +111,18 @@ def run():
         # 程序运行之后，自动启动报告，如果不想启动报告，可注释这段代码
         # os.system(f"allure serve ./report/tmp -h 127.0.0.1 -p 9999")
 
-        #启动本地服务供内网查看报告
-        # server = ReportServer(report_path=ensure_path_sep("\\report\\html"), port=9999, host='0.0.0.0')
-        # server.start_server()
+        #启动报告服务
+
+
+        # 创建 ReportServer 实例
+        server = ReportServer(
+            report_path=ensure_path_sep("\\report\\html"),
+            port=9999,
+            host='0.0.0.0'
+        )
+
+        # 调用智能启动方法 - 让 ReportServer 自己判断是否要启动服务
+        server.start()
 
     except Exception:
         # 如有异常，相关异常发送邮件
