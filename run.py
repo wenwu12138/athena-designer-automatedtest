@@ -73,8 +73,43 @@ def run():
         # 判断现有的测试用例，如果未生成测试代码，则自动生成
         # TestCaseAutomaticGeneration().get_case_automatic()
 
-        pytest.main(['-s', '-W', 'ignore:Module already imported:pytest.PytestWarning',
-                     '--alluredir', './report/tmp', "--clean-alluredir"])
+        # ========== 核心替换：用 subprocess 执行 pytest（子进程） ==========
+        print("======= 开始执行 pytest 测试 =======")
+        # 构造 pytest 命令（和原参数完全一致）
+        pytest_cmd = [
+            sys.executable,  # 用当前 Python 解释器，保证本地/Jenkins 环境一致
+            "-m", "pytest",  # 调用 pytest 模块
+            "-s",
+            "-W", "ignore:Module already imported:pytest.PytestWarning",
+            "--alluredir", "./report/tmp",
+            "--clean-alluredir"
+        ]
+        # 执行 pytest 子进程（捕获输出，不终止主进程）
+        pytest_result = subprocess.run(
+            pytest_cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            encoding="utf-8",
+            cwd=os.getcwd()  # 保证工作目录一致
+        )
+        # 打印 pytest 输出（便于调试）
+        print(f"pytest 标准输出：{pytest_result.stdout}")
+        if pytest_result.stderr:
+            print(f"pytest 错误输出：{pytest_result.stderr}")
+        print("======= pytest 测试执行完成 =======")
+
+        # ========== 现在 Allure 生成逻辑100%执行（主进程） ==========
+        print("======= 开始生成 allure 文件 =======")
+        allure_result = subprocess.run(
+            ["allure", "generate", "./report/tmp", "-o", "./report/html", "--clean"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            encoding="utf-8"
+        )
+        print(f"Allure 输出：{allure_result.stdout}")
+        if allure_result.stderr:
+            print(f"Allure 错误：{allure_result.stderr}")
+        print("======= allure 文件生成完成 =======")
 
         """
                    --reruns: 失败重跑次数
@@ -87,10 +122,7 @@ def run():
                    --maxfail: 设置最大失败次数，当超出这个阈值时，则不会在执行测试用例
                     "--reruns=3", "--reruns-delay=2"
                    """
-        print("开始生成allure文件")
-        #------------生成allure报告文件
-        os.system(r"allure generate ./report/tmp -o ./report/html --clean")
-        print("开始生成allure文件")
+
 
         allure_data = AllureFileClean().get_case_count()
         notification_mapping = {
