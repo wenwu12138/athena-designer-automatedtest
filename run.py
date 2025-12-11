@@ -127,6 +127,22 @@ def run():
             print(f"\n❌ 最终错误：summary.json 不存在 → {summary_json_path}")
             raise RuntimeError("Allure 报告生成失败，summary.json 不存在")
 
+        # ========== 新增：打印 tmp 目录的详细文件 ==========
+        print(f"\n=== 检查 ./report/tmp 目录详细内容 ===")
+        tmp_dir = "/var/jenkins_home/workspace/athena-designer-api-tests/report/tmp"
+        if os.path.exists(tmp_dir):
+            import glob
+            # 列出所有 .json/.xml 文件（Allure 原始数据）
+            allure_files = glob.glob(f"{tmp_dir}/*.json") + glob.glob(f"{tmp_dir}/*.xml")
+            print(f"tmp 目录下的 Allure 原始数据文件：{allure_files}")
+            # 列出所有文件（包括非 Allure 数据）
+            all_files = os.listdir(tmp_dir)
+            print(f"tmp 目录下所有文件：{all_files}")
+            if not allure_files:
+                print(f"⚠️  关键问题：tmp 目录下无 .json/.xml 格式的 Allure 原始数据！")
+        else:
+            print(f"❌ tmp 目录不存在")
+
         allure_data = AllureFileClean().get_case_count()
         notification_mapping = {
             NotificationType.DING_TALK.value: DingTalkSendMsg(allure_data).send_ding_notification,
