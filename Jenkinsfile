@@ -392,7 +392,7 @@ EOF
                     ALLURE_URL="https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.zip"
                     # 下载并解压
                     wget -q ${ALLURE_URL} -O /tmp/allure.zip || { echo "❌ Allure 下载失败"; exit 1; }
-                    unzip -q /tmp/allure.zip -d /opt/ || { echo "❌ Allure 解压失败"; exit 1; }
+                    unzip -oq /tmp/allure.zip -d /opt/ || { echo "❌ Allure 解压失败"; exit 1; }
                     # 配置环境变量（临时生效）
                     export PATH="/opt/allure-${ALLURE_VERSION}/bin:${PATH}"
                     # 验证 Allure 命令
