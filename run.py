@@ -24,6 +24,7 @@ from common.setting import ensure_path_sep
 
 def run():
     # 从配置文件中获取项目名称
+    original_exit = sys.exit
     try:
         INFO.logger.info(
             """
@@ -73,8 +74,12 @@ def run():
         # 判断现有的测试用例，如果未生成测试代码，则自动生成
         # TestCaseAutomaticGeneration().get_case_automatic()
 
-        pytest.main(['-s', '-W', 'ignore:Module already imported:pytest.PytestWarning',
-                     '--alluredir', './report/tmp', "--clean-alluredir"])
+        sys.exit = lambda *args: None  # 让 pytest 调用 sys.exit 时不退出
+        # 执行 pytest，捕获退出码（不影响主进程）
+        pytest_exit_code = pytest.main([
+            '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning',
+            '--alluredir', './report/tmp', "--clean-alluredir"
+        ])
 
         """
                    --reruns: 失败重跑次数
@@ -90,7 +95,7 @@ def run():
         print("开始生成allure文件")
         #------------生成allure报告文件
         os.system(r"allure generate ./report/tmp -o ./report/html --clean")
-        print("完成allure文件生成")
+        print("开始生成allure文件")
 
         allure_data = AllureFileClean().get_case_count()
         notification_mapping = {
@@ -123,6 +128,9 @@ def run():
         send_email = SendEmail(AllureFileClean.get_case_count())
         send_email.error_mail(e)
         raise
+    finally:
+        # 恢复 sys.exit，避免影响其他逻辑
+        sys.exit = original_exit
 
 
 if __name__ == '__main__':
