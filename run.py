@@ -85,7 +85,31 @@ def run():
                     "--reruns=3", "--reruns-delay=2"
                    """
 
-        os.system(r"allure generate ./report/tmp -o ./report/html --clean")
+        # 1. 执行 allure generate 并打印执行结果（替代原有的 os.system 一行）
+        allure_cmd = "allure generate ./report/tmp -o ./report/html --clean"
+        print(f"执行命令：{allure_cmd}")
+        # 执行命令并获取退出码（0=成功，非0=失败）
+        cmd_exit_code = os.system(allure_cmd)
+        print(f"allure generate 执行退出码：{cmd_exit_code}")  # 打印退出码，看是否失败
+
+        # 2. 定义 summary.json 的绝对路径（和报错路径一致）
+        summary_json_path = "/var/jenkins_home/workspace/athena-designer-api-tests/report/html/widgets/summary.json"
+        # 3. 检查文件是否存在，不存在则直接报错并终止，避免执行 get_case_count()
+        if not os.path.exists(summary_json_path):
+            # 打印关键信息，帮助定位
+            print(f"错误：{summary_json_path} 文件不存在！")
+            # 检查 ./report/tmp 是否存在，以及是否有数据
+            tmp_dir = "./report/tmp"
+            if not os.path.exists(tmp_dir):
+                print(f"原因1：{tmp_dir} 目录不存在（pytest 未生成 Allure 原始数据）")
+            else:
+                import glob
+                tmp_files = glob.glob(f"{tmp_dir}/*")
+                print(f"原因2：{tmp_dir} 目录下的文件：{tmp_files}")
+                if not tmp_files:
+                    print(f"  → pytest 执行后，tmp 目录为空，allure 无法生成报告")
+            # 终止程序，避免执行后续的 get_case_count()
+            raise RuntimeError("Allure 报告生成失败，summary.json 不存在")
 
         allure_data = AllureFileClean().get_case_count()
         notification_mapping = {
