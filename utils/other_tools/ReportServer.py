@@ -158,17 +158,34 @@ class ReportServer:
         if self.is_jenkins:
             print("🔧 检测到 Jenkins 环境")
             print(f"📍 报告路径: {self.report_path}")
-            print(f"🌐 请通过 Jenkins Allure 插件查看报告")
 
-            # 在 Jenkins 中，尝试生成可访问的路径
+            # 获取 Jenkins 构建信息
+            build_number = os.environ.get('BUILD_NUMBER', 'N/A')
+            build_url = os.environ.get('BUILD_URL', '')
+            job_name = os.environ.get('JOB_NAME', 'N/A')
+
+            print(f"📋 构建信息:")
+            print(f"   构建号: #{build_number}")
+            print(f"   任务名称: {job_name}")
+
+            if build_url:
+                # 生成 Allure 报告 URL（假设使用了 Allure 插件）
+                allure_url = f"{build_url}/allure"
+                print(f"🔗 Allure 报告链接: {allure_url}")
+
+            # 生成静态文件的相对路径
             workspace = os.environ.get('WORKSPACE', os.getcwd())
-            report_relative = os.path.relpath(self.report_path, workspace)
-            print(f"📁 相对工作区路径: {report_relative}")
+            if workspace:
+                report_rel = os.path.relpath(self.report_path, workspace)
+                print(f"📁 报告相对路径: {report_rel}")
+                print(f"📄 直接访问: {workspace}/{report_rel}/index.html")
 
-            # 检查是否存在 index.html
-            index_path = os.path.join(self.report_path, 'index.html')
-            if os.path.exists(index_path):
-                print(f"✅ 报告文件已生成: {index_path}")
+            # 如果 Jenkins 有公共 IP，也可以生成直接访问链接
+            jenkins_ip = os.environ.get('JENKINS_SERVER_IP', '')
+            if jenkins_ip:
+                # 假设 Jenkins 工作区可以通过 HTTP 访问
+                print(f"🌐 网络访问（如配置了静态文件服务）:")
+                print(f"   http://{jenkins_ip}/job/{job_name}/ws/{report_rel}/index.html")
         else:
             print("🔧 本地环境")
             print(f"📍 本地访问:")

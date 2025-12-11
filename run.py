@@ -88,7 +88,6 @@ def run():
                     "--reruns=3", "--reruns-delay=2"
                    """
         print("开始生成allure文件")
-        #------------生成allure报告文件
         os.system(r"allure generate ./report/tmp -o ./report/html --clean")
         print("开始生成allure文件")
 
