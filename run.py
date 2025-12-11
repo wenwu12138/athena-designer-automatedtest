@@ -112,8 +112,8 @@ def run():
         # os.system(f"allure serve ./report/tmp -h 127.0.0.1 -p 9999")
 
         #启动本地服务供内网查看报告
-        server = ReportServer(report_path=ensure_path_sep("\\report\\html"), port=9999, host='0.0.0.0')
-        server.start_server()
+        # server = ReportServer(report_path=ensure_path_sep("\\report\\html"), port=9999, host='0.0.0.0')
+        # server.start_server()
 
     except Exception:
         # 如有异常，相关异常发送邮件
