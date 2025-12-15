@@ -459,7 +459,7 @@ param_DeleteParam_001:
   host: ${{athena_designer_host()}}
   url: /athena-designer/applicationParam/deleteParam
   method: POST
-  detail: 删除应用${{app2_code()}}中的参数$cache{saved_param_key}
+  detail: 删除应用参数设置
   headers:
     digi-middleware-auth-user: $cache{token}
     token: $cache{token}
