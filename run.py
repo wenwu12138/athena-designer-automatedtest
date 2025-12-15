@@ -18,7 +18,7 @@ from utils.notify.send_mail import SendEmail
 from utils.notify.lark import FeiShuTalkChatBot
 from utils.other_tools.allure_data.error_case_excel import ErrorCaseExcel
 from utils import config
-from utils.other_tools.ReportServer import ReportServer, ServerMode
+from utils.other_tools.ReportServer import ReportServer
 from common.setting import ensure_path_sep
 
 
@@ -87,9 +87,9 @@ def run():
                    --maxfail: 设置最大失败次数，当超出这个阈值时，则不会在执行测试用例
                     "--reruns=3", "--reruns-delay=2"
                    """
-        print("开始生成allure文件")
+        # 生成allure文件
         os.system(r"allure generate ./report/tmp -o ./report/html --clean")
-        print("开始生成allure文件")
+
 
         allure_data = AllureFileClean().get_case_count()
         notification_mapping = {
@@ -110,16 +110,9 @@ def run():
         # 程序运行之后，自动启动报告，如果不想启动报告，可注释这段代码
         # os.system(f"allure serve ./report/tmp -h 127.0.0.1 -p 9999")
 
-        #启动报告服务
-
-
-        # 创建 ReportServer 实例
-        ReportServer(
-            report_path=ensure_path_sep("\\report\\html"),
-            port=9999,
-            host='0.0.0.0',
-            mode=ServerMode.AUTO  # 自动判断最佳模式
-        ).start()
+        #启动本地服务供内网查看报告
+        server = ReportServer(report_path=ensure_path_sep("\\report\\html"), port=9999, host='0.0.0.0')
+        server.start_server()
 
     except Exception:
         # 如有异常，相关异常发送邮件
