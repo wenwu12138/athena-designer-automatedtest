@@ -2,130 +2,159 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2025/11/19 09:01  
 # @Author  : wenwu        
-# @Desc    : 修复服务器绑定问题，支持通过IP地址访问
+# @Desc    : 智能报告服务器，封装所有逻辑，主函数只需简单调用
 # @File    : ReportServer.py
 # @Software: PyCharm
 
 import os
 import socket
 import webbrowser
-from http.server import HTTPServer, SimpleHTTPRequestHandler
 import threading
 import time
 import psutil
 import signal
+import sys
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+from enum import Enum
+
+
+class ServerMode(Enum):
+    """服务器运行模式"""
+    AUTO = "auto"  # 自动判断
+    FOREGROUND = "fg"  # 前台阻塞模式
+    BACKGROUND = "bg"  # 后台非阻塞模式
+    INFO_ONLY = "info"  # 只显示信息，不启动服务
 
 
 class ReportServer:
-    def __init__(self, report_path, port=9999, host='0.0.0.0', auto_serve=True):
+    def __init__(self, report_path, port=9999, host='0.0.0.0', mode=ServerMode.AUTO):
         """
-        初始化报告服务器
+        初始化报告服务器 - 所有逻辑封装在此类中
 
         Args:
             report_path: 报告目录路径
             port: 端口号，默认9999
-            host: 绑定地址，默认'0.0.0.0'（所有网络接口）
-            auto_serve: 是否自动判断是否需要启动服务
+            host: 绑定地址，默认'0.0.0.0'
+            mode: 运行模式，默认自动判断
         """
         self.report_path = report_path
         self.port = port
         self.host = host
-        self.auto_serve = auto_serve  # 修复：保存参数
+        self.mode = mode if isinstance(mode, ServerMode) else ServerMode(mode)
         self.server = None
-        self.is_jenkins = self._is_jenkins_environment()  # 修复：初始化时检查
+        self.server_thread = None
+        self.is_running = False
 
-    def _is_jenkins_environment(self):
-        """检查是否为 Jenkins 环境"""
-        jenkins_env_vars = ['JENKINS_URL', 'BUILD_NUMBER', 'BUILD_ID', 'BUILD_URL']
-        return any(os.environ.get(var) for var in jenkins_env_vars)
+        # 环境检测
+        self.env_info = self._detect_environment()
+        print(f"📋 环境检测: {self.env_info['type']} - {self.env_info['description']}")
 
-    def should_serve_report(self):
-        """
-        判断是否应该启动报告服务
-        返回: (should_serve, reason)
-        """
-        if not self.auto_serve:
-            return False, "auto_serve 设置为 False"
+    def _detect_environment(self):
+        """检测运行环境"""
+        env_vars = os.environ
 
+        # 检测CI/CD环境
+        if env_vars.get('JENKINS_URL'):
+            # Jenkins环境
+            jenkins_url = env_vars.get('JENKINS_URL', '').lower()
+            is_cloud = self._is_cloud_deployment(jenkins_url, env_vars)
+
+            return {
+                'type': 'jenkins_cloud' if is_cloud else 'jenkins_local',
+                'description': '云端Jenkins' if is_cloud else '本地Jenkins',
+                'is_ci': True,
+                'is_jenkins': True,
+                'is_cloud': is_cloud,
+                'should_serve': is_cloud  # 云端Jenkins需要服务
+            }
+        elif env_vars.get('GITLAB_CI'):
+            return {
+                'type': 'gitlab',
+                'description': 'GitLab CI',
+                'is_ci': True,
+                'is_jenkins': False,
+                'is_cloud': True,
+                'should_serve': True
+            }
+        elif env_vars.get('GITHUB_ACTIONS'):
+            return {
+                'type': 'github',
+                'description': 'GitHub Actions',
+                'is_ci': True,
+                'is_jenkins': False,
+                'is_cloud': True,
+                'should_serve': True
+            }
+        else:
+            # 本地环境
+            return {
+                'type': 'local',
+                'description': '本地开发环境',
+                'is_ci': False,
+                'is_jenkins': False,
+                'is_cloud': False,
+                'should_serve': True
+            }
+
+    def _is_cloud_deployment(self, jenkins_url, env_vars):
+        """判断是否为云端部署"""
+        # 云端关键词
+        cloud_keywords = ['cloud', 'aliyun', 'tencent', 'aws', 'azure',
+                          'k8s', 'kubernetes', 'docker', 'ec2', 'ecs']
+
+        # 检查URL
+        if any(keyword in jenkins_url for keyword in cloud_keywords):
+            return True
+
+        # 检查节点名
+        node_name = env_vars.get('NODE_NAME', '').lower()
+        if node_name and node_name not in ['built-in', 'master', 'main']:
+            return True
+
+        # 默认：非本地部署都认为是云端
+        return 'localhost' not in jenkins_url and '127.0.0.1' not in jenkins_url
+
+    def _should_start_server(self):
+        """判断是否应该启动服务器"""
+        # 如果指定了模式，按模式执行
+        if self.mode == ServerMode.FOREGROUND:
+            return True, "前台模式强制启动"
+        elif self.mode == ServerMode.BACKGROUND:
+            return True, "后台模式启动"
+        elif self.mode == ServerMode.INFO_ONLY:
+            return False, "信息模式，不启动服务"
+
+        # AUTO模式：根据环境判断
         if not os.path.exists(self.report_path):
             return False, f"报告目录不存在: {self.report_path}"
 
-        if self.is_jenkins:
-            return False, "检测到 Jenkins 环境，建议使用 Allure 插件查看报告"
+        if self.env_info['should_serve']:
+            return True, f"{self.env_info['description']}需要报告服务"
+        else:
+            return False, f"{self.env_info['description']}建议使用CI工具查看报告"
 
-        return True, "本地环境，可以启动报告服务"
-
-    def is_port_in_use(self, port, host='localhost'):
-        """检查端口是否被占用"""
+    def _check_port(self):
+        """检查端口占用"""
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            return s.connect_ex((host, port)) == 0
+            return s.connect_ex((self.host, self.port)) == 0
 
-    def kill_process_by_port(self, port):
-        """杀死占用指定端口的进程"""
+    def _kill_port_process(self):
+        """清理占用端口的进程"""
         try:
             for proc in psutil.process_iter(['pid', 'name']):
                 try:
                     connections = proc.connections()
                     for conn in connections:
-                        if hasattr(conn.laddr, 'port') and conn.laddr.port == port:
-                            print(f"杀死占用端口 {port} 的进程: {proc.info['name']} (PID: {proc.info['pid']})")
+                        if hasattr(conn.laddr, 'port') and conn.laddr.port == self.port:
+                            print(f"🔪 清理占用端口 {self.port} 的进程: {proc.info['name']} (PID: {proc.info['pid']})")
                             os.kill(proc.info['pid'], signal.SIGTERM)
                             time.sleep(2)
                 except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                     continue
         except Exception as e:
-            print(f"清理端口进程时出错: {e}")
+            print(f"⚠️  清理端口时出错: {e}")
 
-    @staticmethod
-    def get_local_ip():
-        """获取本机局域网IP地址（更可靠的方法）"""
-        try:
-            # 方法1: 通过连接外部地址获取
-            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-                s.connect(("8.8.8.8", 80))
-                ip = s.getsockname()[0]
-                if ip.startswith('192.168') or ip.startswith('10.') or ip.startswith('172.'):
-                    return ip
-        except:
-            pass
-
-        try:
-            # 方法2: 获取主机名对应的IP
-            hostname = socket.gethostname()
-            local_ip = socket.gethostbyname(hostname)
-            if local_ip and local_ip != '127.0.0.1':
-                return local_ip
-        except:
-            pass
-
-        try:
-            # 方法3: 遍历所有网络接口
-            import netifaces
-            for interface in netifaces.interfaces():
-                addrs = netifaces.ifaddresses(interface)
-                if netifaces.AF_INET in addrs:
-                    for addr_info in addrs[netifaces.AF_INET]:
-                        ip = addr_info['addr']
-                        if ip.startswith('192.168') or ip.startswith('10.') or ip.startswith('172.'):
-                            if ip != '127.0.0.1':
-                                return ip
-        except:
-            pass
-
-        # 方法4: 最后尝试获取所有IP
-        try:
-            hostname = socket.gethostname()
-            ip_list = socket.getaddrinfo(hostname, None)
-            for ip in ip_list:
-                ip_addr = ip[4][0]
-                if ip_addr.startswith('192.168') or ip_addr.startswith('10.') or ip_addr.startswith('172.'):
-                    return ip_addr
-        except:
-            pass
-
-        return "无法获取局域网IP"
-
-    def get_all_network_ips(self):
+    def _get_network_ips(self):
         """获取所有网络IP地址"""
         ips = []
         try:
@@ -133,82 +162,81 @@ class ReportServer:
             hostname = socket.gethostname()
 
             # 获取所有IP地址
-            ip_list = socket.getaddrinfo(hostname, None)
-            for ip in ip_list:
-                ip_addr = ip[4][0]
-                if ip_addr != '127.0.0.1' and not ip_addr.startswith('169.254'):
-                    ips.append(ip_addr)
+            all_ips = set()
 
-            # 去重
-            ips = list(set(ips))
+            # 方法1: socket.getaddrinfo
+            try:
+                addr_info = socket.getaddrinfo(hostname, None)
+                for info in addr_info:
+                    ip = info[4][0]
+                    if ip != '127.0.0.1':
+                        all_ips.add(ip)
+            except:
+                pass
+
+            # 方法2: 通过UDP连接获取本地IP
+            try:
+                with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+                    s.connect(("8.8.8.8", 80))
+                    local_ip = s.getsockname()[0]
+                    if local_ip != '127.0.0.1':
+                        all_ips.add(local_ip)
+            except:
+                pass
+
+            # 排序：公网IP优先
+            for ip in sorted(all_ips, key=lambda x: (x.startswith('192.168.'), x.startswith('10.'), x)):
+                ips.append(ip)
+
         except Exception as e:
-            print(f"获取网络IP时出错: {e}")
+            print(f"⚠️  获取网络IP时出错: {e}")
 
         return ips
 
-    def print_report_info(self):
-        """打印报告访问信息"""
-        local_ip = self.get_local_ip()
-        all_ips = self.get_all_network_ips()
-
+    def _print_access_info(self, ips):
+        """打印访问信息"""
         print(f"\n{'=' * 60}")
-        print(f"📊 测试报告信息")
+        print(f"📊 测试报告访问信息")
         print(f"{'=' * 60}")
 
-        if self.is_jenkins:
-            print("🔧 检测到 Jenkins 环境")
-            print(f"📍 报告路径: {self.report_path}")
+        print(f"📍 报告目录: {self.report_path}")
+        print(f"🔧 运行模式: {self.mode.value}")
+        print(f"🌍 环境类型: {self.env_info['description']}")
 
-            # 获取 Jenkins 构建信息
-            build_number = os.environ.get('BUILD_NUMBER', 'N/A')
-            build_url = os.environ.get('BUILD_URL', '')
-            job_name = os.environ.get('JOB_NAME', 'N/A')
+        if self.is_running:
+            print(f"\n✅ 报告服务运行中:")
+            print(f"   本地访问:")
+            print(f"   → http://localhost:{self.port}")
+            print(f"   → http://127.0.0.1:{self.port}")
 
-            print(f"📋 构建信息:")
-            print(f"   构建号: #{build_number}")
-            print(f"   任务名称: {job_name}")
+            if ips:
+                print(f"\n🌐 网络访问:")
+                for ip in ips:
+                    print(f"   → http://{ip}:{self.port}")
 
-            if build_url:
-                # 生成 Allure 报告 URL（假设使用了 Allure 插件）
-                allure_url = f"{build_url}/allure"
-                print(f"🔗 Allure 报告链接: {allure_url}")
+            if self.env_info['is_jenkins']:
+                print(f"\n🔗 Jenkins报告:")
+                build_url = os.environ.get('BUILD_URL', '')
+                if build_url:
+                    print(f"   Allure插件: {build_url}allure")
 
-            # 生成静态文件的相对路径
-            workspace = os.environ.get('WORKSPACE', os.getcwd())
-            if workspace:
-                report_rel = os.path.relpath(self.report_path, workspace)
-                print(f"📁 报告相对路径: {report_rel}")
-                print(f"📄 直接访问: {workspace}/{report_rel}/index.html")
-
-            # 如果 Jenkins 有公共 IP，也可以生成直接访问链接
-            jenkins_ip = os.environ.get('JENKINS_SERVER_IP', '')
-            if jenkins_ip:
-                # 假设 Jenkins 工作区可以通过 HTTP 访问
-                print(f"🌐 网络访问（如配置了静态文件服务）:")
-                print(f"   http://{jenkins_ip}/job/{job_name}/ws/{report_rel}/index.html")
+                # 显示节点信息
+                node_name = os.environ.get('NODE_NAME', '未知')
+                print(f"   执行节点: {node_name}")
         else:
-            print("🔧 本地环境")
-            print(f"📍 本地访问:")
-            print(f"   http://localhost:{self.port}")
-            print(f"   http://127.0.0.1:{self.port}")
+            print(f"\nℹ️  报告服务未启动")
+            print(f"   原因: {self._should_start_server()[1]}")
 
-            print(f"\n🌐 网络访问:")
-            if local_ip != "无法获取局域网IP":
-                print(f"   http://{local_ip}:{self.port}  ← 推荐")
+            if self.env_info['is_ci']:
+                print(f"\n💡 CI环境建议:")
+                print(f"   1. 使用CI平台的Allure插件")
+                print(f"   2. 下载报告文件到本地查看")
+                print(f"   3. 如需远程访问，请设置 mode='background'")
 
-            # 显示所有找到的IP地址
-            for ip in all_ips:
-                if ip != local_ip and ip != '127.0.0.1':
-                    print(f"   http://{ip}:{self.port}")
+        print(f"{'=' * 60}\n")
 
-            print(f"\n🔧 详细信息:")
-            print(f"   报告目录: {self.report_path}")
-            print(f"   是否 Jenkins: {'是' if self.is_jenkins else '否'}")
-
-        print(f"{'=' * 60}")
-
-    def start_server(self):
-        """启动 HTTP 服务器 - 将 start_http_server 重命名为 start_server"""
+    def _run_server(self):
+        """运行HTTP服务器（内部方法）"""
         try:
             # 切换到报告目录
             original_dir = os.getcwd()
@@ -216,94 +244,155 @@ class ReportServer:
 
             # 启动HTTP服务器
             self.server = HTTPServer((self.host, self.port), SimpleHTTPRequestHandler)
+            print(f"🚀 报告服务器启动成功!")
+            print(f"   📍 绑定地址: {self.host}")
+            print(f"   🔌 端口: {self.port}")
+            print(f"   📂 服务目录: {self.report_path}")
 
-            # 在新线程中运行服务器
-            def run_server():
-                print(f"\n🚀 启动报告服务...")
-                print(f"   绑定地址: {self.host}")
-                print(f"   端口: {self.port}")
-                print("   按 Ctrl+C 退出服务器\n")
-                self.server.serve_forever()
+            # 标记为运行中
+            self.is_running = True
 
-            server_thread = threading.Thread(target=run_server)
-            server_thread.daemon = True
-            server_thread.start()
-
-            # 等待服务器启动
-            time.sleep(2)
-
-            # 自动打开浏览器
-            try:
-                webbrowser.open(f'http://localhost:{self.port}')
-            except:
-                pass
+            # 运行服务器
+            self.server.serve_forever()
 
             # 恢复原始目录
             os.chdir(original_dir)
-            return True
 
         except Exception as e:
-            print(f"启动 HTTP 服务器时出错: {e}")
-            return False
+            print(f"❌ 服务器运行出错: {e}")
+            self.is_running = False
+            # 恢复原始目录
+            try:
+                os.chdir(original_dir)
+            except:
+                pass
+
+    def _start_in_background(self):
+        """在后台启动服务器"""
+        print("🔄 在后台启动报告服务...")
+
+        # 创建并启动线程
+        self.server_thread = threading.Thread(target=self._run_server)
+        self.server_thread.daemon = True  # 设置为守护线程
+        self.server_thread.start()
+
+        # 等待服务器启动
+        for i in range(10):
+            if self.is_running:
+                break
+            time.sleep(0.5)
+
+        if self.is_running:
+            print("✅ 报告服务已在后台启动")
+        else:
+            print("⚠️  报告服务启动可能失败")
+
+    def _start_in_foreground(self):
+        """在前台启动服务器（阻塞）"""
+        print("🔄 在前台启动报告服务...")
+        print("💡 按 Ctrl+C 停止服务器\n")
+
+        try:
+            self._run_server()
+        except KeyboardInterrupt:
+            print("\n🛑 收到停止信号，关闭服务器...")
+            self.stop()
+        except Exception as e:
+            print(f"❌ 服务器异常: {e}")
+            self.stop()
 
     def start(self):
         """
-        智能启动方法
-        根据环境自动决定是否启动服务
+        智能启动报告服务器
+
+        根据环境和模式自动决策：
+        1. 判断是否需要启动
+        2. 清理端口占用
+        3. 按模式启动服务
+        4. 打印访问信息
+        5. 自动打开浏览器（本地环境）
+
+        Returns:
+            bool: 是否成功启动
         """
-        should_serve, reason = self.should_serve_report()
-
-        self.print_report_info()
-
-        if not should_serve:
-            print(f"\nℹ️  不启动报告服务: {reason}")
+        # 1. 判断是否需要启动
+        should_start, reason = self._should_start_server()
+        if not should_start:
+            print(f"ℹ️  {reason}")
+            self._print_access_info([])
             return False
 
-        # 检查端口是否被占用
-        if self.is_port_in_use(self.port):
+        # 2. 检查并清理端口
+        if self._check_port():
             print(f"⚠️  端口 {self.port} 被占用，尝试清理...")
-            self.kill_process_by_port(self.port)
+            self._kill_port_process()
             time.sleep(2)
 
-            # 再次检查
-            if self.is_port_in_use(self.port):
-                print(f"❌ 端口 {self.port} 仍然被占用，请手动关闭相关进程")
+            if self._check_port():
+                print(f"❌ 端口 {self.port} 仍然被占用，请手动处理")
                 return False
 
-        # 启动服务
-        if self.start_server():
-            # 保持主线程运行
-            try:
-                while True:
-                    time.sleep(1)
-            except KeyboardInterrupt:
-                print("\n正在关闭服务器...")
-                self.shutdown_server()
-            return True
-        return False
+        # 3. 获取网络IP（用于信息显示）
+        network_ips = self._get_network_ips()
+
+        # 4. 根据模式启动
+        if self.mode == ServerMode.BACKGROUND or (self.mode == ServerMode.AUTO and self.env_info['is_ci']):
+            # CI环境或后台模式：非阻塞启动
+            self._start_in_background()
+
+            # CI环境不需要自动打开浏览器
+            if not self.env_info['is_ci'] and not self.env_info['is_jenkins']:
+                try:
+                    webbrowser.open(f'http://localhost:{self.port}')
+                except:
+                    pass
+
+        else:
+            # 前台模式：阻塞启动
+            self._start_in_foreground()
+
+            # 本地环境自动打开浏览器
+            if not self.env_info['is_ci']:
+                try:
+                    webbrowser.open(f'http://localhost:{self.port}')
+                except:
+                    pass
+
+        # 5. 打印访问信息
+        self._print_access_info(network_ips)
+
+        return self.is_running
+
+    def stop(self):
+        """停止报告服务器"""
+        if self.server:
+            print("🛑 正在停止报告服务器...")
+            self.server.shutdown()
+            self.is_running = False
+            print("✅ 报告服务器已停止")
+        else:
+            print("ℹ️  报告服务器未运行")
 
     def serve_only(self):
-        """
-        只启动报告服务（用于查看已有报告）
-        忽略环境检测，强制启动服务
-        """
-        print("🔧 强制启动报告服务模式")
-        self.auto_serve = True
+        """只启动服务（简化调用）"""
+        self.mode = ServerMode.BACKGROUND
         return self.start()
 
-    def shutdown_server(self):
-        """关闭服务器"""
-        if self.server:
-            self.server.shutdown()
-            print("服务器已关闭")
+    def info_only(self):
+        """只显示信息（简化调用）"""
+        self.mode = ServerMode.INFO_ONLY
+        network_ips = self._get_network_ips()
+        self._print_access_info(network_ips)
+        return True
 
 
+# 命令行接口
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description='测试报告服务器')
+    parser = argparse.ArgumentParser(description='智能测试报告服务器')
     parser.add_argument('--path', '-p', type=str,
-                        default=r"./report/html",
+                        default="./report/html",
                         help='报告目录路径')
     parser.add_argument('--port', '-P', type=int,
                         default=9999,
@@ -311,24 +400,19 @@ if __name__ == "__main__":
     parser.add_argument('--host', '-H', type=str,
                         default='0.0.0.0',
                         help='绑定地址')
-    parser.add_argument('--serve-only', action='store_true',
-                        help='强制启动服务，忽略环境检测')
-    parser.add_argument('--no-auto', action='store_true',
-                        help='禁用自动判断，手动控制')
+    parser.add_argument('--mode', '-m', type=str,
+                        choices=['auto', 'fg', 'bg', 'info'],
+                        default='auto',
+                        help='运行模式: auto(自动), fg(前台), bg(后台), info(仅信息)')
 
     args = parser.parse_args()
 
-    # 创建服务器实例
+    # 创建并启动服务器
     server = ReportServer(
         report_path=args.path,
         port=args.port,
         host=args.host,
-        auto_serve=not args.no_auto
+        mode=ServerMode(args.mode)
     )
 
-    if args.serve_only:
-        # 强制启动服务模式
-        server.serve_only()
-    else:
-        # 智能启动模式
-        server.start()
+    server.start()

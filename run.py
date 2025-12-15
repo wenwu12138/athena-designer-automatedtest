@@ -18,7 +18,7 @@ from utils.notify.send_mail import SendEmail
 from utils.notify.lark import FeiShuTalkChatBot
 from utils.other_tools.allure_data.error_case_excel import ErrorCaseExcel
 from utils import config
-from utils.other_tools.ReportServer import ReportServer
+from utils.other_tools.ReportServer import ReportServer, ServerMode
 from common.setting import ensure_path_sep
 
 
@@ -114,14 +114,12 @@ def run():
 
 
         # 创建 ReportServer 实例
-        server = ReportServer(
+        ReportServer(
             report_path=ensure_path_sep("\\report\\html"),
             port=9999,
-            host='0.0.0.0'
-        )
-
-        # 调用智能启动方法 - 让 ReportServer 自己判断是否要启动服务
-        server.start()
+            host='0.0.0.0',
+            mode=ServerMode.AUTO  # 自动判断最佳模式
+        ).start()
 
     except Exception:
         # 如有异常，相关异常发送邮件
