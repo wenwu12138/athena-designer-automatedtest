@@ -115,7 +115,7 @@ def run():
         server.start_server()
 
     except Exception:
-        # 如有异常，相关异常发送邮件
+        # 如有异常，相关异常发送邮件z
         e = traceback.format_exc()
         print("==========自动化执行异常=========")
         print(e)
