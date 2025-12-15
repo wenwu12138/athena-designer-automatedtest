@@ -49,6 +49,25 @@ class ReportServer:
         self.env_info = self._detect_environment()
         print(f"📋 环境检测: {self.env_info['type']} - {self.env_info['description']}")
 
+    @staticmethod
+    def get_local_ip():
+        """
+        获取本机IP地址（兼容旧版本）
+        注意：建议使用实例方法 _get_network_ips() 替代
+        """
+        try:
+            # 方法1: 通过UDP连接获取
+            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+                s.connect(("8.8.8.8", 80))
+                return s.getsockname()[0]
+        except:
+            try:
+                # 方法2: 通过主机名获取
+                hostname = socket.gethostname()
+                return socket.gethostbyname(hostname)
+            except:
+                return "127.0.0.1"
+
     def _detect_environment(self):
         """检测运行环境"""
         env_vars = os.environ
