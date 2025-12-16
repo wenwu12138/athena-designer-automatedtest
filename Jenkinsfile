@@ -447,47 +447,6 @@ EOF
             }
         }
 
-        stage('Collect Reports') {
-            steps {
-                script {
-                    echo "📊 附加阶段: 报告收集开始"
-                    echo "💡 目的: 收集测试报告并归档"
-                }
-                sh '''
-                    echo "📁 创建报告目录..."
-                    mkdir -p reports
-                    echo "报告目录: $(pwd)/reports"
-
-                    echo "🔍 查找生成的报告文件..."
-                    echo "HTML报告:"
-                    find . -name "*.html" -type f | grep -i report | head -5 || echo "未找到HTML报告"
-
-                    echo "XML报告:"
-                    find . -name "*.xml" -type f | head -5 || echo "未找到XML报告"
-
-                    echo "JSON报告:"
-                    find . -name "*.json" -type f | grep -i test | head -5 || echo "未找到JSON报告"
-
-                    echo "Allure结果:"
-                    find . -name "allure-results" -type d | head -2 || echo "未找到Allure结果"
-
-                    echo "📋 报告目录内容:"
-                    ls -la reports/ 2>/dev/null || echo "reports目录不存在"
-
-                    echo "✅ 报告收集完成"
-                '''
-
-                script {
-                    echo "📦 开始归档测试报告..."
-                }
-                // 归档测试报告
-                archiveArtifacts artifacts: 'reports/**/*,allure-results/**,test-results/**', allowEmptyArchive: true
-                script {
-                    echo "✅ 报告归档完成"
-                }
-            }
-        }
-    }
 
     post {
         always {
@@ -541,7 +500,7 @@ EOF
                 echo ""
                 echo "📎 相关链接:"
                 echo "  Jenkins控制台: ${BUILD_URL}console"
-                echo "  测试报告: ${BUILD_URL}reports/"
+                echo "  测试报告: ${BUILD_URL}report/html/index.html"
                 echo "  工作空间: ${WORKSPACE}"
             }
         }
