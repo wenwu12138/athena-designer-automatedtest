@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time   : 2022/3/29 15:01
-# @Author : 闻武
+# @Author: 闻武
 import json
 import os
 import shutil

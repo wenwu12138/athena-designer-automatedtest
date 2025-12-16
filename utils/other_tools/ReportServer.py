@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 2025/11/19 09:01  
-# @Author  : wenwu        
-# @Desc    : 修复服务器绑定问题，支持通过IP地址访问
-# @File    : ReportServer.py
+# @Author: wenwu
+# @Desc: 修复服务器绑定问题，支持通过IP地址访问
+# @File: ReportServer.py
 # @Software: PyCharm
 
 import os
@@ -28,8 +28,11 @@ class ReportServer:
         """
         self.report_path = report_path
         self.port = port
-        self.host = host  # 新增host参数
+        self.host = host
         self.server = None
+
+        # 新增：判断是否在Jenkins环境
+        self.is_jenkins = self._check_jenkins_environment()
 
     def is_port_in_use(self, port, host='localhost'):
         """检查端口是否被占用"""
@@ -123,60 +126,117 @@ class ReportServer:
         return ips
 
     def start_server(self):
-        """启动本地服务器"""
+        """启动报告服务（智能判断环境）"""
         # 确保报告目录存在
         if not os.path.exists(self.report_path):
-            print(f"报告目录不存在: {self.report_path}")
+            print(f"❌ 报告目录不存在: {self.report_path}")
             return False
 
+        # 显示报告访问URL（本地或云端）
+        self._display_report_urls()
+
+        # Jenkins环境：不启动本地服务器，只打印URL
+        if self.is_jenkins:
+            print("💡 提示: Jenkins环境中，报告会作为构建产物自动归档")
+            return True
+
+        # 本地环境：启动HTTP服务器
+        return self._start_local_server()
+
+    def shutdown_server(self):
+        """关闭服务器"""
+        if self.server:
+            self.server.shutdown()
+            print("服务器已关闭")
+
+    def _check_jenkins_environment(self):
+        """检查是否在Jenkins环境中运行"""
+        # 简单检查常见的Jenkins环境变量
+        jenkins_vars = ['JENKINS_HOME', 'JENKINS_URL', 'BUILD_ID', 'BUILD_URL']
+        for var in jenkins_vars:
+            if os.getenv(var):
+                return True
+        return False
+
+    def _get_jenkins_report_url(self):
+        """生成Jenkins环境下的报告URL"""
+        try:
+            build_url = os.getenv('BUILD_URL')
+            if build_url:
+                # 移除末尾的"/"（如果有）
+                base_url = build_url.rstrip('/')
+                # 生成报告访问URL（假设报告在workspace/report/html）
+                return f"{base_url}/artifact/report/html/"
+        except:
+            pass
+        return None
+
+    def _display_report_urls(self):
+        """显示报告访问URL"""
+        print(f"\n{'=' * 60}")
+        print(f"📊 测试报告已生成!")
+        print(f"{'=' * 60}")
+
+        if self.is_jenkins:
+            # Jenkins环境：显示云端URL
+            jenkins_url = self._get_jenkins_report_url()
+            if jenkins_url:
+                print(f"🌐 Jenkins云端访问:")
+                print(f"   {jenkins_url}")
+                print(f"\n📋 构建信息:")
+                print(f"   任务: {os.getenv('JOB_NAME', '未获取')}")
+                print(f"   构建号: {os.getenv('BUILD_NUMBER', '未获取')}")
+            else:
+                print(f"⚠️  Jenkins环境但无法生成报告URL")
+        else:
+            # 本地环境：显示本地和网络URL
+            local_ip = self.get_local_ip()
+
+            print(f"📍 本地访问:")
+            print(f"   http://localhost:{self.port}")
+            print(f"   http://127.0.0.1:{self.port}")
+
+            if local_ip != "无法获取局域网IP":
+                print(f"\n🌐 网络访问:")
+                print(f"   http://{local_ip}:{self.port}")
+
+            # 显示其他网络IP
+            all_ips = self.get_all_network_ips()
+            for ip in all_ips:
+                if ip != local_ip and ip != '127.0.0.1':
+                    print(f"   http://{ip}:{self.port}")
+
+        print(f"{'=' * 60}")
+
+    def _start_local_server(self):
+        """启动本地HTTP服务器（原有逻辑）"""
         # 检查端口是否被占用
         if self.is_port_in_use(self.port):
             print(f"端口 {self.port} 被占用，尝试清理...")
             self.kill_process_by_port(self.port)
             time.sleep(2)
 
-            # 再次检查
             if self.is_port_in_use(self.port):
-                print(f"端口 {self.port} 仍然被占用，请手动关闭相关进程")
+                print(f"❌ 端口 {self.port} 仍然被占用，请手动关闭相关进程")
                 return False
 
         try:
             # 切换到报告目录
-            original_dir = os.getcwd()  # 保存原始目录
+            original_dir = os.getcwd()
             os.chdir(self.report_path)
 
-            # 启动HTTP服务器 - 关键修改：使用 self.host 而不是 'localhost'
+            # 启动HTTP服务器
             self.server = HTTPServer((self.host, self.port), SimpleHTTPRequestHandler)
 
-            # 获取所有网络IP
-            local_ip = self.get_local_ip()
-            all_ips = self.get_all_network_ips()
+            print(f"🔧 服务器信息:")
+            print(f"   绑定地址: {self.host}")
+            print(f"   端口: {self.port}")
+            print(f"   目录: {self.report_path}")
+            print(f"{'=' * 60}")
+            print("按 Ctrl+C 退出服务器\n")
 
             # 在新线程中运行服务器
             def run_server():
-                print(f"\n{'=' * 60}")
-                print(f"📊 测试报告服务已启动!")
-                print(f"{'=' * 60}")
-                print(f"📍 本地访问:")
-                print(f"   http://localhost:{self.port}")
-                print(f"   http://127.0.0.1:{self.port}")
-
-                print(f"\n🌐 网络访问:")
-                if local_ip != "无法获取局域网IP":
-                    print(f"   http://{local_ip}:{self.port}  ← 推荐")
-
-                # 显示所有找到的IP地址
-                for ip in all_ips:
-                    if ip != local_ip and ip != '127.0.0.1':
-                        print(f"   http://{ip}:{self.port}")
-
-                print(f"\n🔧 服务器信息:")
-                print(f"   绑定地址: {self.host}")
-                print(f"   端口: {self.port}")
-                print(f"   目录: {self.report_path}")
-                print(f"{'=' * 60}")
-                print("按 Ctrl+C 退出服务器\n")
-
                 self.server.serve_forever()
 
             server_thread = threading.Thread(target=run_server)
@@ -186,7 +246,7 @@ class ReportServer:
             # 等待服务器启动
             time.sleep(2)
 
-            # 自动打开浏览器（使用localhost）
+            # 自动打开浏览器
             webbrowser.open(f'http://localhost:{self.port}')
 
             # 保持主线程运行
@@ -201,17 +261,10 @@ class ReportServer:
             os.chdir(original_dir)
 
         except Exception as e:
-            print(f"启动服务器时出错: {e}")
+            print(f"❌ 启动服务器时出错: {e}")
             return False
 
         return True
-
-    def shutdown_server(self):
-        """关闭服务器"""
-        if self.server:
-            self.server.shutdown()
-            print("服务器已关闭")
-
 
 if __name__ == "__main__":
     # 配置报告路径和端口
