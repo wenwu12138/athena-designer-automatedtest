@@ -446,11 +446,11 @@ EOF
                 '''
             }
         }
-
+    }
 
     post {
         always {
-            // 存档报告文件
+        // 存档报告文件
         archiveArtifacts artifacts: 'report/html/**', fingerprint: true
 
         // 生成访问链接
@@ -463,10 +463,7 @@ EOF
                 echo "   存档链接: ${jobUrl}${buildNumber}/"
                 echo "   直接下载: ${jobUrl}${buildNumber}/report/html/index.html"
             }
-            }
-
-
-
+        }
             script {
                 echo ""
                 echo "=" * 60
