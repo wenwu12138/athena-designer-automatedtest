@@ -166,7 +166,7 @@ class ReportServer:
                 # 移除末尾的"/"（如果有）
                 base_url = build_url.rstrip('/')
                 # 生成报告访问URL（假设报告在workspace/report/html）
-                return f"{base_url}/artifact/report/html/"
+                return f"{base_url}/artifact/report/html/index.html"
         except:
             pass
         return None

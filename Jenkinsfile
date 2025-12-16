@@ -501,8 +501,8 @@ EOF
 
             if (jobUrl && buildNumber) {
                 echo "📊 报告存档信息:"
-                echo "   存档链接: ${jobUrl}${buildNumber}/artifact/"
-                echo "   直接下载: ${jobUrl}${buildNumber}/artifact/report/html/index.html"
+                echo "   存档链接: ${jobUrl}${buildNumber}/"
+                echo "   直接下载: ${jobUrl}${buildNumber}/report/html/index.html"
             }
             }
 
@@ -541,7 +541,7 @@ EOF
                 echo ""
                 echo "📎 相关链接:"
                 echo "  Jenkins控制台: ${BUILD_URL}console"
-                echo "  测试报告: ${BUILD_URL}artifact/reports/"
+                echo "  测试报告: ${BUILD_URL}reports/"
                 echo "  工作空间: ${WORKSPACE}"
             }
         }
