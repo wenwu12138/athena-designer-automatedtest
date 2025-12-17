@@ -1,17 +1,42 @@
 pipeline {
-    agent any  // 使用任何可用的 Jenkins agent1
+    agent any
+
+    // 只加一个环境选择参数
+    parameters {
+        choice(
+            name: 'TEST_ENV',
+            choices: ['huawei-prod', 'huawei-test', 'ali-paas', 'on-premise'],
+            description: '选择测试环境'
+        )
+    }
 
     stages {
+        stage('设置环境') {
+            steps {
+                script {
+                    echo "🎯 选择环境: ${params.TEST_ENV}"
+
+                    // 先检出代码
+                    checkout scm
+
+                    // 一行命令更新配置文件
+                    sh """
+                        sed -i "s/current_environment:.*/current_environment: \\\"${params.TEST_ENV}\\\"/" common/config.yaml
+                        echo "✅ 环境已设置为: ${params.TEST_ENV}"
+                    """
+                }
+            }
+        }
+
         stage('Checkout') {
             steps {
                 script {
                     echo "📥 阶段 1/6: 代码检出开始"
                     echo "📁 工作目录: ${WORKSPACE}"
+                    echo "🎯 测试环境: ${params.TEST_ENV}"
                 }
-                checkout scm  // 从 Jenkins 任务配置获取代码
                 script {
                     echo "✅ 代码检出完成"
-                    // 显示最近提交信息，便于调试
                     sh 'echo "最新提交:" && git log --oneline -1 || echo "Git信息获取失败"'
                 }
             }
@@ -381,22 +406,37 @@ EOF
                 script {
                     echo "🚀 阶段 6/6: 测试执行开始"
                     echo "💡 目的: 运行自动化测试套件"
+                    echo "🎯 测试环境: ${params.TEST_ENV}"
                 }
                 sh '''
                     echo "🔌 激活虚拟环境..."
                     . venv/bin/activate
-                    # ========== 新增：安装 Allure 命令行工具 ==========
+
+                    # 显示当前环境信息
+                    echo "📋 当前测试环境信息:"
+                    python -c "
+import yaml
+try:
+    with open('common/config.yaml', 'r') as f:
+        config = yaml.safe_load(f)
+    env = config['current_environment']
+    env_config = config['environments'][env]
+    print(f'   环境: {env_config[\"env\"]}')
+    print(f'   设计器: {env_config[\"athena_designer_host\"]}')
+    print(f'   租户: {env_config[\"tenantId\"]}')
+except:
+    print('   无法读取环境配置')
+                    "
+
+                    # ========== 安装 Allure 命令行工具 ==========
                     echo "📥 安装 Allure 命令行工具..."
-                    # 下载 Allure 2.27.0（兼容所有环境）
                     ALLURE_VERSION="2.27.0"
                     ALLURE_URL="https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.zip"
-                    # 下载并解压
                     wget -q ${ALLURE_URL} -O /tmp/allure.zip || { echo "❌ Allure 下载失败"; exit 1; }
                     unzip -oq /tmp/allure.zip -d /opt/ || { echo "❌ Allure 解压失败"; exit 1; }
-                    # 配置环境变量（临时生效）
                     export PATH="/opt/allure-${ALLURE_VERSION}/bin:${PATH}"
-                    # 验证 Allure 命令
                     allure --version && echo "✅ Allure 命令行工具安装成功" || { echo "❌ Allure 验证失败"; exit 1; }
+
                     echo "📁 项目结构检查:"
                     echo "当前目录: $(pwd)"
                     echo "目录内容:"
@@ -450,20 +490,20 @@ EOF
 
     post {
         always {
-        // 存档报告文件z
-        archiveArtifacts artifacts: 'report/html/**', fingerprint: true
+            // 存档报告文件
+            archiveArtifacts artifacts: 'report/html/**', fingerprint: true
 
-        // 生成访问链接
-        script {
-            def jobUrl = env.JOB_URL ?: ''
-            def buildNumber = env.BUILD_NUMBER ?: ''
+            // 生成访问链接
+            script {
+                def jobUrl = env.JOB_URL ?: ''
+                def buildNumber = env.BUILD_NUMBER ?: ''
 
-            if (jobUrl && buildNumber) {
-                echo "📊 报告存档信息:"
-                echo "   存档链接: ${jobUrl}${buildNumber}/"
-                echo "   直接下载: ${jobUrl}${buildNumber}/artifact/report/html/index.html"
+                if (jobUrl && buildNumber) {
+                    echo "📊 报告存档信息:"
+                    echo "   存档链接: ${jobUrl}${buildNumber}/"
+                    echo "   直接下载: ${jobUrl}${buildNumber}/artifact/report/html/index.html"
+                }
             }
-        }
             script {
                 echo ""
                 echo "=" * 60
@@ -476,15 +516,17 @@ EOF
                 echo "  状态: ${currentBuild.result ?: 'SUCCESS'}"
                 echo "  时长: ${currentBuild.durationString}"
                 echo "  链接: ${BUILD_URL}"
+                echo "  测试环境: ${params.TEST_ENV}"
                 echo ""
                 echo "📊 阶段统计:"
-                echo "  1. ✅ 代码检出"
-                echo "  2. ✅ 环境设置"
-                echo "  3. ✅ 核心依赖安装"
-                echo "  4. ✅ 项目依赖安装"
-                echo "  5. ✅ 依赖验证"
-                echo "  6. ✅ 测试执行"
-                echo "  7. ✅ 报告收集"
+                echo "  1. ✅ 环境设置"
+                echo "  2. ✅ 代码检出"
+                echo "  3. ✅ 环境设置"
+                echo "  4. ✅ 核心依赖安装"
+                echo "  5. ✅ 项目依赖安装"
+                echo "  6. ✅ 依赖验证"
+                echo "  7. ✅ 测试执行"
+                echo "  8. ✅ 报告收集"
                 echo "=" * 60
             }
         }
@@ -493,7 +535,7 @@ EOF
             script {
                 echo ""
                 echo "🎉 🎉 🎉 构建成功! 🎉 🎉 🎉"
-                echo "所有测试通过，可以部署!"
+                echo "环境 ${params.TEST_ENV} 测试通过!"
                 echo ""
                 echo "📎 相关链接:"
                 echo "  Jenkins控制台: ${BUILD_URL}console"
@@ -506,6 +548,7 @@ EOF
             script {
                 echo ""
                 echo "💥 💥 💥 构建失败! 💥 💥 💥"
+                echo "环境 ${params.TEST_ENV} 测试失败!"
                 echo "请检查以下问题:"
                 echo "  1. 查看上方具体错误信息"
                 echo "  2. 检查依赖是否完整"
@@ -529,6 +572,9 @@ EOF
                     echo "PyYAML: $(pip show PyYAML 2>/dev/null | grep Version || echo '未安装')"
                     echo "requests: $(pip show requests 2>/dev/null | grep Version || echo '未安装')"
                 fi
+
+                echo "当前环境配置:"
+                grep -A5 "current_environment" common/config.yaml || echo "无法读取配置"
             '''
         }
     }
