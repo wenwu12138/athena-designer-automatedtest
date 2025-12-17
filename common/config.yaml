@@ -13,23 +13,23 @@ tester_name: 闻武
 
 ####华为正式
 #设计器域名
-#env: "华为正式区"
-#athena_designer_host: https://adp.apps.digiwincloud.com.cn
-#athena_deployer_host: https://aadc.apps.digiwincloud.com.cn
-#athena_tenant_deployer_host: https://atdp.apps.digiwincloud.com.cn
-##iam域名
-#iam_host: https://iam.digiwincloud.com.cn
-## 用例配置
-#app1_code: A1dbf6e345AT
-#app1_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkExZGJmNmUzNDVBVCIsInNpZCI6MH0.lOzR2mZxVVlwU9YyYzRgZhVouLHx_NNyvLqLOI5r32E
-#app2_code: A2ba74bfe3AT
-#app2_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkEyYmE3NGJmZTNBVCIsInNpZCI6MH0.mJoe-Lzd7ruaF_L_hwgn45hK0_Qn4YkuXwq1QSrl9Wg
-##租户信息
-#tenantId: "athenadeveloperTest"
-#tenantSid: 847600433497088
-#tenantName: "配置测试器"
-#serviceCode: DPBAS
-#api_serviceCode: dpbas
+env: "华为正式区"
+athena_designer_host: https://adp.apps.digiwincloud.com.cn
+athena_deployer_host: https://aadc.apps.digiwincloud.com.cn
+athena_tenant_deployer_host: https://atdp.apps.digiwincloud.com.cn
+#iam域名
+iam_host: https://iam.digiwincloud.com.cn
+# 用例配置
+app1_code: A1dbf6e345AT
+app1_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkExZGJmNmUzNDVBVCIsInNpZCI6MH0.lOzR2mZxVVlwU9YyYzRgZhVouLHx_NNyvLqLOI5r32E
+app2_code: A2ba74bfe3AT
+app2_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkEyYmE3NGJmZTNBVCIsInNpZCI6MH0.mJoe-Lzd7ruaF_L_hwgn45hK0_Qn4YkuXwq1QSrl9Wg
+#租户信息
+tenantId: "athenadeveloperTest"
+tenantSid: 847600433497088
+tenantName: "配置测试器"
+serviceCode: DPBAS
+api_serviceCode: dpbas
 
 
 
@@ -38,24 +38,24 @@ tester_name: 闻武
 #------------------------
 
 ####华为测试-设计器域名
-env: "华为测试区"
-athena_designer_host: https://adp-test.apps.digiwincloud.com.cn
-athena_deployer_host: https://aadc-test.apps.digiwincloud.com.cn
-athena_tenant_deployer_host: https://atdp-test.apps.digiwincloud.com.cn
-#iam域名
-iam_host: https://iam-test.digiwincloud.com.cn
-#用例配置
-app1_code: Aautotest1AT
-app1_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFhdXRvdGVzdDFBVCIsInNpZCI6MH0.x51q6SkRChvBOr1ca-iqzHU6SS_Mu2DqnrrJfFKO-7o
-app2_code: A2a1989618AT
-app2_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkEyYTE5ODk2MThBVCIsInNpZCI6MH0.hS1fWh2DVpE0TKSEI5hrJcpr3I6SvwRcnpJB2qqO8sc
-#租户信息
-tenantId: "athenadeveloperTest"
-tenantSid: 847600433497088
-tenantName: "配置测试器"
-serviceCode: DPBAS
-api_serviceCode: dpbas
-
+#env: "华为测试区"
+#athena_designer_host: https://adp-test.apps.digiwincloud.com.cn
+#athena_deployer_host: https://aadc-test.apps.digiwincloud.com.cn
+#athena_tenant_deployer_host: https://atdp-test.apps.digiwincloud.com.cn
+##iam域名
+#iam_host: https://iam-test.digiwincloud.com.cn
+##用例配置
+#app1_code: Aautotest1AT
+#app1_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFhdXRvdGVzdDFBVCIsInNpZCI6MH0.x51q6SkRChvBOr1ca-iqzHU6SS_Mu2DqnrrJfFKO-7o
+#app2_code: A2a1989618AT
+#app2_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkEyYTE5ODk2MThBVCIsInNpZCI6MH0.hS1fWh2DVpE0TKSEI5hrJcpr3I6SvwRcnpJB2qqO8sc
+##租户信息
+#tenantId: "athenadeveloperTest"
+#tenantSid: 847600433497088
+#tenantName: "配置测试器"
+#serviceCode: DPBAS
+#api_serviceCode: dpbas
+#
 
 
 ###阿里paas-设计器域名
