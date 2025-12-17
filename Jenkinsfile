@@ -421,12 +421,12 @@ try:
         config = yaml.safe_load(f)
     env = config['current_environment']
     env_config = config['environments'][env]
-    print(f'   环境: {env_config["env"]}')  # ✅ 正确
-    print(f'   设计器: {env_config["athena_designer_host"]}')  # ✅ 正确
-    print(f'   租户: {env_config["tenantId"]}')  # ✅ 正确
+    print('   环境: ' + env_config['env'])  # 使用字符串拼接
+    print('   设计器: ' + env_config['athena_designer_host'])
+    print('   租户: ' + env_config['tenantId'])
 except Exception as e:
-    print(f'   无法读取环境配置: {e}')
-                    "
+    print('   无法读取环境配置: ' + str(e))
+"
 
                     # ========== 安装 Allure 命令行工具 ==========
                     echo "📥 安装 Allure 命令行工具..."
