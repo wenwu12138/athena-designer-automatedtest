@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time   : 2025-12-17 18:45:27
+# @Time   : 2025-12-17 18:45:26
 
 
 import allure
@@ -16,18 +16,18 @@ import datetime
 import json
 
 
-case_id = ['basis_QueryTenantPipeline_001', 'basis_QueryDeployLogByEnv_001', 'basis_QueryAllAppInTenant_001', 'basis_QueryApplicationLatestCompileInfo_001', 'basis_GetBranchInfo_001', 'basis_QueryCompileLog_001', 'basis_QueryDeployLog_001', 'basis_QueryTenantVersion_001']
+case_id = ['process_FindProcessCountByTriggerType_001', 'process_FindProcessPagination_001', 'monitorRule_AddAPITimingMonitor_001', 'monitorRule_GetMonitorRuleTree_001', 'businessDir_QueryIntegrationAutomationInfo_001', 'monitorRule_GetAllProducts_001', 'project_GetRootProjects_001', 'code_GenerateStandard_001', 'template_All_001', 'applicationParam_GetParamConfig_001', 'guide_IsSkip_001', 'process_FindProcessList_001', 'monitor_SaveMonitorRule_001', 'monitorRule_GetMonitorRule_001', 'monitorRule_UpdateMonitorRule_001', 'operationRecord_GetMonitorRuleHistory_001', 'modulePublish_PublishMonitorRule_001', 'monitorRule_DeleteMonitorRule_001']
 TestData = GetTestCase.case_data(case_id)
 re_data = regular(str(TestData))
 
 
 @allure.epic("开发平台接口")
-@allure.feature("运维中心")
-class TestPipelineDeployment:
+@allure.feature("2.0应用详情")
+class TestMonitorrule:
 
-    @allure.story("流水线部署")
+    @allure.story("数据侦测")
     @pytest.mark.parametrize('in_data', eval(re_data), ids=[i['detail'] for i in TestData])
-    def test_Pipeline_deployment(self, in_data, case_skip):
+    def test_MonitorRule(self, in_data, case_skip):
         """
         :param :
         :return:
@@ -49,4 +49,4 @@ class TestPipelineDeployment:
 
 
 if __name__ == '__main__':
-    pytest.main(['test_test_Pipeline_deployment.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])
+    pytest.main(['test_test_MonitorRule.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])

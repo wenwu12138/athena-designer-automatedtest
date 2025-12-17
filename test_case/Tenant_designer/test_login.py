@@ -16,18 +16,18 @@ import datetime
 import json
 
 
-case_id = ['basis_QueryTenantPipeline_001', 'basis_QueryDeployLogByEnv_001', 'basis_QueryAllAppInTenant_001', 'basis_QueryApplicationLatestCompileInfo_001', 'basis_GetBranchInfo_001', 'basis_QueryCompileLog_001', 'basis_QueryDeployLog_001', 'basis_QueryTenantVersion_001']
+case_id = ['tenant_designer_GetDeviceId_001', 'tenant_designer_GetUserSalt_001', 'tenant_designer_GetPublicKey_001', 'tenant_designer_ExchangeAesKey_001', 'tenant_designer_UserLogin_001', 'tenant_designer_QueryUserTenants_001']
 TestData = GetTestCase.case_data(case_id)
 re_data = regular(str(TestData))
 
 
 @allure.epic("开发平台接口")
-@allure.feature("运维中心")
-class TestPipelineDeployment:
+@allure.feature("租户设计器")
+class TestLogin:
 
-    @allure.story("流水线部署")
+    @allure.story("登录")
     @pytest.mark.parametrize('in_data', eval(re_data), ids=[i['detail'] for i in TestData])
-    def test_Pipeline_deployment(self, in_data, case_skip):
+    def test_login(self, in_data, case_skip):
         """
         :param :
         :return:
@@ -49,4 +49,4 @@ class TestPipelineDeployment:
 
 
 if __name__ == '__main__':
-    pytest.main(['test_test_Pipeline_deployment.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])
+    pytest.main(['test_test_login.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])

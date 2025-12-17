@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time   : 2025-12-17 18:45:27
+# @Time   : 2025-12-17 18:45:26
 
 
 import allure
@@ -16,18 +16,18 @@ import datetime
 import json
 
 
-case_id = ['basis_QueryTenantPipeline_001', 'basis_QueryDeployLogByEnv_001', 'basis_QueryAllAppInTenant_001', 'basis_QueryApplicationLatestCompileInfo_001', 'basis_GetBranchInfo_001', 'basis_QueryCompileLog_001', 'basis_QueryDeployLog_001', 'basis_QueryTenantVersion_001']
+case_id = ['action_FindActionsNoPaging_001', 'action_GetApplication_001', 'action_GetProjectList_001', 'action_JsonReqImportGet_001', 'action_SaveAction_001', 'action_FindActionByActionId_001', 'action_UpdateAction_001', 'modulePublish_Publish_001', 'operationRecord_Get_001', 'action_DeleteActionByActionId_001', 'action_SaveAthenaAction_001', 'action_UpdateAthenaAction_001', 'action_DeleteAthenaAction_001', 'action_SaveDataPullingAction_001', 'action_UpdateDataPullingAction_001', 'action_DeleteDataPullingAction_001', 'action_SaveEocAction_001', 'action_UpdateEocAction_001', 'action_DeleteEocAction_001', 'action_SaveIamAction_001', 'action_UpdateIamAction_001', 'action_DeleteIamAction_001']
 TestData = GetTestCase.case_data(case_id)
 re_data = regular(str(TestData))
 
 
 @allure.epic("开发平台接口")
-@allure.feature("运维中心")
-class TestPipelineDeployment:
+@allure.feature("2.0应用详情")
+class TestAction:
 
-    @allure.story("流水线部署")
+    @allure.story("行动")
     @pytest.mark.parametrize('in_data', eval(re_data), ids=[i['detail'] for i in TestData])
-    def test_Pipeline_deployment(self, in_data, case_skip):
+    def test_Action(self, in_data, case_skip):
         """
         :param :
         :return:
@@ -49,4 +49,4 @@ class TestPipelineDeployment:
 
 
 if __name__ == '__main__':
-    pytest.main(['test_test_Pipeline_deployment.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])
+    pytest.main(['test_test_Action.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])

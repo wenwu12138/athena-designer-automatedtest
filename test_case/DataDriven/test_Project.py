@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time   : 2025-12-17 18:45:27
+# @Time   : 2025-12-17 18:45:26
 
 
 import allure
@@ -16,18 +16,18 @@ import datetime
 import json
 
 
-case_id = ['basis_QueryTenantPipeline_001', 'basis_QueryDeployLogByEnv_001', 'basis_QueryAllAppInTenant_001', 'basis_QueryApplicationLatestCompileInfo_001', 'basis_GetBranchInfo_001', 'basis_QueryCompileLog_001', 'basis_QueryDeployLog_001', 'basis_QueryTenantVersion_001']
+case_id = ['project_FindAppEffectAdpVersion_001', 'project_AddProjectData_001', 'project_CanvasNotUpgradeExists_001', 'project_QueryProjectList_001', 'project_QueryCombinationProjectList_001', 'project_QuerySinglePageTriggerProjectList_001', 'project_GetDataList_001', 'code_GenerateDataOrgProjectCode_001', 'project_SaveProject_001', 'code_GenerateTrackableProjectCode_001', 'project_SaveTrackableProject_001', 'groupHistory_GetDataGroupHistory_001', 'project_GetProject_001', 'guide_IsSkip_002', 'task_GetTaskList_001', 'task_GetDataList_001', 'project_ProjectTree_001', 'task_GetDtdCanvas_001', 'data_DataGroupListByApplication_001', 'data_FindDataStatesByApplication_001', 'task_GetTaskListByState_001', 'code_GenerateSubProjectCode_001', 'project_SaveSubProject_001', 'task_GetTaskListByDataState_001', 'project_DeleteProjectData_001', 'project_DeleteSubProject_001', 'project_DeleteParentProject_001', 'project_DeleteTrackableProject_001']
 TestData = GetTestCase.case_data(case_id)
 re_data = regular(str(TestData))
 
 
 @allure.epic("开发平台接口")
-@allure.feature("运维中心")
-class TestPipelineDeployment:
+@allure.feature("驱动执行")
+class TestProject:
 
-    @allure.story("流水线部署")
+    @allure.story("项目")
     @pytest.mark.parametrize('in_data', eval(re_data), ids=[i['detail'] for i in TestData])
-    def test_Pipeline_deployment(self, in_data, case_skip):
+    def test_Project(self, in_data, case_skip):
         """
         :param :
         :return:
@@ -49,4 +49,4 @@ class TestPipelineDeployment:
 
 
 if __name__ == '__main__':
-    pytest.main(['test_test_Pipeline_deployment.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])
+    pytest.main(['test_test_Project.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])

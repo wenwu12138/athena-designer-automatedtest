@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time   : 2025-12-17 18:45:27
+# @Time   : 2025-12-17 18:45:26
 
 
 import allure
@@ -16,18 +16,18 @@ import datetime
 import json
 
 
-case_id = ['basis_QueryTenantPipeline_001', 'basis_QueryDeployLogByEnv_001', 'basis_QueryAllAppInTenant_001', 'basis_QueryApplicationLatestCompileInfo_001', 'basis_GetBranchInfo_001', 'basis_QueryCompileLog_001', 'basis_QueryDeployLog_001', 'basis_QueryTenantVersion_001']
+case_id = ['auth_QueryNormalUsers_001', 'auth_BatchGrantAuth_001', 'basis_CreateAuthTestApp_001', 'auth_ApplyForAuth_001', 'auth_AuditAuth_001', 'basis_DeleteAuthTestApp_001']
 TestData = GetTestCase.case_data(case_id)
 re_data = regular(str(TestData))
 
 
 @allure.epic("开发平台接口")
-@allure.feature("运维中心")
-class TestPipelineDeployment:
+@allure.feature("基础功能验证")
+class TestLimitAuthority:
 
-    @allure.story("流水线部署")
+    @allure.story("权限相关")
     @pytest.mark.parametrize('in_data', eval(re_data), ids=[i['detail'] for i in TestData])
-    def test_Pipeline_deployment(self, in_data, case_skip):
+    def test_Limit_authority(self, in_data, case_skip):
         """
         :param :
         :return:
@@ -49,4 +49,4 @@ class TestPipelineDeployment:
 
 
 if __name__ == '__main__':
-    pytest.main(['test_test_Pipeline_deployment.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])
+    pytest.main(['test_test_Limit_authority.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])

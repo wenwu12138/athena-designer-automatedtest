@@ -1,6 +1,6 @@
 project_name: Athena开发平台 #项目名称
 tester_name: 闻武 # 测试人员名称，作用于自动生成代码的作者，以及发送企业微信、钉钉通知的测试负责人
-current_environment: "ali-paas"
+current_environment: "huawei-test"
 
 
 # ==================== 环境配置 ====================
@@ -80,102 +80,6 @@ environments:
 #1.config中添加地端环境信息
 #2.conftest中变更登录的信息
 #3.忽略地端登录接口
-
-
-####华为正式
-#设计器域名
-env: "华为正式区"
-athena_designer_host: https://adp.apps.digiwincloud.com.cn
-athena_deployer_host: https://aadc.apps.digiwincloud.com.cn
-athena_tenant_deployer_host: https://atdp.apps.digiwincloud.com.cn
-#iam域名
-iam_host: https://iam.digiwincloud.com.cn
-# 用例配置
-app1_code: A1dbf6e345AT
-app1_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkExZGJmNmUzNDVBVCIsInNpZCI6MH0.lOzR2mZxVVlwU9YyYzRgZhVouLHx_NNyvLqLOI5r32E
-app2_code: A2ba74bfe3AT
-app2_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkEyYmE3NGJmZTNBVCIsInNpZCI6MH0.mJoe-Lzd7ruaF_L_hwgn45hK0_Qn4YkuXwq1QSrl9Wg
-#租户信息
-tenantId: "athenadeveloperTest"
-tenantSid: 847600433497088
-tenantName: "配置测试器"
-serviceCode: DPBAS
-api_serviceCode: dpbas
-
-
-
-
-
-#------------------------
-
-####华为测试-设计器域名
-#env: "华为测试区"
-#athena_designer_host: https://adp-test.apps.digiwincloud.com.cn
-#athena_deployer_host: https://aadc-test.apps.digiwincloud.com.cn
-#athena_tenant_deployer_host: https://atdp-test.apps.digiwincloud.com.cn
-##iam域名
-#iam_host: https://iam-test.digiwincloud.com.cn
-##用例配置
-#app1_code: Aautotest1AT
-#app1_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFhdXRvdGVzdDFBVCIsInNpZCI6MH0.x51q6SkRChvBOr1ca-iqzHU6SS_Mu2DqnrrJfFKO-7o
-#app2_code: A2a1989618AT
-#app2_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkEyYTE5ODk2MThBVCIsInNpZCI6MH0.hS1fWh2DVpE0TKSEI5hrJcpr3I6SvwRcnpJB2qqO8sc
-##租户信息
-#tenantId: "athenadeveloperTest"
-#tenantSid: 847600433497088
-#tenantName: "配置测试器"
-#serviceCode: DPBAS
-#api_serviceCode: dpbas
-#
-
-
-###阿里paas-设计器域名
-#env: "阿里Paas区(代地端)"
-#athena_designer_host: https://adp-paas.apps.digiwincloud.com.cn
-#athena_deployer_host: https://aadc-paas.apps.digiwincloud.com.cn
-#athena_tenant_deployer_host: https://atdp-paas.apps.digiwincloud.com.cn
-##iam域名
-#iam_host: https://iam-test.digiwincloud.com.cn
-##用例配置
-#app1_code: A5f1a0f58aAT
-#app1_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkE1ZjFhMGY1OGFBVCIsInNpZCI6MH0.mesrYxqbgyvShHD0FBqilTXNDzyvPEoOnpuEaPAJmpI
-#app2_code: Aded5e0256AT
-#app2_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFkZWQ1ZTAyNTZBVCIsInNpZCI6MH0.1VL2mxXiVR1tKSxn-Wjr_JfcnCiJ-mj9pEob6waLkSs
-##租户信息
-#tenantId: "athenadeveloperTest"
-#tenantSid: 847600433497088
-#tenantName: "配置测试器"
-#serviceCode: DPBAS
-#api_serviceCode: dpbas
-
-
-####地端--双虎
-#env: "地端双虎环境"
-#athena_designer_host: https://adp.twintigers.com
-#athena_deployer_host: https://aadc.twintigers.com
-#athena_tenant_deployer_host: https://atdp.twintigers.com
-##iam域名
-#iam_host: http://iam.twintigers.com
-##用例配置
-#app1_code: A17cf8730dAT
-#app1_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkExN2NmODczMGRBVCIsInNpZCI6MH0.S-9XQqvDmQZEZLuelfS_ek_1LQPTNTmjNKtWBG5apjc
-#app2_code: Ac83bda9c1AT
-#app2_Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkFjODNiZGE5YzFBVCIsInNpZCI6MH0.2LMn7mwB0vNiJBfkD3KFJItI6qRaXCpb_Ah6w4bk6Hw
-##租户信息
-#tenantId: "72011633_test"
-#tenantSid: 21129805496897
-#tenantName: "武汉双虎涂料股份有限公司测试"
-#serviceCode: dtdapp
-#api_serviceCode: dtdapp
-
-
-#微软正式区-只进行租户设计器的接口测试
-
-
-
-
-
-
 
 # 实时更新用例内容，False时，已生成的代码不会在做变更
 # 设置为True的时候，修改yaml文件的用例，代码中的内容会实时更新
