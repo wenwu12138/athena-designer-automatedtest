@@ -461,7 +461,7 @@ EOF
             if (jobUrl && buildNumber) {
                 echo "📊 报告存档信息:"
                 echo "   存档链接: ${jobUrl}${buildNumber}/"
-                echo "   直接下载: ${jobUrl}${buildNumber}/artifact//report/html/index.html"
+                echo "   直接下载: ${jobUrl}${buildNumber}artifact/report/html/index.html"
             }
         }
             script {
