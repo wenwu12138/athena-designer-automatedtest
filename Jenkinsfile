@@ -7,11 +7,6 @@ pipeline {
             choices: ['huawei-prod', 'huawei-test', 'ali-paas', 'on-premise'],
             description: '选择测试环境'
         )
-        string(
-            name: 'NOTIFICATION_TYPES',
-            defaultValue: 'EMAIL',
-            description: '通知类型（逗号分隔）：DING_TALK/WECHAT/EMAIL/FEI_SHU'
-        )
     }
 
     stages {
