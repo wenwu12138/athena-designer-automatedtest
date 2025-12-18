@@ -4,7 +4,7 @@ pipeline {
     parameters {
         choice(
             name: 'TEST_ENV',
-            choices: ['huawei-prod', 'huawei-test', 'ali-paas', 'on-premise'],
+            choices: ['huawei-test','huawei-prod',  'ali-paas', 'on-premise'],
             description: '选择测试环境'
         )
     }
@@ -411,44 +411,46 @@ except Exception as e:
 
                         # 执行Python通知逻辑
                         python -c '
-                        import os
-                        from utils.other_tools.models import NotificationType
-                        from utils.other_tools.allure_data.allure_report_data import AllureFileClean
-                        from utils.notify.wechat_send import WeChatSend
-                        from utils.notify.ding_talk import DingTalkSendMsg
-                        from utils.notify.send_mail import SendEmail
-                        from utils.notify.lark import FeiShuTalkChatBot
-                        from utils import config
+import json
+import os
+import sys
+from utils.other_tools.models import NotificationType
+from utils.other_tools.allure_data.allure_report_data import AllureFileClean
+from utils.notify.wechat_send import WeChatSend
+from utils.notify.ding_talk import DingTalkSendMsg
+from utils.notify.send_mail import SendEmail
+from utils.notify.lark import FeiShuTalkChatBot
+from utils import config
 
-                        # 获取Allure测试数据
-                        allure_data = AllureFileClean().get_case_count()
+# 获取Allure测试数据
+allure_data = AllureFileClean().get_case_count()
 
-                        # 定义通知映射（复用原有逻辑，邮件注入报告URL）
-                        notification_mapping = {
-                            NotificationType.DING_TALK.value: DingTalkSendMsg(allure_data).send_ding_notification,
-                            NotificationType.WECHAT.value: WeChatSend(allure_data).send_wechat_notification,
-                            NotificationType.EMAIL.value: lambda: SendEmail(allure_data).send_main(report_path=os.environ["REPORT_URL"]),
-                            NotificationType.FEI_SHU.value: FeiShuTalkChatBot(allure_data).post
-                        }
+# 定义通知映射（复用原有逻辑，邮件注入报告URL）
+notification_mapping = {
+    NotificationType.DING_TALK.value: DingTalkSendMsg(allure_data).send_ding_notification,
+    NotificationType.WECHAT.value: WeChatSend(allure_data).send_wechat_notification,
+    NotificationType.EMAIL.value: lambda: SendEmail(allure_data).send_main(report_path=os.environ["REPORT_URL"]),
+    NotificationType.FEI_SHU.value: FeiShuTalkChatBot(allure_data).post
+}
 
-                        # 读取代码内config配置发送通知（复用原有逻辑）
-                        if config.notification_type != NotificationType.DEFAULT.value:
-                            notify_type = config.notification_type.split(",")
-                            for i in notify_type:
-                                notify_key = i.lstrip("")
-                                if notify_key in notification_mapping:
-                                    try:
-                                        print(f"🚀 开始发送{notify_key}通知")
-                                        notification_mapping[notify_key]()
-                                        print(f"✅ {notify_key}通知发送成功")
-                                    except Exception as e:
-                                        print(f"❌ {notify_key}通知发送失败: {str(e)}")
-                                        continue
-                                        ' || echo "⚠️ 通知发送流程异常，继续执行后续步骤"
-                                    """
-                                }
-                            }
-                        }
+# 读取代码内config配置发送通知（复用原有逻辑）
+if config.notification_type != NotificationType.DEFAULT.value:
+    notify_type = config.notification_type.split(",")
+    for i in notify_type:
+        notify_key = i.lstrip("")
+        if notify_key in notification_mapping:
+            try:
+                print(f"🚀 开始发送{notify_key}通知")
+                notification_mapping[notify_key]()
+                print(f"✅ {notify_key}通知发送成功")
+            except Exception as e:
+                print(f"❌ {notify_key}通知发送失败: {str(e)}")
+                continue
+                ' || echo "⚠️ 通知发送流程异常，继续执行后续步骤"
+            """
+        }
+    }
+}
     }
 
     post {
