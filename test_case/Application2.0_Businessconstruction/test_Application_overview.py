@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time   : 2025-12-18 15:12:38
+# @Time   : 2025-12-18 15:12:37
 
 
 import allure
@@ -16,18 +16,18 @@ import datetime
 import json
 
 
-case_id = ['basis_QueryTenantPipeline_001', 'basis_QueryDeployLogByEnv_001', 'basis_QueryAllAppInTenant_001', 'basis_QueryApplicationLatestCompileInfo_001', 'basis_GetBranchInfo_001', 'basis_QueryCompileLog_001', 'basis_QueryDeployLog_001', 'basis_QueryTenantVersion_001']
+case_id = ['basis_QueryParadigm_001', 'basis_AccessRecord_001', 'basis_AuthAppInfo_001', 'basis_QueryAuthPolicy_001', 'basis_QueryAppAuthPolicy_001', 'basis_QueryDataStandardAuth_001', 'basis_GetPresetData_001', 'basis_QueryApplicationDetail_001', 'basis_QueryServiceCodeList_001', 'basis_UpdateApplicationV3_001', 'asset_QueryAllAssetList_001', 'asset_QueryDTDAssetList_001', 'asset_QueryAllExternalDependentAssets_001', 'asset_QueryDTDExternalDependentAssets_001', 'modelDriver_GetAppBackendInfo_001', 'customConfig_AddCustomConfig_001', 'customConfig_QueryCustomConfig_001', 'customConfig_QueryCustomConfigDetail_001', 'customConfig_UpdateCustomConfig_001', 'customConfig_QueryCustomConfigShare_001', 'customConfig_DeleteCustomConfig_001']
 TestData = GetTestCase.case_data(case_id)
 re_data = regular(str(TestData))
 
 
 @allure.epic("开发平台接口")
-@allure.feature("运维中心")
-class TestPipelineDeployment:
+@allure.feature("2.0应用详情")
+class TestApplicationOverview:
 
-    @allure.story("流水线部署")
+    @allure.story("应用总览")
     @pytest.mark.parametrize('in_data', eval(re_data), ids=[i['detail'] for i in TestData])
-    def test_Pipeline_deployment(self, in_data, case_skip):
+    def test_Application_overview(self, in_data, case_skip):
         """
         :param :
         :return:
@@ -49,4 +49,4 @@ class TestPipelineDeployment:
 
 
 if __name__ == '__main__':
-    pytest.main(['test_test_Pipeline_deployment.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])
+    pytest.main(['test_test_Application_overview.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])

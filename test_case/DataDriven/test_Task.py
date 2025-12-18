@@ -16,18 +16,18 @@ import datetime
 import json
 
 
-case_id = ['basis_QueryTenantPipeline_001', 'basis_QueryDeployLogByEnv_001', 'basis_QueryAllAppInTenant_001', 'basis_QueryApplicationLatestCompileInfo_001', 'basis_GetBranchInfo_001', 'basis_QueryCompileLog_001', 'basis_QueryDeployLog_001', 'basis_QueryTenantVersion_001']
+case_id = ['project_FindAppEffectAdpVersion_002', 'task_QueryTaskTree_001', 'code_GenerateStandardCode_001', 'task_SaveTask_001', 'process_UpsertProcess_001', 'task_GetTaskDetail_001', 'data_GetDataFeatures_001', 'processVersion_QueryBigTVersionList_001', 'process_FindBigTProcessById_001', 'modelDriver_QueryModelAssignList_002', 'activity_GetActivityListByPattern_001', 'process_UpdateBigTProcess_001', 'bigT_PublishProcess_001', 'debug_DebugBigTProcess_001', 'debug_GetDebugProgress_002']
 TestData = GetTestCase.case_data(case_id)
 re_data = regular(str(TestData))
 
 
 @allure.epic("开发平台接口")
-@allure.feature("运维中心")
-class TestPipelineDeployment:
+@allure.feature("驱动执行")
+class TestTask:
 
-    @allure.story("流水线部署")
+    @allure.story("任务")
     @pytest.mark.parametrize('in_data', eval(re_data), ids=[i['detail'] for i in TestData])
-    def test_Pipeline_deployment(self, in_data, case_skip):
+    def test_Task(self, in_data, case_skip):
         """
         :param :
         :return:
@@ -49,4 +49,4 @@ class TestPipelineDeployment:
 
 
 if __name__ == '__main__':
-    pytest.main(['test_test_Pipeline_deployment.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])
+    pytest.main(['test_test_Task.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])

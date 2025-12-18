@@ -16,18 +16,18 @@ import datetime
 import json
 
 
-case_id = ['basis_QueryTenantPipeline_001', 'basis_QueryDeployLogByEnv_001', 'basis_QueryAllAppInTenant_001', 'basis_QueryApplicationLatestCompileInfo_001', 'basis_GetBranchInfo_001', 'basis_QueryCompileLog_001', 'basis_QueryDeployLog_001', 'basis_QueryTenantVersion_001']
+case_id = ['basis_AddBranch_002', 'basis_Compile_002', 'basis_PublishTest_002', 'basis_SwitchPlanTest_002', 'basis_PublishHuaweiProd_002', 'basis_SwitchPlanHuaweiProd_002', 'basis_PublishAzureProd_002', 'basis_SwitchPlanAzureProd_002', 'basis_QueryTenantPipeline_local001', 'basis_PublishTest_local001', 'basis_SwitchPlanTest_local001']
 TestData = GetTestCase.case_data(case_id)
 re_data = regular(str(TestData))
 
 
 @allure.epic("开发平台接口")
-@allure.feature("运维中心")
-class TestPipelineDeployment:
+@allure.feature("基础功能验证")
+class TestBasisFunction002:
 
-    @allure.story("流水线部署")
+    @allure.story("基于已有数据验证基础功能z_2.0应用")
     @pytest.mark.parametrize('in_data', eval(re_data), ids=[i['detail'] for i in TestData])
-    def test_Pipeline_deployment(self, in_data, case_skip):
+    def test_Basis_function002(self, in_data, case_skip):
         """
         :param :
         :return:
@@ -49,4 +49,4 @@ class TestPipelineDeployment:
 
 
 if __name__ == '__main__':
-    pytest.main(['test_test_Pipeline_deployment.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])
+    pytest.main(['test_test_Basis_function002.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])

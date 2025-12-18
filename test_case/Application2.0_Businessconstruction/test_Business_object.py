@@ -16,18 +16,18 @@ import datetime
 import json
 
 
-case_id = ['basis_QueryTenantPipeline_001', 'basis_QueryDeployLogByEnv_001', 'basis_QueryAllAppInTenant_001', 'basis_QueryApplicationLatestCompileInfo_001', 'basis_GetBranchInfo_001', 'basis_QueryCompileLog_001', 'basis_QueryDeployLog_001', 'basis_QueryTenantVersion_001']
+case_id = ['get_ModelDefaultCustomProperties_001', 'businessDir_add_001', 'businessDir_add_param_001', 'businessDir_add_transaction_001', 'businessDir_queryList_001', 'resourceTree_queryListOfSource_001', 'template_all_001', 'task_monitorRule_getMonitorRuleTree_001', 'businessDir_queryIntegrationAutomationInfo_001', 'ai_calculateAILeftCount_001', 'modelDriverTarget_servicecode_queryList_001', 'task_monitorRule_getAllProducts_001', 'activityConfigs_getActivityListByPatternAndApplication_001', 'project_getRootProjects_001', 'pageDesignModel_QueryBindApiListConfig_001', 'process_findProcessList_001', 'modelDriver_queryModelByCode_001', 'businessDir_update_transaction_001', 'action_FindActionsV2_001', 'api_GetRelateApi_001', 'dataEntry_QueryRelateTable_001', 'api_GetFields_001', 'api_GetModelRelatePreviewInfo_001', 'api_add_001', 'tbb_checkBindRelation_001', 'businessDir_delete_001', 'modelDriver_queryBasicModel_001', 'tbb_checkBasicBindRelation_001', 'businessDir_cleanup_basic_001', 'modelDriver_queryParamModel_001', 'tbb_checkParamBindRelation_001', 'businessDir_cleanup_param_001', 'modelDriver_queryApiModelByCode_001', 'api_checkModelBindRelation_001', 'api_cleanup_model_001']
 TestData = GetTestCase.case_data(case_id)
 re_data = regular(str(TestData))
 
 
 @allure.epic("开发平台接口")
-@allure.feature("运维中心")
-class TestPipelineDeployment:
+@allure.feature("2.0应用详情")
+class TestBusinessObject:
 
-    @allure.story("流水线部署")
+    @allure.story("业务搭建-业务对象")
     @pytest.mark.parametrize('in_data', eval(re_data), ids=[i['detail'] for i in TestData])
-    def test_Pipeline_deployment(self, in_data, case_skip):
+    def test_Business_object(self, in_data, case_skip):
         """
         :param :
         :return:
@@ -49,4 +49,4 @@ class TestPipelineDeployment:
 
 
 if __name__ == '__main__':
-    pytest.main(['test_test_Pipeline_deployment.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])
+    pytest.main(['test_test_Business_object.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])

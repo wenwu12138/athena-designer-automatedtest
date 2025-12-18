@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time   : 2025-12-18 15:12:38
+# @Time   : 2025-12-18 15:12:37
 
 
 import allure
@@ -16,18 +16,18 @@ import datetime
 import json
 
 
-case_id = ['basis_QueryTenantPipeline_001', 'basis_QueryDeployLogByEnv_001', 'basis_QueryAllAppInTenant_001', 'basis_QueryApplicationLatestCompileInfo_001', 'basis_GetBranchInfo_001', 'basis_QueryCompileLog_001', 'basis_QueryDeployLog_001', 'basis_QueryTenantVersion_001']
+case_id = ['aimEvent_QueryList_001', 'aimEvent_QueryPlatformList_001', 'aimEvent_CreateEvent_001', 'aimEvent_GetDetail_001', 'aimScene_QueryByCondition_001', 'aimEvent_EditEvent_001', 'aimEvent_GetDetail_002', 'aimEvent_DeleteEvent_001', 'aimScene_QueryPlatformByCondition_001', 'aimScene_QueryApplicationByCondition_001', 'aimScene_CreateScene_001', 'aimScene_QueryApplicationByCondition_002', 'aimScene_GetDetail_001', 'aimScene_QueryChannels_001', 'eoc_GetUserList_001', 'eoc_GetDutyList_001', 'aimEvent_QueryPlatformAndAppEvents_001', 'aimScene_UpdateScene_001', 'aimScene_DeleteScene_001', 'aimScene_QueryApplicationByCondition_003']
 TestData = GetTestCase.case_data(case_id)
 re_data = regular(str(TestData))
 
 
 @allure.epic("开发平台接口")
-@allure.feature("运维中心")
-class TestPipelineDeployment:
+@allure.feature("业务搭建")
+class TestAimevent:
 
-    @allure.story("流水线部署")
+    @allure.story("消息管理")
     @pytest.mark.parametrize('in_data', eval(re_data), ids=[i['detail'] for i in TestData])
-    def test_Pipeline_deployment(self, in_data, case_skip):
+    def test_aimEvent(self, in_data, case_skip):
         """
         :param :
         :return:
@@ -49,4 +49,4 @@ class TestPipelineDeployment:
 
 
 if __name__ == '__main__':
-    pytest.main(['test_test_Pipeline_deployment.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])
+    pytest.main(['test_test_aimEvent.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])

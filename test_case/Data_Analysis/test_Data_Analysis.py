@@ -16,18 +16,18 @@ import datetime
 import json
 
 
-case_id = ['basis_QueryTenantPipeline_001', 'basis_QueryDeployLogByEnv_001', 'basis_QueryAllAppInTenant_001', 'basis_QueryApplicationLatestCompileInfo_001', 'basis_GetBranchInfo_001', 'basis_QueryCompileLog_001', 'basis_QueryDeployLog_001', 'basis_QueryTenantVersion_001']
+case_id = ['report_GetActivityListByPattern_001', 'report_AddActivityByPattern_001', 'report_GetActivityDetail_001', 'report_GetResidByCode_001', 'button_QueryReportButtons_001', 'customConfig_GetControlList_001', 'task_GetPageViewList_001', 'report_UpsertActivityConfig_001', 'tenant_QueryCustomerTenants_001', 'module_PublishActivity_001', 'operation_GetRecord_001', 'report_DeleteActivityByCode_001', 'statement_CreateDetailTable_001', 'statement_QueryTableList_001', 'statement_GetLangResource_001', 'statement_QueryActionButtons_001', 'statement_GetTableDetail_001', 'statement_GetCustomControls_001', 'statement_GetPageViews_001', 'statement_UpdateTableConfig_001', 'statement_QueryPublishTenants_001', 'statement_PublishDetailTable_001', 'statement_DeleteDetailTable_001', 'tbb_CreateDataAnalysisTable_001', 'tbb_QueryAnalysisTables_001', 'tbb_PublishAnalysisTable_001', 'tbb_DeleteAnalysisTable_001']
 TestData = GetTestCase.case_data(case_id)
 re_data = regular(str(TestData))
 
 
 @allure.epic("开发平台接口")
-@allure.feature("运维中心")
-class TestPipelineDeployment:
+@allure.feature("数据分析")
+class TestDataAnalysis:
 
-    @allure.story("流水线部署")
+    @allure.story("报表")
     @pytest.mark.parametrize('in_data', eval(re_data), ids=[i['detail'] for i in TestData])
-    def test_Pipeline_deployment(self, in_data, case_skip):
+    def test_Data_Analysis(self, in_data, case_skip):
         """
         :param :
         :return:
@@ -49,4 +49,4 @@ class TestPipelineDeployment:
 
 
 if __name__ == '__main__':
-    pytest.main(['test_test_Pipeline_deployment.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])
+    pytest.main(['test_test_Data_Analysis.py', '-s', '-W', 'ignore:Module already imported:pytest.PytestWarning'])
