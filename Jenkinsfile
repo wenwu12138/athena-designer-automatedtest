@@ -418,10 +418,10 @@ except Exception as e:
                         python -c '
 import os
 from utils.other_tools.allure_data.allure_report_data import AllureFileClean
-from utils.send_dingtalk import DingTalkSendMsg
-from utils.send_wechat import WeChatSend
-from utils.send_email import SendEmail
-from utils.send_feishu import FeiShuTalkChatBot
+from utils.notify.send_mail import SendEmail
+from utils.notify.lark import FeiShuTalkChatBot
+from utils.notify.wechat_send import WeChatSend
+from utils.notify.ding_talk import DingTalkSendMsg
 
 # 获取Allure测试数据
 allure_data = AllureFileClean().get_case_count()

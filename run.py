@@ -90,7 +90,8 @@ def run():
         # 生成allure文件
         os.system(r"allure generate ./report/tmp -o ./report/html --clean")
 
-
+        '''
+        # 目前暂时只让云端发报告了 本地就注释掉 放在jenkinsfiles里面
         allure_data = AllureFileClean().get_case_count()
         notification_mapping = {
             NotificationType.DING_TALK.value: DingTalkSendMsg(allure_data).send_ding_notification,
@@ -103,6 +104,7 @@ def run():
             notify_type = config.notification_type.split(",")
             for i in notify_type:
                 notification_mapping.get(i.lstrip(""))()
+        '''
 
         if config.excel_report:
             ErrorCaseExcel().write_case()
