@@ -411,9 +411,7 @@ except Exception as e:
 
                         # 执行Python通知逻辑
                         python -c '
-                        import json
                         import os
-                        import sys
                         from utils.other_tools.models import NotificationType
                         from utils.other_tools.allure_data.allure_report_data import AllureFileClean
                         from utils.notify.wechat_send import WeChatSend
