@@ -398,22 +398,22 @@ except Exception as e:
                     def reportFullUrl = "${env.BUILD_URL}artifact/report/html/index.html"
                     echo "📄 报告路径: ${reportFullUrl}"
 
-                    // 调用Python发送邮件脚本，传入报告路径
-                    sh '''
+                    // 调用Python发送邮件脚本，传入报告路径（修复引号嵌套）
+                    sh """
                         set +x
                         . venv/bin/activate
-                        export PYTHONPATH="${PWD}:${PYTHONPATH}"
-                        python -c "
-from utils.other_tools.allure_data.allure_report_data import AllureFileClean, TestMetrics
-from utils.send_email import SendEmail
+                        export PYTHONPATH="\${PWD}:\${PYTHONPATH}"
+                        python -c \"
+                        from utils.other_tools.allure_data.allure_report_data import AllureFileClean, TestMetrics
+                        from utils.send_email import SendEmail
 
-# 初始化测试指标
-metrics = AllureFileClean().get_case_count()
-# 发送邮件，传入Jenkins报告路径
-SendEmail(metrics).send_main(report_path=''''${reportFullUrl}''')
-print('✅ 测试报告邮件发送成功')
-                        " || echo "⚠️ 邮件发送可能失败，请检查日志"
-                    '''
+                        # 初始化测试指标
+                        metrics = AllureFileClean().get_case_count()
+                        # 发送邮件，传入Jenkins报告路径
+                        SendEmail(metrics).send_main(report_path='${reportFullUrl}')
+                        print('✅ 测试报告邮件发送成功')
+                        \" || echo \"⚠️ 邮件发送可能失败，请检查日志\"
+                    """
                 }
             }
         }

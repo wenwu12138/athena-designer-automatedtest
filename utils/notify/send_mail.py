@@ -84,7 +84,7 @@ class SendEmail:
         {self.allure_data.get_failed_cases_detail()}
 
         **********************************
-        jenkins地址：https://121.xx.xx.47:8989/login
+        jenkins地址：{final_report_path}
         详细情况可登录jenkins平台查看，非相关负责人员可忽略此消息。谢谢。
         """
         self.send_mail(user_list, sub, content)
