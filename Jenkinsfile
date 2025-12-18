@@ -10,6 +10,7 @@ pipeline {
     }
 
     stages {
+        // 阶段1: 设置环境
         stage('设置环境') {
             steps {
                 script {
@@ -24,6 +25,7 @@ pipeline {
             }
         }
 
+        // 阶段2: 代码检出
         stage('Checkout') {
             steps {
                 script {
@@ -39,6 +41,7 @@ pipeline {
             }
         }
 
+        // 阶段3: 环境设置
         stage('Setup Environment') {
             steps {
                 script {
@@ -70,6 +73,7 @@ pipeline {
             }
         }
 
+        // 阶段4: 核心依赖安装
         stage('Install Core Dependencies') {
             steps {
                 script {
@@ -105,6 +109,7 @@ pipeline {
             }
         }
 
+        // 阶段5: 项目依赖安装
         stage('Install Project Dependencies') {
             steps {
                 script {
@@ -174,7 +179,7 @@ pefile==2023.2.7
 pluggy==1.6.0
 protobuf==6.31.1
 psutil==7.1.3
-publicsuffix2==2.20191221
+publicsuffix2==2.191221
 py==1.11.0
 pyasn1==0.6.1
 pyasn1_modules==0.4.2
@@ -250,6 +255,7 @@ EOF
             }
         }
 
+        // 阶段6: 依赖验证
         stage('Verify Dependencies') {
             steps {
                 script {
@@ -330,6 +336,7 @@ EOF
             }
         }
 
+        // 阶段7: 测试执行
         stage('Run Tests') {
             steps {
                 script {
@@ -389,36 +396,47 @@ except Exception as e:
                 '''
             }
         }
-    }
-    stage('Send Test Report Email') {
+
+        // 阶段8: 发送测试报告邮件（放在stages内，层级正确）
+        stage('Send Test Report Email') {
             steps {
                 script {
                     echo "📧 发送测试报告邮件"
-                    // 构建Jenkins报告完整路径
+                    // 构建报告URL
                     def reportFullUrl = "${env.BUILD_URL}artifact/report/html/index.html"
+                    writeFile file: 'report_url.txt', text: reportFullUrl
                     echo "📄 报告路径: ${reportFullUrl}"
 
-                    // 调用Python发送邮件脚本，传入报告路径（修复引号嵌套）
-                    sh """
+                    // 执行邮件发送
+                    sh '''
                         set +x
                         . venv/bin/activate
-                        export PYTHONPATH="\${PWD}:\${PYTHONPATH}"
-                        python -c \"
-                        from utils.other_tools.allure_data.allure_report_data import AllureFileClean, TestMetrics
-                        from utils.send_email import SendEmail
+                        export PYTHONPATH="${PWD}:${PYTHONPATH}"
 
-                        # 初始化测试指标
-                        metrics = AllureFileClean().get_case_count()
-                        # 发送邮件，传入Jenkins报告路径
-                        SendEmail(metrics).send_main(report_path='${reportFullUrl}')
-                        print('✅ 测试报告邮件发送成功')
-                        \" || echo \"⚠️ 邮件发送可能失败，请检查日志\"
-                    """
+                        # 读取报告URL
+                        REPORT_URL=$(cat report_url.txt)
+
+                        # 发送邮件
+                        python -c '
+from utils.other_tools.allure_data.allure_report_data import AllureFileClean, TestMetrics
+from utils.send_email import SendEmail
+import os
+
+report_url = os.environ.get("REPORT_URL", "")
+metrics = AllureFileClean().get_case_count()
+SendEmail(metrics).send_main(report_path=report_url)
+print("✅ 测试报告邮件发送成功")
+                        ' || echo "⚠️ 邮件发送可能失败，请检查日志"
+
+                        # 清理临时文件
+                        rm -f report_url.txt
+                    '''
                 }
             }
         }
+    } // 结束stages块
 
-
+    // Post块（构建后操作）
     post {
         always {
             archiveArtifacts artifacts: 'report/html/**', fingerprint: true
@@ -433,6 +451,7 @@ except Exception as e:
                     echo "   直接下载: ${jobUrl}${buildNumber}/artifact/report/html/index.html"
                 }
             }
+
             script {
                 echo ""
                 echo "=" * 60
@@ -455,7 +474,8 @@ except Exception as e:
                 echo "  5. ✅ 项目依赖安装"
                 echo "  6. ✅ 依赖验证"
                 echo "  7. ✅ 测试执行"
-                echo "  8. ✅ 报告收集"
+                echo "  8. ✅ 邮件发送"
+                echo "  9. ✅ 报告收集"
                 echo "=" * 60
             }
         }
@@ -495,5 +515,5 @@ except Exception as e:
                 echo "虚拟环境: $(ls -la venv/bin/python 2>/dev/null && echo '存在' || echo '不存在')"
             '''
         }
-    }
-}
+    } // 结束post块
+} // 结束pipeline块
