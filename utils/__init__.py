@@ -17,5 +17,3 @@ config = Config(**_data)
 
 
 
-print(config)
-print(config)

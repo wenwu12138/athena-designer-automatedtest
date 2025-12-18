@@ -28,15 +28,17 @@ class SendEmail:
         @param content: 发送内容
         @return:
         """
+        send_user = config.email.send_user
+
         user = "闻武" + "<" + config.email.send_user + ">"
         message = MIMEText(content, _subtype='plain', _charset='utf-8')
         message['Subject'] = sub
-        message['From'] = user
+        message['From'] = send_user
         message['To'] = ";".join(user_list)
-        server = smtplib.SMTP()
+        server = smtplib.SMTP_SSL(config.email.email_host, 465, timeout=30)
         server.connect(config.email.email_host)
         server.login(config.email.send_user, config.email.stamp_key)
-        server.sendmail(user, user_list, message.as_string())
+        server.sendmail(send_user, user_list, message.as_string())
         server.close()
 
     def error_mail(self, error_message: str) -> None:
@@ -52,11 +54,19 @@ class SendEmail:
         content = f"自动化测试执行完毕，程序中发现异常，请悉知。报错信息如下：\n{error_message}"
         self.send_mail(user_list, sub, content)
 
-    def send_main(self) -> None:
+    def send_main(self, report_path: str = None) -> None:
         """
         发送邮件
         :return:
         """
+        # 设置默认报告路径
+        default_report_path = "http://192.168.201.161:9999"
+        final_report_path = report_path if report_path else default_report_path
+
+        # 打印提示信息
+        if not report_path:
+            print("未获取到云端jenkins报告路径，使用默认本地路径")
+
         email = config.email.send_list
         user_list = email.split(',')  # 多个邮箱发送，yaml文件中直接添加  '806029174@qq.com'
 
