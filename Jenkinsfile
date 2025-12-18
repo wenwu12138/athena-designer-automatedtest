@@ -7,6 +7,12 @@ pipeline {
             choices: ['huawei-prod', 'huawei-test', 'ali-paas', 'on-premise'],
             description: '选择测试环境'
         )
+        // 新增：通知类型选择（可选，也可固定值）
+        string(
+            name: 'NOTIFICATION_TYPES',
+            defaultValue: 'EMAIL',
+            description: '通知类型（逗号分隔）：DING_TALK/WECHAT/EMAIL/FEI_SHU'
+        )
     }
 
     stages {
@@ -24,10 +30,10 @@ pipeline {
             }
         }
 
-        stage('Checkout') {
+        stage('代码检出') {
             steps {
                 script {
-                    echo "📥 阶段 1/6: 代码检出"
+                    echo "📥 阶段 1/7: 代码检出"
                     echo "🎯 测试环境: ${params.TEST_ENV}"
                     echo "✅ 代码检出完成"
                     sh '''
@@ -39,10 +45,10 @@ pipeline {
             }
         }
 
-        stage('Setup Environment') {
+        stage('环境初始化') {
             steps {
                 script {
-                    echo "🔧 阶段 2/6: 环境设置"
+                    echo "🔧 阶段 2/7: 环境初始化"
                 }
                 sh '''
                     set +x
@@ -65,15 +71,15 @@ pipeline {
                     echo "⬆️ 升级基础工具..."
                     pip install --upgrade pip setuptools wheel --quiet
                     echo "升级后pip版本: $(pip --version | cut -d' ' -f2)"
-                    echo "📊 环境设置完成"
+                    echo "📊 环境初始化完成"
                 '''
             }
         }
 
-        stage('Install Core Dependencies') {
+        stage('安装核心依赖') {
             steps {
                 script {
-                    echo "📦 阶段 3/6: 核心依赖安装"
+                    echo "📦 阶段 3/7: 安装核心依赖"
                 }
                 sh '''
                     set +x
@@ -105,10 +111,10 @@ pipeline {
             }
         }
 
-        stage('Install Project Dependencies') {
+        stage('安装项目依赖') {
             steps {
                 script {
-                    echo "📦 阶段 4/6: 项目依赖安装"
+                    echo "📦 阶段 4/7: 安装项目依赖"
                 }
                 sh '''
                     set +x
@@ -250,10 +256,10 @@ EOF
             }
         }
 
-        stage('Verify Dependencies') {
+        stage('验证依赖') {
             steps {
                 script {
-                    echo "🔍 阶段 5/6: 依赖验证"
+                    echo "🔍 阶段 5/7: 验证依赖"
                 }
                 sh '''
                     set +x
@@ -330,10 +336,10 @@ EOF
             }
         }
 
-        stage('Run Tests') {
+        stage('执行测试') {
             steps {
                 script {
-                    echo "🚀 阶段 6/6: 测试执行"
+                    echo "🚀 阶段 6/7: 执行测试"
                     echo "🎯 测试环境: ${params.TEST_ENV}"
                 }
                 sh '''
@@ -389,7 +395,59 @@ except Exception as e:
                 '''
             }
         }
+
+        stage('发送测试通知') {
+            steps {
+                script {
+                    echo "📢 阶段 7/7: 发送测试通知"
+                    // 构建报告访问URL
+                    def reportUrl = "${env.BUILD_URL}artifact/report/html/index.html"
+                    echo "📄 测试报告地址: ${reportUrl}"
+                }
+                sh '''
+                    set +x
+                    . venv/bin/activate && export PYTHONPATH="${PWD}:${PYTHONPATH}"
+                    # 传递报告URL和通知类型
+                    REPORT_URL="''' + reportUrl + '''"
+                    NOTIFY_TYPES="${params.NOTIFICATION_TYPES}"
+
+                    # 执行通知发送逻辑
+                    python -c '
+import os
+from utils.other_tools.allure_data.allure_report_data import AllureFileClean
+from utils.send_dingtalk import DingTalkSendMsg
+from utils.send_wechat import WeChatSend
+from utils.send_email import SendEmail
+from utils.send_feishu import FeiShuTalkChatBot
+
+# 获取Allure测试数据
+allure_data = AllureFileClean().get_case_count()
+
+# 通知类型映射
+notify_map = {
+    "DING_TALK": DingTalkSendMsg(allure_data).send_ding_notification,
+    "WECHAT": WeChatSend(allure_data).send_wechat_notification,
+    "EMAIL": lambda: SendEmail(allure_data).send_main(report_path=os.environ["REPORT_URL"]),
+    "FEI_SHU": FeiShuTalkChatBot(allure_data).post
+}
+
+# 循环发送指定类型通知
+notify_types = [t.strip() for t in os.environ["NOTIFY_TYPES"].split(",") if t.strip()]
+for notify_type in notify_types:
+    if notify_type in notify_map:
+        try:
+            print(f"🚀 开始发送{notify_type}通知")
+            notify_map[notify_type]()
+            print(f"✅ {notify_type}通知发送成功")
+        except Exception as e:
+            print(f"❌ {notify_type}通知发送失败: {str(e)}")
+            continue
+                    ' || echo "⚠️ 通知发送流程异常，继续执行后续步骤"
+                '''
+            }
+        }
     }
+
     post {
         always {
             archiveArtifacts artifacts: 'report/html/**', fingerprint: true
@@ -419,14 +477,15 @@ except Exception as e:
                 echo "  测试环境: ${params.TEST_ENV}"
                 echo ""
                 echo "📊 阶段统计:"
-                echo "  1. ✅ 环境设置"
+                echo "  1. ✅ 设置环境"
                 echo "  2. ✅ 代码检出"
-                echo "  3. ✅ 环境设置"
-                echo "  4. ✅ 核心依赖安装"
-                echo "  5. ✅ 项目依赖安装"
-                echo "  6. ✅ 依赖验证"
-                echo "  7. ✅ 测试执行"
-                echo "  8. ✅ 报告收集"
+                echo "  3. ✅ 环境初始化"
+                echo "  4. ✅ 安装核心依赖"
+                echo "  5. ✅ 安装项目依赖"
+                echo "  6. ✅ 验证依赖"
+                echo "  7. ✅ 执行测试"
+                echo "  8. ✅ 发送测试通知"
+                echo "  9. ✅ 报告收集"
                 echo "=" * 60
             }
         }
