@@ -21,6 +21,7 @@ pipeline {
 
                     // 一行命令更新配置文件
                     sh """
+                        set +x
                         sed -i "s/current_environment:.*/current_environment: \\\"${params.TEST_ENV}\\\"/" common/config.yaml
                         echo "✅ 环境已设置为: ${params.TEST_ENV}"
                     """
@@ -37,7 +38,10 @@ pipeline {
                 }
                 script {
                     echo "✅ 代码检出完成"
-                    sh 'echo "最新提交:" && git log --oneline -1 || echo "Git信息获取失败"'
+                    sh '''
+                        set +x
+                        echo "最新提交:" && git log --oneline -1 || echo "Git信息获取失败"
+                    '''
                 }
             }
         }
@@ -49,6 +53,7 @@ pipeline {
                     echo "💡 目的: 创建独立Python环境，避免依赖冲突"
                 }
                 sh '''
+                    set +x
                     echo "🐍 系统Python信息:"
                     echo "Python3路径: $(which python3 || echo '未找到')"
                     echo "Python3版本:"
@@ -93,6 +98,7 @@ pipeline {
                     echo "💡 目的: 安装项目运行必须的核心包"
                 }
                 sh '''
+                    set +x
                     echo "🔌 激活虚拟环境..."
                     . venv/bin/activate
 
@@ -154,6 +160,7 @@ pipeline {
                     echo "💡 目的: 安装requirements.txt中其他依赖，过滤Windows专用包"
                 }
                 sh '''
+                    set +x
                     echo "🔌 激活虚拟环境..."
                     . venv/bin/activate
 
@@ -318,6 +325,7 @@ EOF
                     echo "💡 目的: 验证所有关键模块能正常导入"
                 }
                 sh '''
+                    set +x
                     echo "🔌 激活虚拟环境..."
                     . venv/bin/activate
 
@@ -409,6 +417,7 @@ EOF
                     echo "🎯 测试环境: ${params.TEST_ENV}"
                 }
                 sh '''
+                    set +x
                     echo "🔌 激活虚拟环境..."
                     . venv/bin/activate
 
@@ -558,6 +567,7 @@ except Exception as e:
                 echo "🔧 调试信息收集:"
             }
             sh '''
+                set +x
                 echo "最后错误位置:"
                 tail -20 ${WORKSPACE}/jenkins-log.txt 2>/dev/null || echo "无法读取日志"
 
