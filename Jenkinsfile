@@ -1,7 +1,6 @@
 pipeline {
     agent any
 
-    // 只加一个环境选择参数
     parameters {
         choice(
             name: 'TEST_ENV',
@@ -15,11 +14,7 @@ pipeline {
             steps {
                 script {
                     echo "🎯 选择环境: ${params.TEST_ENV}"
-
-                    // 先检出代码
                     checkout scm
-
-                    // 一行命令更新配置文件
                     sh """
                         set +x
                         sed -i "s/current_environment:.*/current_environment: \\\"${params.TEST_ENV}\\\"/" common/config.yaml
@@ -32,15 +27,13 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    echo "📥 阶段 1/6: 代码检出开始"
-                    echo "📁 工作目录: ${WORKSPACE}"
+                    echo "📥 阶段 1/6: 代码检出"
                     echo "🎯 测试环境: ${params.TEST_ENV}"
-                }
-                script {
                     echo "✅ 代码检出完成"
                     sh '''
                         set +x
-                        echo "最新提交:" && git log --oneline -1 || echo "Git信息获取失败"
+                        echo "最新提交:"
+                        git log --oneline -1 || echo "Git信息获取失败"
                     '''
                 }
             }
@@ -49,8 +42,7 @@ pipeline {
         stage('Setup Environment') {
             steps {
                 script {
-                    echo "🔧 阶段 2/6: 环境设置开始"
-                    echo "💡 目的: 创建独立Python环境，避免依赖冲突"
+                    echo "🔧 阶段 2/6: 环境设置"
                 }
                 sh '''
                     set +x
@@ -59,33 +51,20 @@ pipeline {
                     echo "Python3版本:"
                     python3 --version || echo "Python3命令失败"
 
-                    echo "🧹 清理旧环境(如果存在)..."
-                    if [ -d "venv" ]; then
-                        echo "发现旧虚拟环境，开始清理..."
-                        rm -rf venv
-                        echo "旧环境已清理"
-                    else
-                        echo "未发现旧虚拟环境"
-                    fi
+                    echo "🧹 清理旧环境..."
+                    [ -d "venv" ] && rm -rf venv && echo "旧环境已清理" || echo "未发现旧虚拟环境"
 
                     echo "📦 创建新虚拟环境..."
                     python3 -m venv venv
-                    if [ $? -eq 0 ]; then
-                        echo "✅ 虚拟环境创建成功"
-                    else
-                        echo "❌ 虚拟环境创建失败"
-                        exit 1
-                    fi
+                    [ $? -eq 0 ] && echo "✅ 虚拟环境创建成功" || { echo "❌ 虚拟环境创建失败"; exit 1; }
 
-                    echo "🔌 激活虚拟环境..."
                     . venv/bin/activate
                     echo "激活后Python路径: $(which python)"
                     echo "激活后Python版本: $(python --version 2>&1 || echo '获取失败')"
 
                     echo "⬆️ 升级基础工具..."
-                    pip install --upgrade pip setuptools wheel
-                    echo "升级后pip版本: $(pip --version || echo '获取失败')"
-
+                    pip install --upgrade pip setuptools wheel --quiet
+                    echo "升级后pip版本: $(pip --version | cut -d' ' -f2)"
                     echo "📊 环境设置完成"
                 '''
             }
@@ -94,57 +73,30 @@ pipeline {
         stage('Install Core Dependencies') {
             steps {
                 script {
-                    echo "📦 阶段 3/6: 核心依赖安装开始"
-                    echo "💡 目的: 安装项目运行必须的核心包"
+                    echo "📦 阶段 3/6: 核心依赖安装"
                 }
                 sh '''
                     set +x
-                    echo "🔌 激活虚拟环境..."
                     . venv/bin/activate
 
-                    echo "🔍 当前Python环境信息:"
+                    echo "🔍 当前环境信息:"
                     echo "Python: $(which python)"
                     echo "版本: $(python --version 2>&1)"
                     echo "PIP: $(pip --version 2>&1 | head -1)"
 
-                    echo "📥 步骤1: 安装核心包..."
-                    echo "  安装 PyYAML (配置文件处理)..."
-                    pip install PyYAML==6.0.2 || { echo "❌ PyYAML安装失败"; exit 1; }
+                    echo "📥 安装核心包..."
+                    pip install PyYAML==6.0.2 --quiet || { echo "❌ PyYAML安装失败"; exit 1; }
+                    echo "  ✅ PyYAML"
 
-                    echo "  安装 requests (HTTP请求)..."
-                    pip install requests==2.32.4 || { echo "⚠️ requests安装警告"; }
-
-                    echo "  安装 pytest (测试框架)..."
-                    pip install pytest==7.4.4 || { echo "⚠️ pytest安装警告"; }
-
-                    echo "  安装 jsonpath (缺失的关键包)..."
-                    pip install jsonpath==0.82.2 || { echo "❌ jsonpath安装失败，这是关键包!"; exit 1; }
-
-                    echo "  安装 openpyxl (Excel处理)..."
-                    pip install openpyxl==3.1.5 || echo "⚠️ openpyxl安装警告"
-
-                    echo "  安装 pymysql (MySQL数据库)..."
-                    pip install pymysql==1.1.1 || echo "⚠️ pymysql安装警告"
-
-                    echo "  安装 flask (Web框架)..."
-                    pip install flask==3.1.0 || echo "⚠️ flask安装警告"
-
-                    echo "📥 步骤2: 安装数据处理包..."
-                    echo "  安装 python-dateutil (日期处理)..."
-                    pip install python-dateutil==2.9.0 || echo "⚠️ dateutil安装警告"
-
-                    echo "  安装 cryptography (加密)..."
-                    pip install cryptography==44.0.3 || echo "⚠️ cryptography安装警告"
-
-                    echo "  安装 allure-pytest (测试报告)..."
-                    pip install allure-pytest==2.13.2 allure-python-commons==2.13.2 || echo "⚠️ allure安装警告"
-
-                    echo "📥 步骤3: 安装其他必需包..."
-                    echo "  安装 Jinja2模板引擎..."
-                    pip install jinja2==3.1.6 markupsafe==3.0.2 || echo "⚠️ Jinja2安装警告"
-
-                    echo "  安装 Flask相关包..."
-                    pip install click==8.2.1 itsdangerous==2.2.0 blinker==1.9.0 werkzeug==3.1.3 || echo "⚠️ Flask相关包安装警告"
+                    pip install requests==2.32.4 --quiet || echo "  ⚠️ requests"
+                    pip install pytest==7.4.4 --quiet || echo "  ⚠️ pytest"
+                    pip install jsonpath==0.82.2 --quiet || { echo "❌ jsonpath安装失败"; exit 1; }
+                    pip install openpyxl==3.1.5 --quiet || echo "  ⚠️ openpyxl"
+                    pip install pymysql==1.1.1 --quiet || echo "  ⚠️ pymysql"
+                    pip install flask==3.1.0 --quiet || echo "  ⚠️ flask"
+                    pip install python-dateutil==2.9.0 --quiet || echo "  ⚠️ python-dateutil"
+                    pip install cryptography==44.0.3 --quiet || echo "  ⚠️ cryptography"
+                    pip install allure-pytest==2.13.2 allure-python-commons==2.13.2 --quiet || echo "  ⚠️ allure"
 
                     echo "📊 核心依赖安装统计:"
                     echo "已安装包数量: $(pip list | wc -l)个"
@@ -156,28 +108,19 @@ pipeline {
         stage('Install Project Dependencies') {
             steps {
                 script {
-                    echo "📦 阶段 4/6: 项目依赖安装开始"
-                    echo "💡 目的: 安装requirements.txt中其他依赖，过滤Windows专用包"
+                    echo "📦 阶段 4/6: 项目依赖安装"
                 }
                 sh '''
                     set +x
-                    echo "🔌 激活虚拟环境..."
                     . venv/bin/activate
 
-                    echo "🔍 检查requirements.txt文件..."
+                    echo "🔍 检查requirements.txt..."
                     if [ ! -f "requirements.txt" ]; then
                         echo "⚠️ requirements.txt不存在，跳过此阶段"
                         exit 0
                     fi
 
-                    echo "📄 requirements.txt内容概览:"
-                    echo "总行数: $(wc -l < requirements.txt)"
-                    echo "包含的包数量: $(grep -v "^#" requirements.txt | grep -v "^$" | wc -l)"
-
                     echo "🧹 过滤Windows专用包..."
-                    echo "过滤规则: 移除 pywin32, mitmproxy-windows, pydivert 等Windows包"
-
-                    # 创建过滤后的文件
                     cat > requirements_filtered.txt << 'EOF'
 aiofiles==24.1.0
 aioquic==1.2.0
@@ -288,9 +231,8 @@ zstandard==0.23.0
 EOF
 
                     echo "📦 安装过滤后的依赖..."
-                    echo "开始安装，这可能需要几分钟..."
                     START_TIME=$(date +%s)
-                    pip install -r requirements_filtered.txt
+                    pip install -r requirements_filtered.txt --quiet
                     INSTALL_STATUS=$?
                     END_TIME=$(date +%s)
                     DURATION=$((END_TIME - START_TIME))
@@ -300,16 +242,6 @@ EOF
                     else
                         echo "⚠️ 部分依赖安装失败，继续执行..."
                     fi
-
-                    echo "🔧 处理可能失败的包..."
-                    echo "  尝试安装 altgraph..."
-                    pip install altgraph==0.17.4 2>/dev/null && echo "  ✅ altgraph安装成功" || echo "  ⚠️ altgraph安装失败，跳过"
-
-                    echo "  尝试安装 html5tagger..."
-                    pip install html5tagger==1.3.0 2>/dev/null && echo "  ✅ html5tagger安装成功" || echo "  ⚠️ html5tagger安装失败，跳过"
-
-                    echo "  尝试安装 crypto..."
-                    pip install crypto==1.4.1 2>/dev/null && echo "  ✅ crypto安装成功" || echo "  ⚠️ crypto安装失败，跳过"
 
                     echo "📊 最终依赖统计:"
                     echo "总包数量: $(pip list | wc -l)个"
@@ -321,18 +253,12 @@ EOF
         stage('Verify Dependencies') {
             steps {
                 script {
-                    echo "🔍 阶段 5/6: 依赖验证开始"
-                    echo "💡 目的: 验证所有关键模块能正常导入"
+                    echo "🔍 阶段 5/6: 依赖验证"
                 }
                 sh '''
                     set +x
-                    echo "🔌 激活虚拟环境..."
                     . venv/bin/activate
 
-                    echo "🔬 开始模块导入测试..."
-                    echo "测试时间: $(date)"
-
-                    # 创建详细的测试脚本
                     cat > verify_deps.py << 'EOF'
 import sys
 import traceback
@@ -344,7 +270,6 @@ print(f"Python 版本: {sys.version}")
 print(f"Python 路径: {sys.executable}")
 print("-" * 60)
 
-# 关键模块列表
 critical_modules = [
     ('yaml', '配置文件处理'),
     ('requests', 'HTTP请求库'),
@@ -371,19 +296,16 @@ for module_name, description in critical_modules:
 
 print("-" * 60)
 
-# 项目特定模块测试
 print("项目模块验证:")
 try:
     from utils.other_tools.models import NotificationType
     print("  ✅ utils.other_tools.models - 通知类型模块")
 except Exception as e:
     print(f"  ❌ utils.other_tools.models - 错误: {str(e)[:100]}")
-    # 打印详细错误信息用于调试
     print(f"      详细错误: {traceback.format_exc()[:200]}")
 
 print("-" * 60)
 
-# 总结
 if all_critical_passed:
     print("✅ 所有核心模块验证通过")
     sys.exit(0)
@@ -402,7 +324,6 @@ EOF
                         echo "⚠️ 依赖验证失败，但继续执行测试..."
                     fi
 
-                    # 清理临时文件
                     rm -f verify_deps.py
                     echo "✅ 依赖验证完成"
                 '''
@@ -412,16 +333,13 @@ EOF
         stage('Run Tests') {
             steps {
                 script {
-                    echo "🚀 阶段 6/6: 测试执行开始"
-                    echo "💡 目的: 运行自动化测试套件"
+                    echo "🚀 阶段 6/6: 测试执行"
                     echo "🎯 测试环境: ${params.TEST_ENV}"
                 }
                 sh '''
                     set +x
-                    echo "🔌 激活虚拟环境..."
                     . venv/bin/activate
 
-                    # 显示当前环境信息
                     echo "📋 当前测试环境信息:"
                     python -c "
 import yaml
@@ -430,59 +348,35 @@ try:
         config = yaml.safe_load(f)
     env = config['current_environment']
     env_config = config['environments'][env]
-    print('   环境: ' + env_config['env'])  # 使用字符串拼接
+    print('   环境: ' + env_config['env'])
     print('   设计器: ' + env_config['athena_designer_host'])
     print('   租户: ' + env_config['tenantId'])
 except Exception as e:
     print('   无法读取环境配置: ' + str(e))
 "
 
-                    # ========== 安装 Allure 命令行工具 ==========
                     echo "📥 安装 Allure 命令行工具..."
                     ALLURE_VERSION="2.27.0"
                     ALLURE_URL="https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.zip"
-                    wget -q ${ALLURE_URL} -O /tmp/allure.zip || { echo "❌ Allure 下载失败"; exit 1; }
-                    unzip -oq /tmp/allure.zip -d /opt/ || { echo "❌ Allure 解压失败"; exit 1; }
+                    wget -q ${ALLURE_URL} -O /tmp/allure.zip 2>/dev/null || { echo "❌ Allure 下载失败"; exit 1; }
+                    unzip -oq /tmp/allure.zip -d /opt/ 2>/dev/null || { echo "❌ Allure 解压失败"; exit 1; }
                     export PATH="/opt/allure-${ALLURE_VERSION}/bin:${PATH}"
-                    allure --version && echo "✅ Allure 命令行工具安装成功" || { echo "❌ Allure 验证失败"; exit 1; }
-
-                    echo "📁 项目结构检查:"
-                    echo "当前目录: $(pwd)"
-                    echo "目录内容:"
-                    ls -la
-                    echo ""
-                    echo "Python文件统计:"
-                    find . -name "*.py" -type f | wc -l
-
-                    echo "🔍 查找测试相关文件:"
-                    find . -name "*test*.py" -type f | head -5
-                    find . -name "run*" -type f | head -5
+                    allure --version 2>/dev/null && echo "✅ Allure 命令行工具安装成功" || { echo "❌ Allure 验证失败"; exit 1; }
 
                     echo "🚦 准备执行测试..."
                     echo "测试开始时间: $(date)"
-                    echo "环境变量 PYTHONPATH: ${PYTHONPATH:-未设置}"
 
-                    # 设置 Python 路径
                     export PYTHONPATH="${PWD}:${PYTHONPATH}"
-                    echo "设置后 PYTHONPATH: $PYTHONPATH"
-
-                    # 记录开始时间
                     START_TIME=$(date +%s)
 
                     echo "▶️ 开始执行自动化测试..."
-                    echo "执行命令: python run.py"
-
-                    # 执行测试
                     python run.py
                     TEST_STATUS=$?
 
-                    # 记录结束时间
                     END_TIME=$(date +%s)
                     DURATION=$((END_TIME - START_TIME))
 
                     echo "⏱️ 测试执行统计:"
-                    echo "  开始时间: $(date -d @$START_TIME)"
-                    echo "  结束时间: $(date -d @$END_TIME)"
                     echo "  总耗时: ${DURATION} 秒"
 
                     if [ $TEST_STATUS -eq 0 ]; then
@@ -499,10 +393,8 @@ except Exception as e:
 
     post {
         always {
-            // 存档报告文件
             archiveArtifacts artifacts: 'report/html/**', fingerprint: true
 
-            // 生成访问链接
             script {
                 def jobUrl = env.JOB_URL ?: ''
                 def buildNumber = env.BUILD_NUMBER ?: ''
@@ -563,28 +455,16 @@ except Exception as e:
                 echo "  2. 检查依赖是否完整"
                 echo "  3. 验证环境配置"
                 echo "  4. 检查测试代码"
-                echo ""
-                echo "🔧 调试信息收集:"
             }
             sh '''
                 set +x
+                echo "🔧 调试信息收集:"
                 echo "最后错误位置:"
                 tail -20 ${WORKSPACE}/jenkins-log.txt 2>/dev/null || echo "无法读取日志"
 
                 echo "环境信息:"
                 echo "Python版本: $(python3 --version 2>/dev/null || echo '未找到')"
                 echo "虚拟环境: $(ls -la venv/bin/python 2>/dev/null && echo '存在' || echo '不存在')"
-
-                echo "关键包状态:"
-                if [ -f "venv/bin/activate" ]; then
-                    . venv/bin/activate
-                    echo "jsonpath: $(pip show jsonpath 2>/dev/null | grep Version || echo '未安装')"
-                    echo "PyYAML: $(pip show PyYAML 2>/dev/null | grep Version || echo '未安装')"
-                    echo "requests: $(pip show requests 2>/dev/null | grep Version || echo '未安装')"
-                fi
-
-                echo "当前环境配置:"
-                grep -A5 "current_environment" common/config.yaml || echo "无法读取配置"
             '''
         }
     }
