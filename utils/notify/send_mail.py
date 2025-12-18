@@ -5,7 +5,7 @@
 # @Author : 闻武
 描述: 发送邮件
 """
-
+from datetime import datetime
 import smtplib
 from email.mime.text import MIMEText
 from utils.other_tools.allure_data.allure_report_data import TestMetrics, AllureFileClean
@@ -17,7 +17,11 @@ class SendEmail:
     def __init__(self, metrics: TestMetrics):
         self.metrics = metrics
         self.allure_data = AllureFileClean()
-        self.CaseDetail = self.allure_data.get_failed_cases_detail()
+        self.failed_detail = self.allure_data.get_failed_cases_detail() or "本次无失败用例"
+        # 计算补充指标（保证简洁，只加核心）
+        self.pass_rate = self.metrics.pass_rate
+        self.failure_rate = round((self.metrics.failed / self.metrics.total * 100) if self.metrics.total > 0 else 0, 2)
+        self.exec_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     @classmethod
     def send_mail(cls, user_list: list, sub, content: str) -> None:
@@ -72,21 +76,36 @@ class SendEmail:
 
         sub = config.project_name + "接口自动化报告"
         content = f"""
-        各位同事, 大家好:
-            自动化用例执行完成，执行结果如下:
-            用例运行总数: {self.metrics.total} 个
-            通过用例个数: {self.metrics.passed} 个
-            失败用例个数: {self.metrics.failed} 个
-            异常用例个数: {self.metrics.broken} 个
-            跳过用例个数: {self.metrics.skipped} 个
-            成  功   率: {self.metrics.pass_rate} %
-
-        {self.allure_data.get_failed_cases_detail()}
-
-        **********************************
-        jenkins地址：{final_report_path}
-        详细情况可登录jenkins平台查看，非相关负责人员可忽略此消息。谢谢。
-        """
+                    各位同事：
+                    
+                    您好！{config.project_name}接口自动化用例执行完成，核心结果如下：
+                    
+                    ┌────────────────┬────────────────────┐
+                    │  执行维度      │  执行结果          │
+                    ├────────────────┼────────────────────┤
+                    │  执行时间      │  {self.exec_time:<16} │
+                    │  用例总数      │  {self.metrics.total:>4} 个        │
+                    │  通过用例      │  {self.metrics.passed:>4} 个        │
+                    │  失败用例      │  {self.metrics.failed:>4} 个        │
+                    │  异常用例      │  {self.metrics.broken:>4} 个        │
+                    │  跳过用例      │  {self.metrics.skipped:>4} 个        │
+                    │  成功率        │  {self.pass_rate:>6.2f}%           │
+                    │  失败率        │  {self.failure_rate:>6.2f}%           │
+                    └────────────────┴────────────────────┘
+                    
+                    【失败用例详情】
+                    {self.failed_detail}
+                    
+                    【报告链接】
+                    Jenkins详情地址：{final_report_path}
+                    
+                    温馨提示：
+                    1. 非相关负责人员可忽略此邮件
+                    2. 失败用例请及时排查原因并修复
+                    3. 本邮件为系统自动发送，无需回复
+                    
+                    感谢配合！
+                    """.strip()
         self.send_mail(user_list, sub, content)
 
 
