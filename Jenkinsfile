@@ -7,7 +7,6 @@ pipeline {
             choices: ['huawei-prod', 'huawei-test', 'ali-paas', 'on-premise'],
             description: '选择测试环境'
         )
-        // 新增：通知类型选择（可选，也可固定值）
         string(
             name: 'NOTIFICATION_TYPES',
             defaultValue: 'EMAIL',
@@ -400,19 +399,23 @@ except Exception as e:
             steps {
                 script {
                     echo "📢 阶段 7/7: 发送测试通知"
-                    // 构建报告访问URL
+                    // 定义报告URL
                     def reportUrl = "${env.BUILD_URL}artifact/report/html/index.html"
                     echo "📄 测试报告地址: ${reportUrl}"
-                }
-                sh '''
-                    set +x
-                    . venv/bin/activate && export PYTHONPATH="${PWD}:${PYTHONPATH}"
-                    # 传递报告URL和通知类型
-                    REPORT_URL="''' + reportUrl + '''"
-                    NOTIFY_TYPES="${params.NOTIFICATION_TYPES}"
 
-                    # 执行通知发送逻辑
-                    python -c '
+                    // 核心修复：改用双引号插值，避免变量拼接错误
+                    sh """
+                        set +x
+                        # 激活虚拟环境 + 设置Python路径
+                        . venv/bin/activate
+                        export PYTHONPATH="\${PWD}:\${PYTHONPATH}"
+
+                        # 传递变量到Shell环境
+                        export REPORT_URL="${reportUrl}"
+                        export NOTIFY_TYPES="${params.NOTIFICATION_TYPES}"
+
+                        # 执行Python通知逻辑
+                        python -c '
 import os
 from utils.other_tools.allure_data.allure_report_data import AllureFileClean
 from utils.send_dingtalk import DingTalkSendMsg
@@ -431,7 +434,7 @@ notify_map = {
     "FEI_SHU": FeiShuTalkChatBot(allure_data).post
 }
 
-# 循环发送指定类型通知
+# 循环发送通知
 notify_types = [t.strip() for t in os.environ["NOTIFY_TYPES"].split(",") if t.strip()]
 for notify_type in notify_types:
     if notify_type in notify_map:
@@ -442,8 +445,9 @@ for notify_type in notify_types:
         except Exception as e:
             print(f"❌ {notify_type}通知发送失败: {str(e)}")
             continue
-                    ' || echo "⚠️ 通知发送流程异常，继续执行后续步骤"
-                '''
+                        ' || echo "⚠️ 通知发送流程异常，继续执行后续步骤"
+                    """
+                }
             }
         }
     }
