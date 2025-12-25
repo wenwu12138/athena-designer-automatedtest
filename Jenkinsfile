@@ -47,38 +47,15 @@ pipeline {
                 sh '''
                     set +x
                     echo "🐍 系统Python信息:"
-                    PYTHON3_PATH=$(which python3 || echo '未找到')
-                    echo "Python3路径: $PYTHON3_PATH"
+                    echo "Python3路径: $(which python3 || echo '未找到')"
                     echo "Python3版本:"
-                    python3 --version 2>&1 || echo "Python3命令失败"
-
-                    # 检测Python3是否存在，不存在则手动安装
-                    if ! command -v python3 &> /dev/null; then
-                        echo "❌ 系统未找到Python3，开始手动安装..."
-                        # 判断系统发行版，选择对应的安装命令
-                        if [ -f /etc/redhat-release ]; then
-                            # CentOS/RHEL 系列
-                            echo "📌 检测到CentOS/RHEL系统，使用yum安装Python3"
-                            sudo yum install -y python3 python3-devel || { echo "❌ CentOS安装Python3失败"; exit 1; }
-                        elif [ -f /etc/debian_version ]; then
-                            # Ubuntu/Debian 系列
-                            echo "📌 检测到Ubuntu/Debian系统，使用apt安装Python3"
-                            sudo apt update && sudo apt install -y python3 python3-venv python3-pip || { echo "❌ Ubuntu安装Python3失败"; exit 1; }
-                        else
-                            echo "❌ 不支持的系统发行版，无法自动安装Python3"; exit 1;
-                        fi
-                        echo "✅ Python3手动安装成功"
-                        # 重新获取Python3路径
-                        PYTHON3_PATH=$(which python3)
-                        echo "新安装的Python3路径: $PYTHON3_PATH"
-                    fi
+                    python3 --version || echo "Python3命令失败"
 
                     echo "🧹 清理旧环境..."
                     [ -d "venv" ] && rm -rf venv && echo "旧环境已清理" || echo "未发现旧虚拟环境"
 
                     echo "📦 创建新虚拟环境..."
-                    # 使用确认存在的Python3创建虚拟环境
-                    $PYTHON3_PATH -m venv venv
+                    python3 -m venv venv
                     [ $? -eq 0 ] && echo "✅ 虚拟环境创建成功" || { echo "❌ 虚拟环境创建失败"; exit 1; }
 
                     . venv/bin/activate
